@@ -7,7 +7,7 @@
 **--------------------------------------------------------------------------------
 ** ALL RIGHTS ON THIS SOURCES RESERVED TO SILICON DEPARTMENT SOFTWARE
 **
-** $Id: mc60_build.c 1.4 1997/04/14 23:06:35 schlote Exp schlote $
+** $Id: mc60_mmu.c,v 1.5 1997/04/15 19:20:11 schlote Exp schlote $
 **
 **--------------------------------------------------------------------------------
 */
@@ -30,6 +30,7 @@ extern __stdargs void NewList(struct List*);
 
 //**--------------------------------------------------------------------------------
 
+//#define MYDEBUG 1
 #include "mc60_rev.h"
 #include	"mc60_Debug.h"
 #include	"mc60_LibBase.h"
@@ -38,7 +39,86 @@ extern __stdargs void NewList(struct List*);
 
 //**--------------------------------------------------------------------------------
 
-extern __regargs struct mc60_mmu* Map_PatchArea(struct mc60_mmu*);
+//**--------------------------------------------------------------------------------
+//** AllocMemPage - this routine allocates a MemPage at natural Boundary
+//** FreeMemPage = free possible natural page
+//**--------------------------------------------------------------------------------
+//**
+#define MC60_PAGESIZE 0x1000
+#define MC60_PAGEMASK (MC60_PAGESIZE-1)
+
+static
+APTR AllocMemPage(void)
+{
+APTR mptr;
+ULONG size = MC60_PAGESIZE;
+ULONG align = MC60_PAGEMASK;
+
+	if ( mptr = AllocMem( size+align, MEMF_PUBLIC | MEMF_CLEAR ) )
+	{
+      Forbid();													// Don't disturb
+		FreeMem(mptr,size+align);              			// Free mem chunk legally
+		mptr =
+			AllocAbs( size,
+          (APTR)( ((ULONG)(mptr)+ align)&(~align)) ); // Now round addr to next align
+      Permit();		 										   // Allocate and free system
+	}
+	D(bug("Allocated 4k aligned MemPage(%08lx,%08lx):=%08lx\n",size,align,mptr));
+   return mptr;
+}
+static
+void FreeMemPage(APTR mptr)                   // FreeMemory only on boundaries
+{                                             // as only pages are allocated
+	if ( ((ULONG)(mptr) & MC60_PAGEMASK) == 0 )
+	{
+		FreeMem( mptr, MC60_PAGESIZE );
+	}
+}
+
+//**--------------------------------------------------------------------------------
+//** Alloc Memory Aligned
+//**--------------------------------------------------------------------------------
+//**
+//** Allocate aligned Memory chunks for pointer & page tables from a previously
+//** allocated natural page.
+
+static
+APTR AllocAlignedMem(struct mc60_mmu *fptr, ULONG size, ULONG align )
+{
+APTR mptr = NULL;
+struct mc60_pl *pl;
+
+	if ( (fptr->mmu_MemPage == NULL )   ||
+        (fptr->mmu_MemPageOffset <= 0) ||       		// Uninitialized OR
+        (fptr->mmu_MemPageOffset < size ) ||				// No space left OR
+        ((fptr->mmu_MemPageOffset-1)&~align < 0 ) )	// Align unsafe
+	{
+      if ( fptr->mmu_MemPage = AllocMemPage() )
+      {
+			fptr->mmu_MemPageOffset = MC60_PAGESIZE;
+
+         //** Add Page to tracking
+
+	      if ( pl = AllocMem( sizeof(struct mc60_pl), MEMF_CHIP ))
+	      {
+	       	pl->pl_PageAddr = fptr->mmu_MemPage;
+	         AddHead( (struct List*)&fptr->mmu_PageList, (struct Node*)pl );
+	         D2(bug("Alloc PageList Entry at $%08lx ($%08lx)\n",pl,pl->PageAddr));
+   	   }
+      }
+   }
+
+	if ( fptr->mmu_MemPage && (fptr->mmu_MemPageOffset>0) )
+	{
+   	// Get next free offset in MemPage - previous checks proved memory to be suffient !
+
+		fptr->mmu_MemPageOffset = (fptr->mmu_MemPageOffset-size)&~align;
+		mptr   = (APTR)((ULONG)(fptr->mmu_MemPage)+fptr->mmu_MemPageOffset);
+	}
+	D2(bug("AllocAlignedMem(%08lx,%08lx):=%08lx\n",size,align,mptr));
+
+   return mptr;
+}
 
 //**--------------------------------------------------------------------------------
 //** FreeMMUFrame
@@ -47,90 +127,46 @@ extern __regargs struct mc60_mmu* Map_PatchArea(struct mc60_mmu*);
 //** Free MMUFrame, traverse lists and free custom pages, then delte default
 //** pages and Structure.
 
+static
 void FreeMMUFrame(struct mc60_mmu *fptr)
 {
-struct mc60_nc* nc;				// Ptr to nest count tables
-ULONG *rptr,rdesc;				// Ptr to 128 RootTable and current Desc
-ULONG *tptr,tdesc;            // Ptr to 128 PointerTable and curr. desc
-ULONG *pptr;						// Ptr to 64 PageTable
-int i,j;
+struct mc60_nc* nc;		// Ptr to nest count tables
+struct mc60_pl* pl;		// Ptr to PageList
 
 	D(bug("\tFreeMMUFrame\n"));
 	if ( fptr )
 	{
-   	//*****************************************************************
-      //*** Trackdown tree and free all custom chunks
+		//**---------------------------------------------------------------
+      //** Trackdown list and free Pages
 
-      if ( fptr->mmu_RootTable &&		// Default tables were inited ??
-           fptr->mmu_PointerTable &&
-           fptr->mmu_PageTable )
-      {
-			//-------------------------------------------------
-      	rptr = (ULONG*)fptr->mmu_RootTable;					// Copy APTR to Ptr;
-      	for ( i = 0; i<128; i++)								// Scan complet RootTable
-      	{
-      	   rdesc = rptr[i];                     			// Get current RootDesc
-            if ((rdesc|3)!= fptr->mmu_RootTableDesc)	// Custom Entry ?
-            {
-					//------------------------------------------
-            	tptr = (ULONG*)( rdesc & ~0x1ff );			// Get Custom PointerTab Addr
-            	for ( j = 0; j<128; j++ )						// Scan custom ptr table
-            	{
-            		tdesc = tptr[j];             				// Get custom ptr desc.
-            		if ((tdesc|3)!=fptr->mmu_PointerTableDesc) // Custom Entry ?
-            		{
-            			pptr = (ULONG*)(tdesc & ~0x1ff);		// Get custom PageTab Addr
-                     FreeMem( pptr, 64*4); 					// Free custom PageTable
-            		}
-            	}
-					//------------------------------------------
-            	FreeMem( tptr, 128*4 );			// Free custom PointerTable
-            }
-      	}
+      while (pl = (struct mc60_pl*)RemHead((struct List*)&fptr->mmu_PageList ))
+		{
+			D(bug("Free 4k aligned MemPage at $%08lx\n",pl->pl_PageAddr));
+        	FreeMemPage( pl->pl_PageAddr );
+      	FreeMem(	pl, sizeof(struct mc60_pl));
       }
-      //*****************************************************************
-      // Free Base MMU Tables - but only if allocated
 
-      if (fptr->mmu_RootTable    ) FreeMem( fptr->mmu_RootTable   , 128*4 );
-      if (fptr->mmu_PointerTable ) FreeMem( fptr->mmu_PointerTable, 128*4 );
-      if (fptr->mmu_PageTable    ) FreeMem( fptr->mmu_PageTable   ,  64*4 );
+		//**---------------------------------------------------------------
+		//** Free DMA tracking
 
-      FreeMem( fptr->mmu_IllegalPage,   4096 );    		// Free DummyPage
-
-      nc = (struct mc60_nc*)fptr->mmu_NestCounts.mlh_Head;	// Delete NestCounts
-      while ( nc->nc_Node.mln_Succ )
-      	FreeVec(	nc = (struct mc60_nc*)RemHead((struct List*)&fptr->mmu_NestCounts ));
+		while (nc = (struct mc60_nc*)RemHead((struct List*)&fptr->mmu_NestCounts ))
+		{
+			D(bug("Free NestCount at $%08lx\n",nc));
+      	FreeVec(	nc );
+      }
+		//**---------------------------------------------------------------
 
 		FreeMem( fptr, sizeof(struct mc60_mmu) );				// Free MMUFrame
 	}
 }
 
-//**--------------------------------------------------------------------------------
-//** Alloc Memory Aligned
-//**--------------------------------------------------------------------------------
-//**
-//** Allocate aligned Memory chunks reversed from PUBLIC mem pool.
-
-APTR AllocMemAligned( ULONG size, ULONG align )
-{
-APTR mptr;
-	if ( mptr = AllocMem( size+align, MEMF_PUBLIC | MEMF_REVERSE | MEMF_CLEAR ) )
-	{
-      Forbid();													// Don't disturb
-		FreeMem(mptr,size+align);              			// Free mem chunk legally
-		mptr = AllocAbs( size,
-				(APTR)( ((ULONG)(mptr)+ align)&(~align)) ); // Now round addr to next align
-      Permit();													  // Allocate and free system
-	}
-	D2(bug("AllocMemAligned(%08lx,%08lx):=%08lx\n",size,align,mptr));
-   return mptr;
-}
 
 //**--------------------------------------------------------------------------------
 //** Map Memory
 //**--------------------------------------------------------------------------------
 //** Add the memory range to the mmu table and set cache mode.
 
+static
 struct mc60_mmu *Map_Memory(struct mc60_mmu* fptr, ULONG addr, ULONG size , ULONG mode)
 {
 ULONG spage,epage;			// Number of 4 KB aligned Page
@@ -164,7 +200,7 @@ int i;
 
       	if ( rptr[rindx] ==  fptr->mmu_RootTableDesc )	// Default Desc ???
       	{
-				if ( mptr = AllocMemAligned( 128*4, 0x1ff ))		// Allocate new PointerTable
+				if ( mptr = AllocAlignedMem(fptr, 128*4, 0x1ff ))		// Allocate new PointerTable
 				{
       	      rptr[rindx] = (ULONG)(mptr) | 0x3;				// Store new Table
       	      for ( i=0; i<128; i++ )                      // Fill it wit def Desc
@@ -184,7 +220,7 @@ int i;
 
       	   if ( tptr[tindx] ==  fptr->mmu_PointerTableDesc )	// Default Desc ???
       	   {
-      	     	if ( mptr = AllocMemAligned( 64*4, 0x1ff ))		// Alloc new PageTable
+      	     	if ( mptr = AllocAlignedMem( fptr,64*4, 0x1ff ))		// Alloc new PageTable
       	     	{
       	         tptr[tindx] = (ULONG)(mptr) | 3;		// Store Valid Ptr to PageTable
 	   	         for ( i=0; i<64; i++ )					// Fill with def PageDes
@@ -207,8 +243,8 @@ int i;
 
 	 	     		 pptr[pindx] = pptr[pindx] | mode;			// Patch Mode Bits
 
-					if ( (pptr[pindx] & 0x60) == 0x60 )
-						pptr[pindx] &= ~0x20;
+//					if ( (pptr[pindx] & 0x60) == 0x60 )
+//						pptr[pindx] &= ~0x20;
 
 /*
 					if ( ( 0x60 & pptr[pindx] ) > 0x20 )
@@ -233,6 +269,7 @@ int i;
 //** Map Kickstart
 //**--------------------------------------------------------------------------------
 
+static
 struct mc60_mmu *Map_Kickstart(struct mc60_mmu *fptr, ULONG addr)
 {
 ULONG i, *x;
@@ -281,7 +318,7 @@ struct mc60_nc *nc;				// Ptr to Segment
       {
       	nc->nc_Low = spage;						// Add Segment to List
       	nc->nc_High = epage;
-         AddTail( (struct List*)&fptr->mmu_NestCounts, (struct Node*)nc );
+         AddHead( (struct List*)&fptr->mmu_NestCounts, (struct Node*)nc );
 
 			D(bug(" (%08lx):%08lx, %08lx\n",nc, nc->nc_Low, nc->nc_High));
       }
@@ -295,6 +332,7 @@ struct mc60_nc *nc;				// Ptr to Segment
 //**
 //**  Setup a fresh mmu frame and a Default and blank  MMU setup incl. DummyPage
 
+static
 struct mc60_mmu *SetupMMUFrame(void)
 {
 struct mc60_mmu *fptr;
@@ -303,15 +341,16 @@ ULONG i,ready=FALSE;
 
 	if ( fptr = AllocMem( sizeof(struct mc60_mmu), MEMF_PUBLIC | MEMF_CLEAR ))
 	{
-   	NewList((struct List*)&fptr->mmu_NestCounts );		// Initialize NestCount List
+   	NewList((struct List*)&fptr->mmu_NestCounts );	// Initialize NestCount List
+   	NewList((struct List*)&fptr->mmu_PageList );    // Remember resources :-)
 
 		//******* Allocate Default MMU Tables.
 
 		D(bug("\t\tAllocate Buffers\n"));
-		if (   ( fptr->mmu_RootTable    = AllocMemAligned( 128*4, 0x1ff ) )
-	        &&( fptr->mmu_PointerTable = AllocMemAligned( 128*4, 0x1ff ) )
-	        &&( fptr->mmu_PageTable    = AllocMemAligned(  64*4, 0x1ff ) )
-	        &&( fptr->mmu_IllegalPage  = AllocMemAligned(  4096, 0xfff ) ) )
+		if (   ( fptr->mmu_IllegalPage  = AllocAlignedMem( fptr,  4096, 0xfff ) )
+	        &&( fptr->mmu_PointerTable = AllocAlignedMem( fptr, 128*4, 0x1ff ) )
+	        &&( fptr->mmu_PageTable    = AllocAlignedMem( fptr,  64*4, 0x1ff ) )
+	        &&( fptr->mmu_RootTable    = AllocAlignedMem( fptr, 128*4, 0x1ff ) ) )
       {
 			D(bug("\t\tSetup Values\n"));
       	//******** Precalculate Descriptors for Default Tables.
@@ -319,7 +358,7 @@ ULONG i,ready=FALSE;
       	//** It is located and modified inside of MMUFrame. The indirekt
       	//** IllPageDesc points to the desc inside MMUFrame  - nice !
 
-      	fptr->mmu_IllPageDesc      = (ULONG)(fptr->mmu_IllegalPage)  | 0x41;
+      	fptr->mmu_IllPageDesc      = (ULONG)(fptr->mmu_IllegalPage)  | 0x661;
       	fptr->mmu_IndIllPageDesc   = (ULONG)(&fptr->mmu_IllPageDesc) | 0x02;
 
 			//** These points down to next down level default mmu table
@@ -345,11 +384,12 @@ ULONG i,ready=FALSE;
 
          //** Special Setup for 060er
 
+         fptr = Map_Memory( fptr, (ULONG)fptr->mmu_IllegalPage ,  4096, 0x40 );
+
          fptr = Map_Memory( fptr, (ULONG)fptr->mmu_RootTable   , 128*4, 0x60 );
          fptr = Map_Memory( fptr, (ULONG)fptr->mmu_PointerTable, 128*4, 0x60 );
          fptr = Map_Memory( fptr, (ULONG)fptr->mmu_PageTable   ,  64*4, 0x60 );
 
-         fptr = Map_Memory( fptr, (ULONG)fptr->mmu_IllegalPage ,  4096, 0x40 );
          ready = TRUE;
       }
       if (!ready) FreeMMUFrame(fptr);
@@ -410,7 +450,26 @@ struct mc60_mmu *fptr;       	// Ptr to MMUFrame, it's our tag ptr
 
    fptr  = Map_Memory( fptr, 0x0000, 0x1000, 0x40 );
 
-	//***************************************************************
+   //*********************************************************************
+	//** Check for AutoConfig Memory Boards and map mem as cachable.
+	//**
+	{
+	struct Library *ExpansionBase;
+
+		if ( ExpansionBase = OpenLibrary( "expansion.library",0 ) )
+		{
+   	struct ConfigDev *cd = NULL;
+
+	      while ( cd = FindConfigDev( cd, -1, -1 ) )
+   	   {
+      		if ( cd && !(cd->cd_Rom.er_Type & ERTF_MEMLIST ))
+				   fptr  =
+						Map_Memory( fptr,(ULONG)cd->cd_BoardAddr,cd->cd_BoardSize, 0x40 );
+         }
+         CloseLibrary(ExpansionBase);
+   	}
+	}
+   //***********************************************************************
    //** Now map PUBLIC Memory Lists as cacheable.
    //** All other entries are non cachable
    //** This code is single threaded as we don't want to be disturbed
@@ -430,44 +489,35 @@ struct mc60_mmu *fptr;       	// Ptr to MMUFrame, it's our tag ptr
 															 (ULONG)memhdr->mh_Upper -
             	                               (ULONG)memhdr->mh_Lower,
 															pagemode );
-			if ( pagemode == 0x20 )
-   	      fptr = CreateNestCount(fptr,(ULONG)memhdr->mh_Lower,(ULONG)memhdr->mh_Upper);
    	}
    	Permit();
 	}
-   //*********************************************************************
-	//** Check for AutoConfig Memory Boards and map mem as cachable.
-	//**
+   D(bug("End of MMU Setup.\n"));
+
+   //***********************************************************************
+   //** End of MMU setups. Allocate DMA glue tables :-)
+
 	{
-	struct Library *ExpansionBase;
-
-		if ( ExpansionBase = OpenLibrary( "expansion.library",0 ) )
-		{
-   	struct ConfigDev *cd = NULL;
-
-	      while ( cd = FindConfigDev( cd, -1, -1 ) )
-   	   {
-      		if ( cd && !(cd->cd_Rom.er_Type & ERTF_MEMLIST ))
-				   fptr  = Map_Memory( fptr,
-													(ULONG)cd->cd_BoardAddr,
-													cd->cd_BoardSize, 0x40 );
-	      }
-			CloseLibrary(ExpansionBase);
-		}
-   }
-	//***********************************************************************
-
-	D(bug("End of MMU Setup.\n"));
+	struct MemHeader *memhdr;        // Ptr to MemHdr
+	   for ( memhdr = (struct MemHeader*)SysBase->MemList.lh_Head;
+	         memhdr->mh_Node.ln_Succ != 0;
+				memhdr = (struct MemHeader*)memhdr->mh_Node.ln_Succ	)
+	   {
+   		if ( !(TypeOfMem( memhdr->mh_Lower ) & MEMF_CHIP))
+   		{
+   	      fptr = CreateNestCount(fptr,(ULONG)memhdr->mh_Lower,(ULONG)memhdr->mh_Upper);
+         }
+   	}
+	}
    return fptr;
 }
 
 /*
-
 void main(void)
 {
 struct mc60_mmu *fp;
    fp = BuildMMUTables();
-	FreeMMUFrame(fp);
+   FreeMMUFrame(fp);
 }
-
 */
+
