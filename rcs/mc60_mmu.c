@@ -7,7 +7,7 @@
 **--------------------------------------------------------------------------------
 ** ALL RIGHTS ON THIS SOURCES RESERVED TO SILICON DEPARTMENT SOFTWARE
 **
-** $Id: mc60_mmu.c,v 1.5 1997/04/15 19:20:11 schlote Exp schlote $
+** $Id: mc60_mmu.c,v 1.6 1997/04/28 20:01:06 schlote Exp schlote $
 **
 **--------------------------------------------------------------------------------
 */
@@ -274,7 +274,7 @@ struct mc60_mmu *Map_Kickstart(struct mc60_mmu *fptr, ULONG addr)
 {
 ULONG i, *x;
 	D(bug("\tMap Kickstart as cacheable\n"));
-	if ( fptr  = Map_Memory( fptr, 0xF80000,  0x80000, 0x00 ))
+	if ( fptr && (fptr  = Map_Memory( fptr, 0xF80000,  0x80000, 0x00 )))
 	{
 		if ( addr != 0xf80000 )
 		{
@@ -448,7 +448,7 @@ struct mc60_mmu *fptr;       	// Ptr to MMUFrame, it's our tag ptr
 	//***************************************************************
 	// Make low memory page non cache cachable
 
-   fptr  = Map_Memory( fptr, 0x0000, 0x1000, 0x40 );
+   fptr  = Map_Memory( fptr, 0x0000, 0x40000, 0x40 );
 
    //*********************************************************************
 	//** Check for AutoConfig Memory Boards and map mem as cachable.
@@ -484,6 +484,7 @@ struct mc60_mmu *fptr;       	// Ptr to MMUFrame, it's our tag ptr
 	   ULONG pagemode;
 
    		pagemode =(TypeOfMem( memhdr->mh_Lower ) & MEMF_CHIP )? 0x40:0x20;
+
 
 	   	fptr  = Map_Memory( fptr, (ULONG)memhdr->mh_Lower,
 															 (ULONG)memhdr->mh_Upper -
