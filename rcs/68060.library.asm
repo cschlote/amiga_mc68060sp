@@ -554,7 +554,7 @@ _060_real_chk:	TST.B	(SP)
 *	*****************	*****************
 *
 	MOVE.B	#$24,(7,SP)
-	BRA.L	_060_real_trace2
+	BRA.L	_060_real_trace
 
 real_chk_end:	RTE
 
@@ -590,7 +590,7 @@ _060_real_divbyzero:
 *	*****************	*****************
 *
 	MOVE.B	#$24,(7,SP)
-	BRA.L	_060_real_trace2
+	BRA.L	_060_real_trace
 
 real_divbyzero_end:	RTE
 
