@@ -7,7 +7,7 @@
 **-------------------------------------------------------------------------------
 ** ALL RIGHTS ON THIS SOURCES RESERVED TO SILICON DEPARTMENT SOFTWARE
 **
-** $Id: 68060.library.i,v 1.1 1996/06/09 18:15:11 schlote Exp schlote $
+** $Id: 68060.library.i,v 1.2 1996/06/09 20:03:14 schlote Exp schlote $
 **
 **
 	incdir	include:
@@ -25,6 +25,15 @@ FPSP_SETVECTOR:	MACRO       ; vector
 	MOVE.L	(\2*4,A2),(A1)
 	LEA	(_fpsp+(\1*8)+2,PC),A1
 	ADDA.L	(A1),A1
+	MOVE.L	A1,(\2*4,A2)
+	MOVE.L	A1,(\2*4).W
+	ENDM
+
+ISP_SETVECTOR:	MACRO       ; vector
+	LEA	(Vector_\2,PC),A1
+	MOVE.L	(\2*4,A2),(A1)
+
+	LEA	(\1,PC),A1
 	MOVE.L	A1,(\2*4,A2)
 	MOVE.L	A1,(\2*4).W
 	ENDM

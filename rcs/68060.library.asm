@@ -7,7 +7,7 @@
 **-------------------------------------------------------------------------------
 ** ALL RIGHTS ON THIS SOURCES RESERVED TO SILICON DEPARTMENT SOFTWARE
 **
-** $Id: 68060.library.asm,v 1.3 1996/06/09 20:03:14 schlote Exp schlote $
+** $Id: 68060.library.asm,v 1.4 1996/06/09 20:29:50 schlote Exp schlote $
 **
 **
 	include	68060.library.i
@@ -494,43 +494,9 @@ _060ILSP_TOP:	include          "isp_lib.sa"
 *-------------------------------------------------------------------------------------------------------------
 *-------------------------------------------------------------------------------------------------------------
 
+*	section	isp,data
 Install_Int_Emulation:
 	MOVEM.L	D0-D7/A0-A6,-(SP)
-	LEA	(_I_CALL_TOP_MEM,PC),A0
-	LEA	(_I_CALL_TOP,PC),A1
-	MOVE.L	($007A,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)+
-	MOVE.L	($007E,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)+
-	MOVE.L	($0082,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)+
-	MOVE.L	($0086,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)+
-	MOVE.L	($008A,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)+
-	MOVE.L	($008E,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)+
-	MOVE.L	($0092,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)+
-	MOVE.L	($0096,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)+
-	MOVE.L	($009A,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)+
-	MOVE.L	($009E,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)+
-	MOVE.L	($00A2,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)
 	LEA	(Install_I_Emulation_Traps,PC),A5
 	MOVEA.L	(4).W,A6
 	JSR	(_LVOSupervisor,A6)
@@ -540,361 +506,210 @@ Install_Int_Emulation:
 
 Install_I_Emulation_Traps:
 	MOVEC	VBR,A2
-	LEA	(Vector_61,PC),A1
-	MOVE.L	($00F4,A2),(A1)
-	LEA	(lbW015B5A,PC),A1
-	ADDA.L	(A1),A1
-	LEA	(_060_isp_unimp,PC),A1
-	MOVE.L	A1,($00F4,A2)
-	MOVE.L	A1,($F4).W
+	ISP_SETVECTOR	_060_isp_unimp,61
 	RTE
+
+* ----------------------------------------------------------
 
 Vector_61:	dc.l	0
 
+* ----------------------------------------------------------
+*
+* _060_isp_done():
+*
+* This is and example main exit point for the Unimplemented Integer
+* Instruction exception handler. For a normal exit, the
+* _isp_unimp() branches to here so that the operating system
+* can do any clean-up desired. The stack frame is the
+* Unimplemented Integer Instruction stack frame with
+* the PC pointing to the instruction following the instruction
+* just emulated.
+* To simply continue execution at the next instruction, just
+* do an "rte".
+*
 _060_isp_done:	RTE
 
+* ----------------------------------------------------------
+*
+* _060_real_chk():
+*
+* This is an alternate exit point for the Unimplemented Integer
+* Instruction exception handler. If the instruction was a "chk2"
+* and the operand was out of bounds, then _isp_unimp() creates
+* a CHK exception stack frame from the Unimplemented Integer Instrcution
+* stack frame and branches to this routine.
+*
 _060_real_chk:	TST.B	(SP)
 	BPL.B	real_chk_end
+*
+*	    CHK FRAME		   TRACE FRAME
+*	*****************	*****************
+*	*   Current PC	*	*   Current PC	*
+*	*****************	*****************
+*	* $2 *  $018	*	* $2 *  $024	*
+*	*****************	*****************
+*	*     Next	*	*     Next	*
+*	*      PC	*	*      PC	*
+*	*****************	*****************
+*	*      SR	*	*      SR	*
+*	*****************	*****************
+*
 	MOVE.B	#$24,(7,SP)
 	BRA.L	_060_real_trace2
 
 real_chk_end:	RTE
 
+* ----------------------------------------------------------
+*
+* _060_real_divbyzero:
+*
+* This is an alternate exit point for the Unimplemented Integer
+* Instruction exception handler isp_unimp(). If the instruction is a 64-bit
+* integer divide where the source operand is a zero, then the _isp_unimp()
+* creates a Divide-by-zero exception stack frame from the Unimplemented
+* Integer Instruction stack frame and branches to this routine.
+*
+* Remember that a trace exception may be pending. The code below performs
+* no action associated with the "chk" exception. If tracing is enabled,
+* then it create a Trace exception stack frame from the "chk" exception
+* stack frame and branches to the _real_trace() entry point.
+*
 _060_real_divbyzero:
 	TST.B	(SP)
 	BPL.B	real_divbyzero_end
+*
+*	 DIVBYZERO FRAME	   TRACE FRAME
+*	*****************	*****************
+*	*   Current PC	*	*   Current PC	*
+*	*****************	*****************
+*	* $2 *  $014	*	* $2 *  $024	*
+*	*****************	*****************
+*	*     Next	*	*     Next	*
+*	*      PC	*	*      PC	*
+*	*****************	*****************
+*	*      SR	*	*      SR	*
+*	*****************	*****************
+*
 	MOVE.B	#$24,(7,SP)
 	BRA.L	_060_real_trace2
 
 real_divbyzero_end:	RTE
 
-_060_real_cas:	BRA.L	lbW015B60
+* ----------------------------------------------------------
+*
+* _060_real_cas():
+*
+* Entry point for the selected cas emulation code implementation.
+* If the implementation provided by the 68060ISP is sufficient,
+* then this routine simply re-enters the package through _isp_cas.
+*
+_060_real_cas:	BRA.L	_isp+(1*8)
 
-;fiX Code reference expected
-_060_real_cas2:	BRA.L	lbW015B68
+* ----------------------------------------------------------
+*
+* _060_real_cas2():
+*
+* Entry point for the selected cas2 emulation code implementation.
+* If the implementation provided by the 68060ISP is sufficient,
+* then this routine simply re-enters the package through _isp_cas2.
+*
+_060_real_cas2:	BRA.L            _isp+(2*8)
 
-;fiX Code reference expected
+* ----------------------------------------------------------
+*
+* _060_lock_page():
+*
+* Entry point for the operating system's routine to "lock" a page
+* from being paged out. This routine is needed by the cas/cas2
+* algorithms so that no page faults occur within the "core" code
+* region. Note: the routine must lock two pages if the operand
+* spans two pages.
+* NOTE: THE ROUTINE SHOULD RETURN AN FSLW VALUE IN D0 ON FAILURE
+* SO THAT THE 060SP CAN CREATE A PROPER ACCESS ERROR FRAME.
+* Arguments:
+*	a0 = operand address
+*	d0 = `xxxxxxff -> supervisor; `xxxxxx00 -> user
+*	d1 = `xxxxxxff -> longword; `xxxxxx00 -> word
+* Expected outputs:
+*	d0 = 0 -> success; non-zero -> failure
+*
 _060_real_lock_page:
 	CLR.L	D0
 	RTS
 
+
+* ----------------------------------------------------------
+*
+* _060_unlock_page():
+*
+* Entry point for the operating system's routine to "unlock" a
+* page that has been "locked" previously with _real_lock_page.
+* Note: the routine must unlock two pages if the operand spans
+* two pages.
+* Arguments:
+* 	a0 = operand address
+*	d0 = `xxxxxxff -> supervisor; `xxxxxx00 -> user
+*	d1 = `xxxxxxff -> longword; `xxxxxx00 -> word
+*
 _060_real_unlock_page:
 	CLR.L	D0
 	RTS
+
 
 _060_real_trace2:	RTE
 
 _060_real_access2:	RTE
 
-_060_isp_unimp:	BRA.L	lbW015B58
 
-;fiX Code reference expected
-_060_isp_cas:	BRA.L	lbW015B60
+* ----------------------------------------------------------
 
-;fiX Code reference expected
-_060_isp_cas2:	BRA.L	lbW015B68
+_060_isp_unimp:	BRA.L	_isp+(0*8)
+_060_isp_cas:	BRA.L	_isp+(1*8)
+_060_isp_cas2:	BRA.L	_isp+(2*8)
+_060_isp_cas_finish:	BRA.L	_isp+(3*8)
+_060_isp_cas2_finish:	BRA.L	_isp+(4*8)
+_060_isp_cas_inrange:	BRA.L	_isp+(5*8)
+_060_isp_cas_terminate:	BRA.L	_isp+(6*8)
+_060_isp_cas_restart:	BRA.L	_isp+(7*8)
 
-;fiX Code reference expected
-_060_isp_cas_finish:
-	BRA.L	lbW015B70
+* ----------------------------------------------------------
 
-;fiX Code reference expected
-_060_isp_cas2_finish:
-	BRA.L	lbW015B78
+_I_CALL_TOP:	dc.l	_060_real_chk		- _I_CALL_TOP
+	dc.l	_060_real_divbyzero	- _I_CALL_TOP
+	dc.l	_060_real_trace2	- _I_CALL_TOP
+	dc.l	_060_real_access2	- _I_CALL_TOP
+	dc.l	_060_isp_done		- _I_CALL_TOP
+	dc.l	_060_real_cas		- _I_CALL_TOP
+	dc.l	_060_real_cas2		- _I_CALL_TOP
+	dc.l	_060_real_lock_page	- _I_CALL_TOP
+	dc.l	_060_real_unlock_page	- _I_CALL_TOP
+	dcb.l	7,0
 
-;fiX Code reference expected
-_060_isp_cas_inrange:
-	BRA.L	lbW015B80
 
-;fiX Code reference expected
-_060_isp_cas_terminate:
-	BRA.L	lbW015B88
+	dc.l	_060_imem_read		- _I_CALL_TOP
+	dc.l	_060_dmem_read		- _I_CALL_TOP
+	dc.l	_060_dmem_write	- _I_CALL_TOP
+	dc.l	_060_imem_read_word	- _I_CALL_TOP
+	dc.l	_060_imem_read_long	- _I_CALL_TOP
+	dc.l	_060_dmem_read_byte	- _I_CALL_TOP
+	dc.l	_060_dmem_read_word	- _I_CALL_TOP
+	dc.l	_060_dmem_read_long	- _I_CALL_TOP
+	dc.l	_060_dmem_write_byte	- _I_CALL_TOP
+	dc.l	_060_dmem_write_word	- _I_CALL_TOP
+	dc.l	_060_dmem_write_long	- _I_CALL_TOP
+	dcb.l	5,0
 
-;fiX Code reference expected
-_060_isp_cas_restart:
-	BRA.L	lbW015B90
+_isp:	include 	"isp.sa"
 
-;fiX Code reference expected
-_I_CALL_TOP:	dc.l	$FFFFFF94,$FFFFFFA6,$FFFFFFCC,$FFFFFFCE,$FFFFFF92,$FFFFFFB8,$FFFFFFBE
-	dc.l	$FFFFFFC4,$FFFFFFC8,0,0,0,0,0,0,0
-_I_CALL_TOP_MEM:	dcb.l	$00000010,0
-lbW015B58:	dc.w	$60FF
-lbW015B5A:	dc.w	0,$0236,0
-lbW015B60:	dc.w	$60FF,0,$1626,0
-lbW015B68:	dc.w	$60FF,0,$12DC,0
-lbW015B70:	dc.w	$60FF,0,$11EA,0
-lbW015B78:	dc.w	$60FF,0,$10DE,0
-lbW015B80:	dc.w	$60FF,0,$12A4,0
-lbW015B88:	dc.w	$60FF,0,$1256,0
-lbW015B90:	dc.w	$60FF,0,$122A,0,$51FC
-	dcb.w	$0000001F,$51FC
-	dc.w	$2F00,$203A,$FEFC,$487B,$0930,$FFFF,$FEF8,$202F,4,$4E74,4,$2F00,$203A
-	dc.w	$FEEA,$487B,$0930,$FFFF,$FEE2,$202F,4,$4E74,4,$2F00,$203A,$FED8,$487B
-	dc.w	$0930,$FFFF,$FECC,$202F,4,$4E74,4,$2F00,$203A,$FEC6,$487B,$0930,$FFFF
-	dc.w	$FEB6,$202F,4,$4E74,4,$2F00,$203A,$FEB4,$487B,$0930,$FFFF,$FEA0,$202F
-	dc.w	4,$4E74,4,$2F00,$203A,$FEA2,$487B,$0930,$FFFF,$FE8A,$202F,4,$4E74,4
-	dc.w	$2F00,$203A,$FE90,$487B,$0930,$FFFF,$FE74,$202F,4,$4E74,4,$2F00,$203A
-	dc.w	$FE7E,$487B,$0930,$FFFF,$FE5E,$202F,4,$4E74,4,$2F00,$203A,$FE6C,$487B
-	dc.w	$0930,$FFFF,$FE48,$202F,4,$4E74,4,$2F00,$203A,$FE76,$487B,$0930,$FFFF
-	dc.w	$FE32,$202F,4,$4E74,4,$2F00,$203A,$FE64,$487B,$0930,$FFFF,$FE1C,$202F
-	dc.w	4,$4E74,4,$2F00,$203A,$FE52,$487B,$0930,$FFFF,$FE06,$202F,4,$4E74,4
-	dc.w	$2F00,$203A,$FE40,$487B,$0930,$FFFF,$FDF0,$202F,4,$4E74,4,$2F00,$203A
-	dc.w	$FE2E,$487B,$0930,$FFFF,$FDDA,$202F,4,$4E74,4,$2F00,$203A,$FE1C,$487B
-	dc.w	$0930,$FFFF,$FDC4,$202F,4,$4E74,4,$2F00,$203A,$FE0A,$487B,$0930,$FFFF
-	dc.w	$FDAE,$202F,4,$4E74,4,$2F00,$203A,$FDF8,$487B,$0930,$FFFF,$FD98,$202F
-	dc.w	4,$4E74,4,$2F00,$203A,$FDE6,$487B,$0930,$FFFF,$FD82,$202F,4,$4E74,4
-	dc.w	$2F00,$203A,$FDD4,$487B,$0930,$FFFF,$FD6C,$202F,4,$4E74,4,$2F00,$203A
-	dc.w	$FDC2,$487B,$0930,$FFFF,$FD56,$202F,4,$4E74,4,$4E56,$FFA0,$48EE,$3FFF
-	dc.w	$FFC0,$2D56,$FFF8,$082E,5,4,$6608,$4E68,$2D48,$FFFC,$6008,$41EE,12
-	dc.w	$2D48,$FFFC,$422E,$FFAA,$3D6E,4,$FFA8,$2D6E,6,$FFA4,$206E,$FFA4,$58AE
-	dc.w	$FFA4,$61FF,$FFFF,$FF26,$2D40,$FFA0,$0800,$001E,$6768,$0800,$0016
-	dc.w	$6628,$61FF,0,$0CB0,$082E,5,4,$6700,$00AC,$082E,2,$FFAA,$6700,$00A2
-	dc.w	$082E,7,4,$6600,$0186,$6000,$01B0,$61FF,0,$0A28,$082E,2,$FFAA,$660E
-	dc.w	$082E,5,$FFAA,$6600,$010A,$6000,$0078,$082E,5,4,$67EA,$082E,5,$FFAA
-	dc.w	$6600,$0126,$4A2E,4,$6B00,$014C,$6000,$0176,$0800,$0018,$670A,$61FF,0
-	dc.w	$07AE,$6000,$004A,$0800,$001B,$6730,$4840,$0C00,$00FC,$670A,$61FF,0
-	dc.w	$0E92,$6000,$0032,$206E,$FFA4,$54AE,$FFA4,$61FF,$FFFF,$FE68,$4A81
-	dc.w	$6600,$0198,$61FF,0,$0D20,$6000,$0014,$61FF,0,$08C4,$0C2E,$0010,$FFAA
-	dc.w	$6600,4,$605C,$1D6E,$FFA9,5,$082E,5,4,$6606,$206E,$FFFC,$4E60,$4CEE
-	dc.w	$3FFF,$FFC0,$082E,7,4,$6612,$2D6E,$FFA4,6,$2CAE,$FFF8,$4E5E,$60FF
-	dc.w	$FFFF,$FD62,$2D6E,$FFF8,$FFFC,$3D6E,4,0,$2D6E,6,8,$2D6E,$FFA4,2,$3D7C
-	dc.w	$2024,6,$598E,$4E5E,$60FF,$FFFF,$FD0E,$1D6E,$FFA9,5,$4CEE,$3FFF,$FFC0
-	dc.w	$3CAE,4,$2D6E,6,8,$2D6E,$FFA4,2,$3D7C,$2018,6,$2C6E,$FFF8,$DFFC,0
-	dc.w	$0060,$60FF,$FFFF,$FCB0,$1D6E,$FFA9,5,$4CEE,$3FFF,$FFC0,$3CAE,4,$2D6E
-	dc.w	6,8,$2D6E,$FFA4,2,$3D7C,$2014,6,$2C6E,$FFF8,$DFFC,0,$0060,$60FF,$FFFF
-	dc.w	$FC94,$1D6E,$FFA9,5,$4CEE,$3FFF,$FFC0,$2D6E,6,12,$3D7C,$2014,10,$2D6E
-	dc.w	$FFA4,6,$2C6E,$FFF8,$DFFC,0,$0064,$60FF,$FFFF,$FC66,$1D6E,$FFA9,5
-	dc.w	$4CEE,$3FFF,$FFC0,$2D6E,6,12,$3D7C,$2024,10,$2D6E,$FFA4,6,$2C6E,$FFF8
-	dc.w	$DFFC,0,$0064,$60FF,$FFFF,$FC4E,$1D6E,$FFA9,5,$4CEE,$3FFF,$FFC0,$3D7C
-	dc.w	$00F4,14,$2D6E,$FFA4,10,$3D6E,4,8,$2C6E,$FFF8,$DFFC,0,$0068,$60FF
-	dc.w	$FFFF,$FC4C,$2C88,$2D40,$FFFC,$4FEE,$FFC0,$4CDF,$7FFF,$2F2F,12,$2F6F
-	dc.w	4,$0010,$2F6F,12,4,$2F6F,8,12,$2F5F,4,$3F7C,$4008,6,$6028,$4CEE,$3FFF
-	dc.w	$FFC0,$4E5E,$514F,$2EAF,8,$3F6F,12,4,$3F7C,$4008,6,$2F6F,2,8,$2F7C
-	dc.w	$0942,$8001,12,$0817,5,$6706,$08EF,2,13,$60FF,$FFFF,$FBCC,$0C2E,$0040
-	dc.w	$FFAA,$660C,$4280,$102E,$FFAB,$2DAE,$FFAC,$0CE0,$4E75,$2040,$302E
-	dc.w	$FFA0,$3200,$0240,$003F,$0281,0,7,$303B,$020A,$4EFB,6,$4AFC,$0040,0,0
-	dcb.w	14,0
-	dc.w	$0080,$0086,$008C,$0092,$0098,$009E,$00A4,$00AA,$00B0,$00CE,$00EC
-	dc.w	$010A,$0128,$0146,$0164,$0182,$0196,$01B4,$01D2,$01F0,$020E,$022C
-	dc.w	$024A,$0268,$027C,$029A,$02B8,$02D6,$02F4,$0312,$0330,$034E,$036C
-	dcb.w	7,$036C
-	dc.w	$03D6,$03F0,$040A,$042A,$03CA,0,0,0,$206E,$FFE0,$4E75,$206E,$FFE4
-	dc.w	$4E75,$206E,$FFE8,$4E75,$206E,$FFEC,$4E75,$206E,$FFF0,$4E75,$206E
-	dc.w	$FFF4,$4E75,$206E,$FFF8,$4E75,$206E,$FFFC,$4E75,$2008,$206E,$FFE0
-	dc.w	$D088,$2D40,$FFE0,$2D48,$FFAC,$1D7C,0,$FFAB,$1D7C,$0040,$FFAA,$4E75
-	dc.w	$2008,$206E,$FFE4,$D088,$2D40,$FFE4,$2D48,$FFAC,$1D7C,1,$FFAB,$1D7C
-	dc.w	$0040,$FFAA,$4E75,$2008,$206E,$FFE8,$D088,$2D40,$FFE8,$2D48,$FFAC
-	dc.w	$1D7C,2,$FFAB,$1D7C,$0040,$FFAA,$4E75,$2008,$206E,$FFEC,$D088,$2D40
-	dc.w	$FFEC,$2D48,$FFAC,$1D7C,3,$FFAB,$1D7C,$0040,$FFAA,$4E75,$2008,$206E
-	dc.w	$FFF0,$D088,$2D40,$FFF0,$2D48,$FFAC,$1D7C,4,$FFAB,$1D7C,$0040,$FFAA
-	dc.w	$4E75,$2008,$206E,$FFF4,$D088,$2D40,$FFF4,$2D48,$FFAC,$1D7C,5,$FFAB
-	dc.w	$1D7C,$0040,$FFAA,$4E75,$2008,$206E,$FFF8,$D088,$2D40,$FFF8,$2D48
-	dc.w	$FFAC,$1D7C,6,$FFAB,$1D7C,$0040,$FFAA,$4E75,$1D7C,4,$FFAA,$2008,$206E
-	dc.w	$FFFC,$D088,$2D40,$FFFC,$4E75,$202E,$FFE0,$2D40,$FFAC,$9088,$2D40
-	dc.w	$FFE0,$2040,$1D7C,0,$FFAB,$1D7C,$0040,$FFAA,$4E75,$202E,$FFE4,$2D40
-	dc.w	$FFAC,$9088,$2D40,$FFE4,$2040,$1D7C,1,$FFAB,$1D7C,$0040,$FFAA,$4E75
-	dc.w	$202E,$FFE8,$2D40,$FFAC,$9088,$2D40,$FFE8,$2040,$1D7C,2,$FFAB,$1D7C
-	dc.w	$0040,$FFAA,$4E75,$202E,$FFEC,$2D40,$FFAC,$9088,$2D40,$FFEC,$2040
-	dc.w	$1D7C,3,$FFAB,$1D7C,$0040,$FFAA,$4E75,$202E,$FFF0,$2D40,$FFAC,$9088
-	dc.w	$2D40,$FFF0,$2040,$1D7C,4,$FFAB,$1D7C,$0040,$FFAA,$4E75,$202E,$FFF4
-	dc.w	$2D40,$FFAC,$9088,$2D40,$FFF4,$2040,$1D7C,5,$FFAB,$1D7C,$0040,$FFAA
-	dc.w	$4E75,$202E,$FFF8,$2D40,$FFAC,$9088,$2D40,$FFF8,$2040,$1D7C,6,$FFAB
-	dc.w	$1D7C,$0040,$FFAA,$4E75,$1D7C,8,$FFAA,$202E,$FFFC,$9088,$2D40,$FFFC
-	dc.w	$2040,$4E75,$206E,$FFA4,$54AE,$FFA4,$61FF,$FFFF,$F9D4,$4A81,$66FF
-	dc.w	$FFFF,$FD04,$3040,$D1EE,$FFE0,$4E75,$206E,$FFA4,$54AE,$FFA4,$61FF
-	dc.w	$FFFF,$F9B6,$4A81,$66FF,$FFFF,$FCE6,$3040,$D1EE,$FFE4,$4E75,$206E
-	dc.w	$FFA4,$54AE,$FFA4,$61FF,$FFFF,$F998,$4A81,$66FF,$FFFF,$FCC8,$3040
-	dc.w	$D1EE,$FFE8,$4E75,$206E,$FFA4,$54AE,$FFA4,$61FF,$FFFF,$F97A,$4A81
-	dc.w	$66FF,$FFFF,$FCAA,$3040,$D1EE,$FFEC,$4E75,$206E,$FFA4,$54AE,$FFA4
-	dc.w	$61FF,$FFFF,$F95C,$4A81,$66FF,$FFFF,$FC8C,$3040,$D1EE,$FFF0,$4E75
-	dc.w	$206E,$FFA4,$54AE,$FFA4,$61FF,$FFFF,$F93E,$4A81,$66FF,$FFFF,$FC6E
-	dc.w	$3040,$D1EE,$FFF4,$4E75,$206E,$FFA4,$54AE,$FFA4,$61FF,$FFFF,$F920
-	dc.w	$4A81,$66FF,$FFFF,$FC50,$3040,$D1EE,$FFF8,$4E75,$206E,$FFA4,$54AE
-	dc.w	$FFA4,$61FF,$FFFF,$F902,$4A81,$66FF,$FFFF,$FC32,$3040,$D1EE,$FFFC
-	dc.w	$4E75,$2F01,$206E,$FFA4,$54AE,$FFA4,$61FF,$FFFF,$F8E2,$4A81,$66FF
-	dc.w	$FFFF,$FC12,$221F,$2076,$14E0,$0800,8,$670E,$48E7,$3C00,$2A00,$2608
-	dc.w	$60FF,0,$00EC,$2F02,$2200,$E959,$0241,15,$2236,$14C0,$0800,11,$6602
-	dc.w	$48C1,$2400,$EF5A,$0282,0,3,$E5A9,$49C0,$D081,$D1C0,$241F,$4E75,$1D7C
-	dc.w	$0080,$FFAA,$206E,$FFA4,$4E75,$206E,$FFA4,$54AE,$FFA4,$61FF,$FFFF
-	dc.w	$F87A,$4A81,$66FF,$FFFF,$FBAA,$3040,$4E75,$206E,$FFA4,$58AE,$FFA4
-	dc.w	$61FF,$FFFF,$F876,$4A81,$66FF,$FFFF,$FB90,$2040,$4E75,$206E,$FFA4
-	dc.w	$54AE,$FFA4,$61FF,$FFFF,$F846,$4A81,$66FF,$FFFF,$FB76,$3040,$D1EE
-	dc.w	$FFA4,$5588,$4E75,$206E,$FFA4,$54AE,$FFA4,$61FF,$FFFF,$F826,$4A81
-	dc.w	$66FF,$FFFF,$FB56,$206E,$FFA4,$5588,$0800,8,$670E,$48E7,$3C00,$2A00
-	dc.w	$2608,$60FF,0,$0030,$2F02,$2200,$E959,$0241,15,$2236,$14C0,$0800,11
-	dc.w	$6602,$48C1,$2400,$EF5A,$0282,0,3,$E5A9,$49C0,$D081,$D1C0,$241F,$4E75
-	dc.w	$0805,6,$6704,$4282,$6016,$E9C5,$2404,$2436,$24C0,$0805,11,$6602
-	dc.w	$48C2,$E9C5,$0542,$E1AA,$0805,7,$6702,$4283,$E9C5,$0682,$0C00,2,$6D34
-	dc.w	$6718,$206E,$FFA4,$58AE,$FFA4,$61FF,$FFFF,$F7AC,$4A81,$66FF,$FFFF
-	dc.w	$FAC6,$6018,$206E,$FFA4,$54AE,$FFA4,$61FF,$FFFF,$F77E,$4A81,$66FF
-	dc.w	$FFFF,$FAAE,$48C0,$D680,$E9C5,$0782,$6700,$006A,$0C00,2,$6D34,$6718
-	dc.w	$206E,$FFA4,$58AE,$FFA4,$61FF,$FFFF,$F76A,$4A81,$66FF,$FFFF,$FA84
-	dc.w	$601C,$206E,$FFA4,$54AE,$FFA4,$61FF,$FFFF,$F73C,$4A81,$66FF,$FFFF
-	dc.w	$FA6C,$48C0,$6002,$4280,$2800,$0805,2,$6712,$2043,$61FF,$FFFF,$F776
-	dc.w	$4A81,$6624,$D082,$D084,$6016,$D682,$2043,$61FF,$FFFF,$F762,$4A81
-	dc.w	$6610,$D084,$6004,$D682,$2003,$2040,$4CDF,$003C,$4E75,$2043,$203C
-	dc.w	$0101,1,$60FF,$FFFF,$F9F0,$322E,$FFA0,$1001,$0240,7,$2076,$04E0,$D0EE
-	dc.w	$FFA2,$0801,7,$6700,$008C,$3001,$EF58,$0240,7,$2036,$04C0,$0801,6
-	dc.w	$6752,$2400,$2448,$E19A,$2002,$61FF,$FFFF,$F71C,$4A81,$6600,$00FC
-	dc.w	$544A,$204A,$E19A,$2002,$61FF,$FFFF,$F708,$4A81,$6600,$00E8,$544A
-	dc.w	$204A,$E19A,$2002,$61FF,$FFFF,$F6F4,$4A81,$6600,$00D4,$544A,$204A
-	dc.w	$E19A,$2002,$61FF,$FFFF,$F6E0,$4A81,$6600,$00C0,$4E75,$2400,$2448
-	dc.w	$E048,$61FF,$FFFF,$F6CC,$4A81,$6600,$00AC,$544A,$204A,$2002,$61FF
-	dc.w	$FFFF,$F6BA,$4A81,$6600,$009A,$4E75,$0801,6,$675C,$2448,$61FF,$FFFF
-	dc.w	$F662,$4A81,$6600,$0092,$2400,$544A,$204A,$61FF,$FFFF,$F650,$4A81
-	dc.w	$6600,$0080,$E14A,$1400,$544A,$204A,$61FF,$FFFF,$F63C,$4A81,$6600
-	dc.w	$006C,$E18A,$1400,$544A,$204A,$61FF,$FFFF,$F628,$4A81,$6600,$0058
-	dc.w	$E18A,$1400,$122E,$FFA0,$E209,$0241,7,$2D82,$14C0,$4E75,$2448,$61FF
-	dc.w	$FFFF,$F606,$4A81,$6600,$0036,$2400,$544A,$204A,$61FF,$FFFF,$F5F4
-	dc.w	$4A81,$6600,$0024,$E14A,$1400,$122E,$FFA0,$E209,$0241,7,$3D82,$14C2
-	dc.w	$4E75,$204A,$203C,$00A1,1,$60FF,$FFFF,$F8A8,$204A,$203C,$0121,1,$60FF
-	dc.w	$FFFF,$F89A,$61FF,$FFFF,$F914,$102E,$FFA2,$E918,$0240,15,$2436,$04C0
-	dc.w	$0C2E,2,$FFA0,$6D50,$6728,$2448,$61FF,$FFFF,$F5C4,$4A81,$6600,$009E
-	dc.w	$2600,$588A,$204A,$61FF,$FFFF,$F5B2,$4A81,$6600,$008C,$2200,$2003
-	dc.w	$6000,$0048,$2448,$61FF,$FFFF,$F59C,$4A81,$6600,$0076,$3200,$4840
-	dc.w	$48C0,$48C1,$082E,7,$FFA2,$6600,$0028,$48C2,$6000,$0022,$2448,$61FF
-	dc.w	$FFFF,$F560,$4A81,$6600,$005E,$1200,$E048,$49C0,$49C1,$082E,7,$FFA2
-	dc.w	$6602,$49C2,$9480,$42C3,$0203,4,$9280,$B282,$42C4,$8604,$0203,5,$382E
-	dc.w	$FFA8,$0204,$001A,$8803,$3D44,$FFA8,$082E,3,$FFA2,$6602,$4E75,$0804,0
-	dc.w	$6602,$4E75,$1D7C,$0010,$FFAA,$4E75,$204A,$203C,$0101,1,$60FF,$FFFF
-	dc.w	$F7C4,$204A,$203C,$0141,1,$60FF,$FFFF,$F7B6,$102E,$FFA1,$0200,$0038
-	dc.w	$6600,$0208,$102E,$FFA1,$0240,7,$2E36,$04C0,$6700,$00C0,$102E,$FFA3
-	dc.w	$122E,$FFA2,$0240,7,$E809,$0241,7,$3D40,$FFB2,$3D41,$FFB4,$2A36,$04C0
-	dc.w	$2C36,$14C0,$082E,3,$FFA2,$671A,$4A87,$5DEE,$FFB0,$6A02,$4487,$4A85
-	dc.w	$5DEE,$FFB1,$6A08,$44FC,0,$4086,$4085,$4A85,$6616,$4A86,$6700,$0048
-	dc.w	$BE86,$6306,$CB46,$6000,$0012,$4C47,$6005,$600A,$BE85,$634E,$61FF,0
-	dc.w	$0068,$082E,3,$FFA2,$6724,$4A2E,$FFB1,$6702,$4485,$102E,$FFB0,$B12E
-	dc.w	$FFB1,$670C,$0C86,$8000,0,$6226,$4486,$6006,$0806,$001F,$661C,$44EE
-	dc.w	$FFA8,$4A86,$42EE,$FFA8,$302E,$FFB2,$322E,$FFB4,$2D85,$04C0,$2D86
-	dc.w	$14C0,$4E75,$08EE,1,$FFA9,$08AE,0,$FFA9,$4E75,$022E,$001E,$FFA9,$002E
-	dc.w	$0020,$FFAA,$4E75,$0C87,0,$FFFF,$621E,$4281,$4845,$4846,$3A06,$8AC7
-	dc.w	$3205,$4846,$3A06,$8AC7,$4841,$3205,$4245,$4845,$2C01,$4E75,$42AE
-	dc.w	$FFBC,$422E,$FFB6,$4281,$0807,$001F,$660E,$52AE,$FFBC,$E38F,$E38E
-	dc.w	$E395,$6000,$FFEE,$2607,$2405,$4842,$4843,$B443,$6606,$323C,$FFFF
-	dc.w	$600A,$2205,$82C3,$0281,0,$FFFF,$2F06,$4246,$4846,$2607,$2401,$C4C7
-	dc.w	$4843,$C6C1,$2805,$9883,$4844,$3004,$3806,$4A40,$6600,10,$B484,$6304
-	dc.w	$5381,$60DE,$2F05,$2C01,$4846,$2A07,$61FF,0,$006A,$2405,$2606,$2A1F
-	dc.w	$2C1F,$9C83,$9B82,$64FF,0,$001A,$5381,$4282,$2607,$4843,$4243,$DC83
-	dc.w	$DB82,$2607,$4243,$4843,$DA83,$4A2E,$FFB6,$6616,$3D41,$FFB8,$4281
-	dc.w	$4845,$4846,$3A06,$4246,$50EE,$FFB6,$6000,$FF6C,$3D41,$FFBA,$3C05
-	dc.w	$4846,$4845,$2E2E,$FFBC,$670A,$5387,$E28D,$E296,$51CF,$FFFA,$2A06
-	dc.w	$2C2E,$FFB8,$4E75,$2406,$2606,$2805,$4843,$4844,$CCC5,$CAC3,$C4C4
-	dc.w	$C6C4,$4284,$4846,$DC45,$D744,$DC42,$D744,$4846,$4245,$4242,$4845
-	dc.w	$4842,$DA82,$DA83,$4E75,$7004,$61FF,$FFFF,$F61C,$0C2E,$0080,$FFAA
-	dc.w	$6712,$2448,$61FF,$FFFF,$F2DC,$4A81,$661E,$2E00,$6000,$FDE6,$58AE
-	dc.w	$FFA4,$61FF,$FFFF,$F286,$4A81,$66FF,$FFFF,$F5A0,$2E00,$6000,$FDCE
-	dc.w	$61FF,$FFFF,$F5CE,$204A,$203C,$0101,1,$60FF,$FFFF,$F556,$102E,$FFA1
-	dc.w	$0C00,7,$6E00,$00B4,$0240,7,$2636,$04C0,$342E,$FFA2,$4241,$1202,$E95A
-	dc.w	$0242,7,$2836,$24C0,$4A84,$6700,$0088,$4A83,$6700,$0082,$422E,$FFB0
-	dc.w	$082E,3,$FFA2,$6718,$4A83,$6C08,$4483,$002E,1,$FFB0,$4A84,$6C08,$4484
-	dc.w	$0A2E,1,$FFB0,$2A03,$2C03,$2E04,$4846,$4847,$C6C4,$C8C6,$CAC7,$CCC7
-	dc.w	$4287,$4843,$D644,$DD87,$D645,$DD87,$4843,$4244,$4245,$4844,$4845
-	dc.w	$D885,$D886,$4A2E,$FFB0,$6708,$4683,$4684,$5283,$D987,$2D83,$24C0
-	dc.w	$44FC,0,$2D84,$14C0,$42C7,$0207,8,$1C2E,$FFA9,$0206,$0010,$8C07,$1D46
-	dc.w	$FFA9,$4E75,$42B6,$24C0,$42B6,$14C0,$7E04,$60E4,$7004,$61FF,$FFFF
-	dc.w	$F510,$0C2E,$0080,$FFAA,$6714,$2448,$61FF,$FFFF,$F1D0,$4A81,$6600
-	dc.w	$0020,$2600,$6000,$FF34,$58AE,$FFA4,$61FF,$FFFF,$F178,$4A81,$66FF
-	dc.w	$FFFF,$F492,$2600,$6000,$FF1C,$61FF,$FFFF,$F4C0,$204A,$203C,$0101,1
-	dc.w	$60FF,$FFFF,$F448,$2D40,$FFB4,$2200,$E958,$0240,15,$2276,$04C0,$2D49
-	dc.w	$FFB0,$2001,$EC49,$0241,7,$2A36,$14C0,$0240,7,$2636,$04C0,$3D40,$FFBA
-	dc.w	$302E,$FFA2,$2200,$E958,$0240,15,$2076,$04C0,$2D48,$FFBC,$2001,$EC49
-	dc.w	$0241,7,$2836,$14C0,$0240,7,$2436,$04C0,$3D40,$FFB8,$082E,1,$FFA0
-	dc.w	$56C7,$082E,5,4,$56C6,$2448,$2649,$2207,$2006,$61FF,$FFFF,$F05C,$204A
-	dc.w	$4A80,$66FF,0,$01C8,$2207,$2006,$204B,$61FF,$FFFF,$F046,$204B,$4A80
-	dc.w	$660A,$204A,$224B,$60FF,$FFFF,$F020,$2F00,$2207,$2006,$204A,$61FF
-	dc.w	$FFFF,$F03E,$201F,$204B,$60FF,0,$0194,$082E,1,$FFA0,$6648,$44EE,$FFA8
-	dc.w	$B042,$6602,$B243,$42EE,$FFA8,$4A04,$6610,$362E,$FFBA,$3D81,$34C2
-	dc.w	$342E,$FFB8,$3D80,$24C2,$082E,5,4,$56C2,$2002,$51C1,$206E,$FFBC,$61FF
-	dc.w	$FFFF,$EFF4,$2002,$51C1,$206E,$FFB0,$61FF,$FFFF,$EFE6,$4E75,$44EE
-	dc.w	$FFA8,$B082,$6602,$B283,$42EE,$FFA8,$4A04,$6610,$362E,$FFBA,$2D81
-	dc.w	$34C0,$342E,$FFB8,$2D80,$24C0,$082E,5,4,$56C2,$2002,$50C1,$206E,$FFBC
-	dc.w	$61FF,$FFFF,$EFAC,$2002,$50C1,$206E,$FFB0,$61FF,$FFFF,$EF9E,$4E75
-	dc.w	$202E,$FFB4,$6000,$FEAE,$082E,1,$FFA0,$6610,$7002,$61FF,$FFFF,$F364
-	dc.w	$2D48,$FFB4,$51C7,$600E,$7004,$61FF,$FFFF,$F354,$2D48,$FFB4,$50C7
-	dc.w	$302E,$FFA2,$2200,$EC48,$0240,7,$2436,$04C0,$0241,7,$2836,$14C0,$3D41
-	dc.w	$FFB8,$082E,5,4,$56C6,$2448,$2207,$2006,$61FF,$FFFF,$EF28,$4A80,$6600
-	dc.w	$0096,$204A,$60FF,$FFFF,$EEEE,$082E,1,$FFA0,$662C,$44EE,$FFA8,$B044
-	dc.w	$42EE,$FFA8,$4A01,$6608,$362E,$FFB8,$3D80,$34C2,$206E,$FFB4,$51C1
-	dc.w	$082E,5,4,$56C0,$61FF,$FFFF,$EEFE,$4E75,$44EE,$FFA8,$B084,$42EE,$FFA8
-	dc.w	$4A01,$6608,$362E,$FFB8,$2D80,$34C0,$206E,$FFB4,$50C1,$082E,5,4,$56C0
-	dc.w	$61FF,$FFFF,$EED2,$4E75,$4E7B,$6000,$4E7B,$6001,$0C2E,$00FC,$FFA1
-	dc.w	$67FF,$FFFF,$FF24,$206E,$FFB4,$082E,1,$FFA0,$56C7,$6000,$FF40,$4E7B
-	dc.w	$6000,$4E7B,$6001,$2448,$2F00,$61FF,$FFFF,$F264,$201F,$588F,$518F
-	dc.w	$518E,$721A,$41EF,8,$43EF,0,$22D8,$51C9,$FFFC,$3D7C,$4008,10,$2D4A,12
-	dc.w	$2D40,$0010,$4CEE,$3FFF,$FFC0,$4E5E,$60FF,$FFFF,$EDF8,$4280,$43FB
-	dc.w	$0170,0,$05AE,$B3C8,$6D0E,$43FB,$0170,0,$0010,$B1C9,$6D02,$4E75,$70FF
-	dc.w	$4E75,$4A06,$6604,$7001,$6002,$7005,$4A07,$6700,$01E4,$2448,$2649
-	dc.w	$2848,$2A49,$568C,$568D,$220A,$40C7,$007C,$0700,$4E7A,$6000,$4E7B,0
-	dc.w	$4E7B,1,$F58A,$F58C,$F58B,$F58D,$F46A,$F46C,$F46B,$F46D,$2441,$5681
-	dc.w	$2841,$F5CA,$F5CC,$247C,$8000,0,$267C,$A000,0,$287C,0,0,$2008,$0200,3
-	dc.w	$671C,$0C00,2,$6700,$0096,$6000,$0102,$51FC,$4E7B,$A008,$0E91,$1000
-	dc.w	$0E90,0,$6002,$600E,$B082,$661C,$B283,$6618,$0E91,$5800,$6002,$600E
-	dc.w	$4E7B,$B008,$0E90,$4800,$4E7B,$C008,$6034,$600E,$4E7B,$B008,$0E90
-	dc.w	$0800,$4E7B,$C008,$6012,$600E,$4E71,$4E71,$4E71,$4E71,$4E71,$4E71
-	dc.w	$4E71,$60B0,$4E7B,$6000,$4E7B,$6001,$46C7,$51C4,$60FF,$FFFF,$FD42
-	dc.w	$4E7B,$6000,$4E7B,$6001,$46C7,$50C4,$60FF,$FFFF,$FD30,$51FC,$51FC
-	dcb.w	4,$51FC
-	dc.w	$4E7B,$A008,$0E91,$1000,$0E90,0,$6002,$600E,$B082,$662C,$B283,$6628
-	dc.w	$0E91,$5800,$6002,$600E,$4844,$0E58,$4800,$4E7B,$B008,$4844,$6002
-	dc.w	$600E,$0E50,$4800,$4E7B,$C008,$6000,$FFA8,$4E71,$600E,$4840,$0E58
-	dc.w	$0800,$4E7B,$B008,$4840,$6002,$600E,$0E50,$0800,$4E7B,$C008,$6000
-	dc.w	$FF76,$4E71,$600E,$4E71,$4E71,$4E71,$4E71,$4E71,$4E71,$4E71,$6090
-	dc.w	$4E7B,$A008,$0E91,$1000,$0E90,0,$6002,$600E,$B082,$663C,$B283,$6638
-	dc.w	$0E91,$5800,$6002,$600E,$E19C,$0E18,$4800,$4844,$0E58,$4800,$6002
-	dc.w	$600E,$E19C,$4E7B,$B008,$0E10,$4800,$6004,$4E71,$600E,$4E7B,$C008
-	dc.w	$6000,$FF2C,$4E71,$4E71,$4E71,$600E,$E198,$0E18,$0800,$4840,$0E58
-	dc.w	$0800,$6002,$600E,$E198,$4E7B,$B008,$0E10,$0800,$6004,$4E71,$600E
-	dc.w	$4E7B,$C008,$6000,$FEEA,$4E71,$4E71,$4E71,$600C,$4E71,$4E71,$4E71
-	dcb.w	3,$4E71
-	dc.w	$6000,$FF72,$2448,$2649,$2848,$2A49,$528C,$528D,$220A,$40C7,$007C
-	dc.w	$0700,$4E7A,$6000,$4E7B,0,$4E7B,1,$F58A,$F58C,$F58B,$F58D,$F46A,$F46C
-	dc.w	$F46B,$F46D,$2441,$5681,$2841,$F5CA,$F5CC,$247C,$8000,0,$267C,$A000,0
-	dc.w	$287C,0,0,$2008,$0800,0,$6600,$009A,$6016,$51FC,$51FC,$51FC,$51FC
-	dc.w	$4E7B,$A008,$0E51,$1000,$0E50,0,$6002,$600E,$B042,$661C,$B243,$6618
-	dc.w	$0E51,$5800,$6002,$600E,$4E7B,$B008,$0E50,$4800,$4E7B,$C008,$6034
-	dc.w	$600E,$4E7B,$B008,$0E50,$0800,$4E7B,$C008,$6012,$600E,$4E71,$4E71
-	dcb.w	5,$4E71
-	dc.w	$60B0,$4E7B,$6000,$4E7B,$6001,$46C7,$51C4,$60FF,$FFFF,$FB62,$4E7B
-	dc.w	$6000,$4E7B,$6001,$46C7,$50C4,$60FF,$FFFF,$FB50,$51FC,$51FC,$51FC
-	dcb.w	3,$51FC
-	dc.w	$4E7B,$A008,$0E51,$1000,$0E50,0,$6002,$600E,$B042,$662C,$B243,$6628
-	dc.w	$0E51,$5800,$6002,$600E,$E09C,$0E18,$4800,$4E7B,$B008,$E19C,$6002
-	dc.w	$600E,$0E10,$4800,$4E7B,$C008,$6000,$FFA8,$4E71,$600E,$E098,$0E18
-	dc.w	$0800,$4E7B,$B008,$E198,$6002,$600E,$0E10,$0800,$4E7B,$C008,$6000
-	dc.w	$FF76,$4E71,$600E,$4E71,$4E71,$4E71,$4E71,$4E71,$4E71,$4E71,$6090
-	dc.w	$4A06,$6604,$7001,$6002,$7005,$4A07,$6600,$00C6,$2248,$2448,$528A
-	dc.w	$2602,$E04A,$40C7,$007C,$0700,$4E7A,$6000,$4E7B,0,$4E7B,1,$F589,$F58A
-	dc.w	$F469,$F46A,$227C,$8000,0,$247C,$A000,0,$267C,0,0,$6016,$51FC,$51FC
-	dcb.w	2,$51FC
-	dc.w	$4E7B,$9008,$0E50,0,$B044,$6624,$6002,$600E,$0E18,$2800,$4E7B,$A008
-	dc.w	$0E10,$3800,$6002,$600E,$4E7B,$B008,$604C,$4E71,$4E71,$4E71,$4E71
-	dc.w	$600E,$E098,$0E18,$0800,$4E7B,$A008,$E198,$6002,$600E,$0E10,$0800
-	dc.w	$4E7B,$B008,$6016,$4E71,$4E71,$600E,$4E71,$4E71,$4E71,$4E71,$4E71
-	dcb.w	2,$4E71
-	dc.w	$60A0,$4E7B,$6000,$4E7B,$6001,$46C7,$51C1,$60FF,$FFFF,$FB16,$4E7B
-	dc.w	$6000,$4E7B,$6001,$46C7,$50C1,$60FF,$FFFF,$FB04,$2248,$2448,$568A
-	dc.w	$2208,$0801,0,$6600,$00C2,$2602,$4842,$40C7,$007C,$0700,$4E7A,$6000
-	dc.w	$4E7B,0,$4E7B,1,$F589,$F58A,$F469,$F46A,$227C,$8000,0,$247C,$A000,0
-	dc.w	$267C,0,0,$6018,$51FC,$51FC,$51FC,$51FC,$51FC,$4E7B,$9008,$0E90,0
-	dc.w	$B084,$6624,$6002,$600E,$0E58,$2800,$4E7B,$A008,$0E50,$3800,$6002
-	dc.w	$600E,$4E7B,$B008,$604C,$4E71,$4E71,$4E71,$4E71,$600E,$4840,$0E58
-	dc.w	$0800,$4840,$4E7B,$A008,$6002,$600E,$0E50,$0800,$4E7B,$B008,$6016
-	dcb.w	2,$4E71
-	dc.w	$600E,$4E71,$4E71,$4E71,$4E71,$4E71,$4E71,$4E71,$60A0,$4E7B,$6000
-	dc.w	$4E7B,$6001,$46C7,$51C1,$60FF,$FFFF,$FA46,$4E7B,$6000,$4E7B,$6001
-	dc.w	$46C7,$50C1,$60FF,$FFFF,$FA34,$2A02,$E08A,$2602,$4842,$40C7,$007C
-	dc.w	$0700,$4E7A,$6000,$4E7B,0,$4E7B,1,$F589,$F58A,$F469,$F46A,$227C,$8000
-	dc.w	0,$247C,$A000,0,$267C,0,0,$6014,$51FC,$51FC,$51FC,$4E7B,$9008,$0E90,0
-	dc.w	$B084,$6624,$6002,$600E,$0E18,$2800,$0E58,$3800,$4E7B,$A008,$6002
-	dc.w	$600E,$0E10,$5800,$4E7B,$B008,$6000,$FF88,$4E71,$600E,$E198,$0E18
-	dc.w	$0800,$4840,$0E58,$0800,$6002,$600E,$E198,$4E7B,$A008,$0E10,$0800
-	dc.w	$6004,$4E71,$600E,$4E7B,$B008,$6000,$FF4A,$4E71,$4E71,$4E71,$600E
-	dcb.w	7,$4E71
-	dc.w	$6090,$4E71,$4E71,$4E71
-Install_Int_Emulation_End:
-	dc.w	$4425,$4833,$FBCC,$3290
+*-------------------------------------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------------------------------------
 
-; --------------------------------------------------------------------------
 Install_Mem_Library:
 	LEA	(_060_imem_read,PC),A0
 	MOVE.L	A0,($007A,A6)
@@ -985,14 +800,7 @@ _060_real_trace3:	RTE
 
 _060_real_access3:	RTE
 
-;fiX Label expected
-	NOP
-	NOP
-	NOP
-Install_Mem_Library_End:
-	dc.l	$3A34967C,$B28A2422
 
-;fiX Bad code terminator
 ; --------------------------------------------------------------------------
 Install_Exec_Patches:
 	MOVEM.L	D0-D7/A0-A6,-(SP)
@@ -1441,8 +1249,13 @@ Nest_Count:	dc.l	0
 MMUFrame:	dc.l	0
 InputName:	dc.b	'input.device',0,0
 	dcb.b	2,0
-Install_Exec_Patches_End:
-	dc.l	$4479F681,$174003D2
+
+
+
+
+
+
+
 
 ; --------------------------------------------------------------------------
 Install_Caches:	MOVEM.L	D0-D7/A0-A6,-(SP)
@@ -1479,13 +1292,9 @@ Install_Caches_Doit:
 	NOP
 	RTE
 
-;fiX Label expected
-	NOP
-	NOP
-	NOP
-Install_Caches_End:	dc.l	$6A845C87,$B404DAB7
 
-;fiX Bad code terminator
+
+
 ; --------------------------------------------------------------------------
 Install_Dispatcher:	MOVEM.L	D0-D7/A0-A6,-(SP)
 
@@ -1805,11 +1614,9 @@ _KDoFmt:	MOVEM.L	A2/A3,-(SP)
 	MOVEM.L	(SP)+,A2/A3
 	RTS
 
-;fiX Label expected
-	dc.w	0
 RomTagEnd:
-	dc.l	$4E710000
-	dc.w	$4E71
+
+
 
 
 	SECTION	68060library_newrs017D1C,CODE
