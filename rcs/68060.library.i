@@ -7,11 +7,38 @@
 **-------------------------------------------------------------------------------
 ** ALL RIGHTS ON THIS SOURCES RESERVED TO SILICON DEPARTMENT SOFTWARE
 **
-** $Id$
+** $Id: 68060.library.i,v 1.1 1996/06/09 18:15:11 schlote Exp schlote $
 **
 **
 	incdir	include:
 	include	exec/initializers.i
+
+FPSP_ENTRY:	MACRO
+	MOVE.L	A0,-(SP)
+	MOVEA.L	(6,SP),A0
+	MOVEA.L	(SP)+,A0
+	BRA.L	_fpsp+(\1*8)
+	ENDM
+
+FPSP_SETVECTOR:	MACRO       ; vector
+	LEA	(Vector_\2,PC),A1
+	MOVE.L	(\2*4,A2),(A1)
+	LEA	(_fpsp+(\1*8)+2,PC),A1
+	ADDA.L	(A1),A1
+	MOVE.L	A1,(\2*4,A2)
+	MOVE.L	A1,(\2*4).W
+	ENDM
+
+
+
+
+
+
+
+
+
+
+
 
 ThisTask:	EQU	$00000114
 _LVOSetFunction:	EQU	-$000001A4

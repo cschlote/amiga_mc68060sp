@@ -7,7 +7,7 @@
 **-------------------------------------------------------------------------------
 ** ALL RIGHTS ON THIS SOURCES RESERVED TO SILICON DEPARTMENT SOFTWARE
 **
-** $Id: 68060.library.asm,v 1.1 1996/06/09 17:39:13 schlote Exp schlote $
+** $Id: 68060.library.asm,v 1.2 1996/06/09 18:14:28 schlote Exp schlote $
 **
 **
 	include	68060.library.i
@@ -174,44 +174,17 @@ cdstrapname:	dc.b	'cdstrap',0
 expansionname:	dc.b	'expansion.library',0
 FPUPatchPortName:	dc.b	'68060_PatchPort',0
 
-; --------------------------------------------------------------------------
+
+; ------------------------------------------------------------------------------------------------------
+; ------------------------------------------------------------------------------------------------------
+; ------------------------------------------------------------------------------------------------------
+; ------------------------------------------------------------------------------------------------------
+; ------------------------------------------------------------------------------------------------------
+; ------------------------------------------------------------------------------------------------------
+
+;	section	fpsp,data
 Install_FPU_Emulation:
 	MOVEM.L	D0-D7/A0-A6,-(SP)
-	LEA	(_FP_CALL_TOP_MEM,PC),A0
-	LEA	(_FP_CALL_TOP,PC),A1
-	MOVE.L	($007A,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)+
-	MOVE.L	($007E,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)+
-	MOVE.L	($0082,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)+
-	MOVE.L	($0086,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)+
-	MOVE.L	($008A,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)+
-	MOVE.L	($008E,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)+
-	MOVE.L	($0092,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)+
-	MOVE.L	($0096,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)+
-	MOVE.L	($009A,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)+
-	MOVE.L	($009E,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)+
-	MOVE.L	($00A2,A6),D0
-	SUB.L	A1,D0
-	MOVE.L	D0,(A0)
 	LEA	(Install_FPU_Emulation_Traps,PC),A5
 	MOVEA.L	(4).W,A6
 	JSR	(_LVOSupervisor,A6)
@@ -219,63 +192,22 @@ Install_FPU_Emulation:
 	MOVEQ	#0,D0
 	RTS
 
+; --------------------------------------------------------------
+
 Install_FPU_Emulation_Traps:
 	MOVEC	VBR,A2
-	LEA	(Vector_54,PC),A1
-	MOVE.L	($00D8,A2),(A1)
-	LEA	(lbW000618,PC),A1
-	ADDA.L	(A1),A1
-	MOVE.L	A1,($00D8,A2)
-	MOVE.L	A1,($D8).W
-	LEA	(Vector_52,PC),A1
-	MOVE.L	($00D0,A2),(A1)
-	LEA	(lbW000620,PC),A1
-	ADDA.L	(A1),A1
-	MOVE.L	A1,($00D0,A2)
-	MOVE.L	A1,($D0).W
-	LEA	(Vector_53,PC),A1
-	MOVE.L	($00D4,A2),(A1)
-	LEA	(lbW000628,PC),A1
-	ADDA.L	(A1),A1
-	MOVE.L	A1,($00D4,A2)
-	MOVE.L	A1,($D4).W
-	LEA	(Vector_51,PC),A1
-	MOVE.L	($00CC,A2),(A1)
-	LEA	(lbW000630,PC),A1
-	ADDA.L	(A1),A1
-	MOVE.L	A1,($00CC,A2)
-	MOVE.L	A1,($CC).W
-	LEA	(Vector_50,PC),A1
-	MOVE.L	($00C8,A2),(A1)
-	LEA	(lbW000638,PC),A1
-	ADDA.L	(A1),A1
-	MOVE.L	A1,($00C8,A2)
-	MOVE.L	A1,($C8).W
-	LEA	(Vector_49,PC),A1
-	MOVE.L	($00C4,A2),(A1)
-	LEA	(lbW000640,PC),A1
-	ADDA.L	(A1),A1
-	MOVE.L	A1,($00C4,A2)
-	MOVE.L	A1,($C4).W
-	LEA	(Vector_11,PC),A1
-	MOVE.L	($002C,A2),(A1)
-	LEA	(lbW000648,PC),A1
-	ADDA.L	(A1),A1
-	MOVE.L	A1,($002C,A2)
-	MOVE.L	A1,($2C).W
-	LEA	(Vector_55,PC),A1
-	MOVE.L	($00DC,A2),(A1)
-	LEA	(lbW000650,PC),A1
-	ADDA.L	(A1),A1
-	MOVE.L	A1,($00DC,A2)
-	MOVE.L	A1,($DC).W
-	LEA	(Vector_60,PC),A1
-	MOVE.L	($00F0,A2),(A1)
-	LEA	(lbW000658,PC),A1
-	ADDA.L	(A1),A1
-	MOVE.L	A1,($00F0,A2)
-	MOVE.L	A1,($F0).W
+	FPSP_SETVECTOR	0,54
+	FPSP_SETVECTOR	1,52
+	FPSP_SETVECTOR	2,53
+	FPSP_SETVECTOR	3,51
+	FPSP_SETVECTOR	4,50
+	FPSP_SETVECTOR	5,49
+	FPSP_SETVECTOR   6,11
+	FPSP_SETVECTOR	7,55
+	FPSP_SETVECTOR   8,60
 	RTE
+
+; --------------------------------------------------------------
 
 Vector_54:	dc.l	0
 Vector_52:	dc.l	0
@@ -287,38 +219,140 @@ Vector_11:	dc.l	0
 Vector_55:	dc.l	0
 Vector_60:	dc.l	0
 
+; --------------------------------------------------------------
+;  Emulation follows
+; --------------------------------------------------------------
+;
+; _060_fpsp_done():
+;
+; This is the main exit point for the 68060 Floating-Point
+; Software Package. For a normal exit, all 060FPSP routines call this
+; routine. The operating system can do system dependent clean-up or
+; simply execute an "rte" as with the sample code below.
+;
+
 _060_fpsp_done:	RTE
+
+; --------------------------------------------------------------
+;
+; _060_real_ovfl():
+;
+; This is the exit point for the 060FPSP when an enabled overflow exception
+; is present. The routine below should point to the operating system handler
+; for enabled overflow conditions. The exception stack frame is an overflow
+; stack frame. The FP state frame holds the EXCEPTIONAL OPERAND.
+;
+; The sample routine below simply clears the exception status bit and
+; does an "rte".
+;
 
 _060_real_ovfl:	FSAVE	-(SP)
 	MOVE.W	#$6000,(2,SP)
 	FRESTORE	(SP)+
 	RTE
 
+; --------------------------------------------------------------
+;
+; _060_real_unfl():
+;
+; This is the exit point for the 060FPSP when an enabled underflow exception
+; is present. The routine below should point to the operating system handler
+; for enabled underflow conditions. The exception stack frame is an underflow
+; stack frame. The FP state frame holds the EXCEPTIONAL OPERAND.
+;
+; The sample routine below simply clears the exception status bit and
+; does an "rte".
+;
 _060_real_unfl:	FSAVE	-(SP)
 	MOVE.W	#$6000,(2,SP)
 	FRESTORE	(SP)+
 	RTE
 
+; --------------------------------------------------------------
+;
+; _060_real_operr():
+;
+; This is the exit point for the 060FPSP when an enabled operand error exception
+; is present. The routine below should point to the operating system handler
+; for enabled operand error exceptions. The exception stack frame is an operand error
+; stack frame. The FP state frame holds the source operand of the faulting
+; instruction.
+;
+; The sample routine below simply clears the exception status bit and
+; does an "rte".
+;
 _060_real_operr:	FSAVE	-(SP)
 	MOVE.W	#$6000,(2,SP)
 	FRESTORE	(SP)+
 	RTE
 
+; --------------------------------------------------------------
+;
+; _060_real_snan():
+;
+; This is the exit point for the 060FPSP when an enabled signalling NaN exception
+; is present. The routine below should point to the operating system handler
+; for enabled signalling NaN exceptions. The exception stack frame is a signalling NaN
+; stack frame. The FP state frame holds the source operand of the faulting
+; instruction.
+;
+; The sample routine below simply clears the exception status bit and
+; does an "rte".
+;
 _060_real_snan:	FSAVE	-(SP)
 	MOVE.W	#$6000,(2,SP)
 	FRESTORE	(SP)+
 	RTE
 
+; --------------------------------------------------------------
+;
+; _060_real_dz():
+;
+; This is the exit point for the 060FPSP when an enabled divide-by-zero exception
+; is present. The routine below should point to the operating system handler
+; for enabled divide-by-zero exceptions. The exception stack frame is a divide-by-zero
+; stack frame. The FP state frame holds the source operand of the faulting
+; instruction.
+;
+; The sample routine below simply clears the exception status bit and
+; does an "rte".
+;
 _060_real_dz:	FSAVE	-(SP)
 	MOVE.W	#$6000,(2,SP)
 	FRESTORE	(SP)+
 	RTE
 
+; --------------------------------------------------------------
+;
+; _060_real_inex():
+;
+; This is the exit point for the 060FPSP when an enabled inexact exception
+; is present. The routine below should point to the operating system handler
+; for enabled inexact exceptions. The exception stack frame is an inexact
+; stack frame. The FP state frame holds the source operand of the faulting
+; instruction.
+;
+; The sample routine below simply clears the exception status bit and
+; does an "rte".
+;
 _060_real_inex:	FSAVE	-(SP)
 	MOVE.W	#$6000,(2,SP)
 	FRESTORE	(SP)+
 	RTE
 
+; --------------------------------------------------------------
+;
+; _060_real_bsun():
+;
+; This is the exit point for the 060FPSP when an enabled bsun exception
+; is present. The routine below should point to the operating system handler
+; for enabled bsun exceptions. The exception stack frame is a bsun
+; stack frame.
+;
+; The sample routine below clears the exception status bit, clears the NaN
+; bit in the FPSR, and does an "rte". The instruction that caused the
+; bsun will now be re-executed but with the NaN FPSR bit cleared.
+;
 _060_real_bsun:	FSAVE	-(SP)
 	FMOVE.L	FPSR,-(SP)
 	ANDI.B	#$FE,(SP)
@@ -326,2302 +360,112 @@ _060_real_bsun:	FSAVE	-(SP)
 	ADDA.L	#12,SP
 	RTE
 
+; --------------------------------------------------------------
+;
+; _060_real_fline():
+;
+; This is the exit point for the 060FPSP when an F-Line Illegal exception is
+; encountered. Three different types of exceptions can enter the F-Line exception
+; vector number 11: FP Unimplemented Instructions, FP implemented instructions when
+; the FPU is disabled, and F-Line Illegal instructions. The 060FPSP module
+; _fpsp_fline() distinguishes between the three and acts appropriately. F-Line
+; Illegals branch here.
+;
 _060_real_fline:	MOVE.L	(Vector_11,PC),-(SP)
 	RTS
 
+; --------------------------------------------------------------
+;
+; _060_real_fpu_disabled():
+;
+; This is the exit point for the 060FPSP when an FPU disabled exception is
+; encountered. Three different types of exceptions can enter the F-Line exception
+; vector number 11: FP Unimplemented Instructions, FP implemented instructions when
+; the FPU is disabled, and F-Line Illegal instructions. The 060FPSP module
+; _fpsp_fline() distinguishes between the three and acts appropriately. FPU disabled
+; exceptions branch here.
+;
+; The sample code below enables the FPU, sets the PC field in the exception stack
+; frame to the PC of the instruction causing the exception, and does an "rte".
+; The execution of the instruction then proceeds with an enabled floating-point
+; unit.
+;
 _060_real_fpu_disabled:
-	MOVE.L	D0,-(SP)
-	dc.w	$4E7A,$0808
-
-;fiX Bad code terminator
+	MOVE.L	D0,-(SP)	; enable FPU
+                        MOVEC	PCR,D0
 	BCLR	#1,D0
-	dc.w	$4E7B,$0808
-
-;fiX Bad code terminator
+	MOVEC	D0,PCR
 	MOVE.L	(SP)+,D0
-	MOVE.L	(12,SP),(2,SP)
+	MOVE.L	(12,SP),(2,SP)	; set Current pc
 	RTE
 
+; --------------------------------------------------------------
+;
+; _060_real_trap():
+;
+; This is the exit point for the 060FPSP when an emulated "ftrapcc" instruction
+; discovers that the trap condition is true and it should branch to the operating
+; system handler for the trap exception vector number 7.
+;
+; The sample code below simply executes an "rte".
+;
 _060_real_trap:	RTE
-
 _060_real_trace:	RTE
-
 _060_real_access:	RTE
 
-_060_fpsp_snan:	MOVE.L	A0,-(SP)
-	MOVEA.L	(6,SP),A0
-	MOVEA.L	(SP)+,A0
-	BRA.L	lbW000616
+; --------------------------------------------------------------
 
-;fiX Code reference expected
-_060_fpsp_operr:	MOVE.L	A0,-(SP)
-	MOVEA.L	(6,SP),A0
-	MOVEA.L	(SP)+,A0
-	BRA.L	lbW00061E
+_060_fpsp_snan:         FPSP_ENTRY 	0	
+_060_fpsp_operr:        FPSP_ENTRY  	1
+_060_fpsp_ovfl:         FPSP_ENTRY 	2
+_060_fpsp_unfl:         FPSP_ENTRY 	3
+_060_fpsp_dz:           FPSP_ENTRY  	4
+_060_fpsp_inex:         FPSP_ENTRY  	5
+_060_fpsp_fline:        FPSP_ENTRY  	6
+_060_fpsp_unsupp:       FPSP_ENTRY  	7
+_060_fpsp_effadd:       FPSP_ENTRY  	8
+                                    
+; --------------------------------------------------------------
 
-;fiX Code reference expected
-_060_fpsp_ovfl:	MOVE.L	A0,-(SP)
-	MOVEA.L	(6,SP),A0
-	MOVEA.L	(SP)+,A0
-	BRA.L	lbW000626
+_FP_CALL_TOP:	dc.l	_060_real_bsun		- _FP_CALL_TOP
+	dc.l	_060_real_snan		- _FP_CALL_TOP
+	dc.l	_060_real_operr	- _FP_CALL_TOP
+	dc.l	_060_real_ovfl		- _FP_CALL_TOP
+	dc.l	_060_real_unfl		- _FP_CALL_TOP
+	dc.l	_060_real_dz		- _FP_CALL_TOP
+	dc.l	_060_real_inex		- _FP_CALL_TOP
+	dc.l	_060_real_fline	- _FP_CALL_TOP
+	dc.l	_060_real_fpu_disabled	- _FP_CALL_TOP
+	dc.l	_060_real_trap		- _FP_CALL_TOP
+	dc.l	_060_real_trace	- _FP_CALL_TOP
+	dc.l	_060_real_access	- _FP_CALL_TOP
+	dc.l	_060_fpsp_done		- _FP_CALL_TOP
+	dcb.l	3,0
 
-;fiX Code reference expected
-_060_fpsp_unfl:	MOVE.L	A0,-(SP)
-	MOVEA.L	(6,SP),A0
-	MOVEA.L	(SP)+,A0
-	BRA.L	lbW00062E
+	dc.l	_060_imem_read		- _FP_CALL_TOP
+	dc.l	_060_dmem_read		- _FP_CALL_TOP
+	dc.l	_060_dmem_write	- _FP_CALL_TOP
+	dc.l	_060_imem_read_word	- _FP_CALL_TOP
+	dc.l	_060_imem_read_long	- _FP_CALL_TOP
+	dc.l	_060_dmem_read_byte	- _FP_CALL_TOP
+	dc.l	_060_dmem_read_word	- _FP_CALL_TOP
+	dc.l	_060_dmem_read_long	- _FP_CALL_TOP
+	dc.l	_060_dmem_write_byte	- _FP_CALL_TOP
+	dc.l	_060_dmem_write_word	- _FP_CALL_TOP
+	dc.l	_060_dmem_write_long	- _FP_CALL_TOP
+	dcb.l	5,0
 
-;fiX Code reference expected
-_060_fpsp_dz:	MOVE.L	A0,-(SP)
-	MOVEA.L	(6,SP),A0
-	MOVEA.L	(SP)+,A0
-	BRA.L	lbW000636
+_fpsp:	include     "fpsp.sa"
 
-;fiX Code reference expected
-_060_fpsp_inex:	MOVE.L	A0,-(SP)
-	MOVEA.L	(6,SP),A0
-	MOVEA.L	(SP)+,A0
-	BRA.L	lbW00063E
+*-------------------------------------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------------------------------------
 
-;fiX Code reference expected
-_060_fpsp_fline:	MOVE.L	A0,-(SP)
-	MOVEA.L	(6,SP),A0
-	MOVEA.L	(SP)+,A0
-	BRA.L	lbW000646
-
-;fiX Code reference expected
-_060_fpsp_unsupp:	MOVE.L	A0,-(SP)
-	MOVEA.L	(6,SP),A0
-	MOVEA.L	(SP)+,A0
-	BRA.L	lbW00064E
-
-;fiX Code reference expected
-_060_fpsp_effadd:	MOVE.L	A0,-(SP)
-	MOVEA.L	(6,SP),A0
-	MOVEA.L	(SP)+,A0
-	BRA.L	lbW000656
-
-;fiX Code reference expected
-_FP_CALL_TOP:	dc.l	$FFFFFF48,$FFFFFF24,$FFFFFF18,$FFFFFF00,$FFFFFF0C,$FFFFFF30,$FFFFFF3C
-	dc.l	$FFFFFF5E,$FFFFFF64,$FFFFFF7C,$FFFFFF7E,$FFFFFF80,$FFFFFEFE,0,0,0
-_FP_CALL_TOP_MEM:	dcb.l	$00000010,0
-lbW000616:	dc.w	$60FF
-lbW000618:	dc.w	0,$1740,0
-lbW00061E:	dc.w	$60FF
-lbW000620:	dc.w	0,$15F4,0
-lbW000626:	dc.w	$60FF
-lbW000628:	dc.w	0,$02B6,0
-lbW00062E:	dc.w	$60FF
-lbW000630:	dc.w	0,$0470,0
-lbW000636:	dc.w	$60FF
-lbW000638:	dc.w	0,$1B10,0
-lbW00063E:	dc.w	$60FF
-lbW000640:	dc.w	0,$19AA,0
-lbW000646:	dc.w	$60FF
-lbW000648:	dc.w	0,$1B5A,0
-lbW00064E:	dc.w	$60FF
-lbW000650:	dc.w	0,$062E,0
-lbW000656:	dc.w	$60FF
-lbW000658:	dc.w	0,$102C,0,$51FC,$51FC,$51FC,$51FC,$51FC,$51FC,$51FC,$51FC,$51FC,$51FC
-	dcb.w	$00000012,$51FC
-	dc.w	$2F00,$203A,$FF2C,$487B,$0930,$FFFF,$FEF8,$202F,4,$4E74,4,$2F00,$203A
-	dc.w	$FEF2,$487B,$0930,$FFFF,$FEE2,$202F,4,$4E74,4,$2F00,$203A,$FEE0,$487B
-	dc.w	$0930,$FFFF,$FECC,$202F,4,$4E74,4,$2F00,$203A,$FED2,$487B,$0930,$FFFF
-	dc.w	$FEB6,$202F,4,$4E74,4,$2F00,$203A,$FEA4,$487B,$0930,$FFFF,$FEA0,$202F
-	dc.w	4,$4E74,4,$2F00,$203A,$FE96,$487B,$0930,$FFFF,$FE8A,$202F,4,$4E74,4
-	dc.w	$2F00,$203A,$FE7C,$487B,$0930,$FFFF,$FE74,$202F,4,$4E74,4,$2F00,$203A
-	dc.w	$FE76,$487B,$0930,$FFFF,$FE5E,$202F,4,$4E74,4,$2F00,$203A,$FE68,$487B
-	dc.w	$0930,$FFFF,$FE48,$202F,4,$4E74,4,$2F00,$203A,$FE56,$487B,$0930,$FFFF
-	dc.w	$FE32,$202F,4,$4E74,4,$2F00,$203A,$FE44,$487B,$0930,$FFFF,$FE1C,$202F
-	dc.w	4,$4E74,4,$2F00,$203A,$FE32,$487B,$0930,$FFFF,$FE06,$202F,4,$4E74,4
-	dc.w	$2F00,$203A,$FE20,$487B,$0930,$FFFF,$FDF0,$202F,4,$4E74,4,$2F00,$203A
-	dc.w	$FE1E,$487B,$0930,$FFFF,$FDDA,$202F,4,$4E74,4,$2F00,$203A,$FE0C,$487B
-	dc.w	$0930,$FFFF,$FDC4,$202F,4,$4E74,4,$2F00,$203A,$FDFA,$487B,$0930,$FFFF
-	dc.w	$FDAE,$202F,4,$4E74,4,$2F00,$203A,$FDE8,$487B,$0930,$FFFF,$FD98,$202F
-	dc.w	4,$4E74,4,$2F00,$203A,$FDD6,$487B,$0930,$FFFF,$FD82,$202F,4,$4E74,4
-	dc.w	$2F00,$203A,$FDC4,$487B,$0930,$FFFF,$FD6C,$202F,4,$4E74,4,$2F00,$203A
-	dc.w	$FDB2,$487B,$0930,$FFFF,$FD56,$202F,4,$4E74,4,$2F00,$203A,$FDA0,$487B
-	dc.w	$0930,$FFFF,$FD40,$202F,4,$4E74,4,$2F00,$203A,$FD8E,$487B,$0930,$FFFF
-	dc.w	$FD2A,$202F,4,$4E74,4,$2F00,$203A,$FD7C,$487B,$0930,$FFFF,$FD14,$202F
-	dc.w	4,$4E74,4,$2F00,$203A,$FD6A,$487B,$0930,$FFFF,$FCFE,$202F,4,$4E74,4
-	dc.w	$40C6,$2D38,$D3D6,$4634,$3D6F,$90AE,$B1E7,$5CC7,$4000,0,$C90F,$DAA2
-	dc.w	$2168,$C235,0,0,$3FFF,0,$C90F,$DAA2,$2168,$C235,0,0,$3FE4,$5F30,$6DC9
-	dc.w	$C883
-lbW0008DE:	dc.w	$4E56,$FF40,$F32E,$FF6C,$48EE,$0303,$FF9C,$F22E,$BC00,$FF60,$F22E
-	dc.w	$F0C0,$FFDC,$2D6E,$FF68,$FF44,$206E,$FF44,$58AE,$FF44,$61FF,$FFFF
-	dc.w	$FF04,$2D40,$FF40,$082E,5,$FF42,$6600,$0116,$41EE,$FF6C,$61FF,0,$051C
-	dc.w	$41EE,$FF6C,$61FF,0,$C1DC,$1D40,$FF4E,$082E,5,$FF43,$6726,$E9EE,$0183
-	dc.w	$FF42,$61FF,0,$BD22,$41EE,$FF78,$61FF,0,$C1BA,$0C00,6,$6606,$61FF,0
-	dc.w	$C11E,$1D40,$FF4F,$4280,$102E,$FF63,$122E,$FF43,$0241,$007F,$02AE
-	dc.w	$00FF,$01FF,$FF64,$F23C,$9000,0,0,$F23C,$8800,0,0,$41EE,$FF6C,$43EE
-	dc.w	$FF78,$223B,$1530,0,$7112,$4EBB,$1930,0,$710A,$E9EE,$0183,$FF42,$61FF
-	dc.w	0,$BD4E,$082E,4,$FF62,$6622,$082E,1,$FF62,$6644,$F22E,$D0C0,$FFDC
-	dc.w	$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$4E5E,$60FF,$FFFF,$FCC6,$F22E
-	dc.w	$F040,$FF6C,$3D7C,$E005,$FF6E,$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60
-	dc.w	$4CEE,$0303,$FF9C,$F36E,$FF6C,$4E5E,$60FF,$FFFF,$FCB2,$F22E,$F040
-	dc.w	$FF6C,$1D7C,$00C4,11,$3D7C,$E001,$FF6E,$F22E,$D0C0,$FFDC,$F22E,$9C00
-	dc.w	$FF60,$4CEE,$0303,$FF9C,$F36E,$FF6C,$4E5E,$60FF,$FFFF,$FCAE,$1D7C,0
-	dc.w	$FF4E,$4280,$102E,$FF63,$02AE,$FFFF,$00FF,$FF64,$F23C,$9000,0,0,$F23C
-	dc.w	$8800,0,0,$41EE,$FF6C,$61FF,0,$B2CE,$082E,4,$FF62,$6600,$FF70,$082E,1
-	dc.w	$FF62,$6600,$FF90,$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303
-	dc.w	$FF9C,$4E5E,$0817,7,$67FF,$FFFF,$FC0C,$F22F,$A400,8,$3F7C,$2024,6
-	dc.w	$60FF,$FFFF,$FCEC
-lbW000AA0:	dc.w	$4E56,$FF40,$F32E,$FF6C,$48EE,$0303,$FF9C,$F22E,$BC00,$FF60,$F22E
-	dc.w	$F0C0,$FFDC,$2D6E,$FF68,$FF44,$206E,$FF44,$58AE,$FF44,$61FF,$FFFF
-	dc.w	$FD42,$2D40,$FF40,$082E,5,$FF42,$6600,$0132,$41EE,$FF6C,$61FF,0,$035A
-	dc.w	$41EE,$FF6C,$61FF,0,$C01A,$1D40,$FF4E,$082E,5,$FF43,$672E,$082E,4
-	dc.w	$FF43,$6626,$E9EE,$0183,$FF42,$61FF,0,$BB58,$41EE,$FF78,$61FF,0,$BFF0
-	dc.w	$0C00,6,$6606,$61FF,0,$BF54,$1D40,$FF4F,$4280,$102E,$FF63,$122E,$FF43
-	dc.w	$0241,$007F,$02AE,$00FF,$01FF,$FF64,$F23C,$9000,0,0,$F23C,$8800,0,0
-	dc.w	$41EE,$FF6C,$43EE,$FF78,$223B,$1530,0,$6F48,$4EBB,$1930,0,$6F40,$E9EE
-	dc.w	$0183,$FF42,$61FF,0,$BB84,$082E,3,$FF62,$6622,$082E,1,$FF62,$664E
-	dc.w	$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$4E5E,$60FF
-	dc.w	$FFFF,$FAFC,$082E,3,$FF66,$6700,$FFD6,$F22E,$F040,$FF6C,$3D7C,$E003
-	dc.w	$FF6E,$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$F36E
-	dc.w	$FF6C,$4E5E,$60FF,$FFFF,$FAF4,$082E,1,$FF66,$6700,$FFAA,$F22E,$F040
-	dc.w	$FF6C,$1D7C,$00C4,11,$3D7C,$E001,$FF6E,$F22E,$D0C0,$FFDC,$F22E,$9C00
-	dc.w	$FF60,$4CEE,$0303,$FF9C,$F36E,$FF6C,$4E5E,$60FF,$FFFF,$FAD0,$1D7C,0
-	dc.w	$FF4E,$4280,$102E,$FF63,$02AE,$FFFF,$00FF,$FF64,$F23C,$9000,0,0,$F23C
-	dc.w	$8800,0,0,$41EE,$FF6C,$61FF,0,$B0F0,$082E,3,$FF62,$6600,$FF66,$082E,1
-	dc.w	$FF62,$6600,$FF90,$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303
-	dc.w	$FF9C,$4E5E,$0817,7,$67FF,$FFFF,$FA2E,$F22F,$A400,8,$3F7C,$2024,6
-	dc.w	$60FF,$FFFF,$FB0E
-lbW000C7E:	dc.w	$4E56,$FF40,$F32E,$FF6C,$48EE,$0303,$FF9C,$F22E,$BC00,$FF60,$F22E
-	dc.w	$F0C0,$FFDC,$082E,5,4,$6608,$4E68,$2D48,$FFD8,$6008,$41EE,$0010,$2D48
-	dc.w	$FFD8,$2D6E,$FF68,$FF44,$206E,$FF44,$58AE,$FF44,$61FF,$FFFF,$FB4C
-	dc.w	$2D40,$FF40,$422E,$FF4A,$082E,5,$FF42,$6600,$0208,$E9EE,6,$FF42,$0C00
-	dc.w	$0013,$6700,$049E,$02AE,$00FF,$00FF,$FF64,$F23C,$9000,0,0,$F23C,$8800
-	dcb.w	2,0
-	dc.w	$41EE,$FF6C,$61FF,0,$013A,$41EE,$FF6C,$61FF,0,$BDFA,$0C00,6,$6606
-	dc.w	$61FF,0,$BD5E,$1D40,$FF4E,$E9EE,$0183,$FF42,$082E,5,$FF43,$6728,$0C2E
-	dc.w	$003A,$FF43,$6720,$61FF,0,$B92C,$41EE,$FF78,$61FF,0,$BDC4,$0C00,6
-	dc.w	$6606,$61FF,0,$BD28,$1D40,$FF4F,$4280,$102E,$FF63,$E9EE,$1047,$FF43
-	dc.w	$41EE,$FF6C,$43EE,$FF78,$223B,$1D30,0,$6D36,$4EBB,$1930,0,$6D2E,$102E
-	dc.w	$FF62,$6634,$102E,$FF43,$0200,$0038,$0C00,$0038,$670C,$E9EE,$0183
-	dc.w	$FF42,$61FF,0,$B95E,$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303
-	dc.w	$FF9C,$4E5E,$60FF,$FFFF,$F8E6,$C02E,$FF66,$EDC0,$0608,$6614,$082E,4
-	dc.w	$FF66,$67BA,$082E,1,$FF62,$67B2,$6000,$0066,$0480,0,$0018,$0C00,6
-	dc.w	$6614,$082E,3,$FF66,$6600,$004A,$082E,4,$FF66,$6600,$0046,$2F00,$61FF
-	dc.w	0,$07E0,$201F,$3D7B,$0222,$FF6E,$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60
-	dc.w	$4CEE,$0303,$FF9C,$F36E,$FF6C,$4E5E,$60FF,$FFFF,$F87A,$E000,$E006
-	dc.w	$E004,$E005,$E003,$E002,$E001,$E001,$303C,4,$60BC,$303C,3,$60B6,$E9EE
-	dc.w	6,$FF42,$0C00,$0011,$6708,$0C00,$0015,$6750,$4E75,$3028,0,$0240,$7FFF
-	dc.w	$0C40,$3F80,$6708,$0C40,$407F,$672C,$4E75,$02A8,$7FFF,$FFFF,4,$6718
-	dc.w	$61FF,0,$BBBC,$4440,$0640,$3F81,$0268,$8000,0,$8168,0,$4E75,$0268
-	dc.w	$8000,0,$4E75,$0228,$007F,4,$0068,$7FFF,0,$4E75,$3028,0,$0240,$7FFF
-	dc.w	$0C40,$3C00,$6708,$0C40,$43FF,$67DE,$4E75,$02A8,$7FFF,$FFFF,4,$6606
-	dc.w	$4AA8,8,$67C4,$61FF,0,$BB68,$4440,$0640,$3C01,$0268,$8000,0,$8168,0
-	dc.w	$4E75,$E9EE,$00C3,$FF42,$0C00,3,$6700,$04A2,$0C00,7,$6700,$049A,$02AE
-	dc.w	$FFFF,$00FF,$FF64,$F23C,$9000,0,0,$F23C,$8800,0,0,$302E,$FF6C,$0240
-	dc.w	$7FFF,$6710,$41EE,$FF6C,$61FF,0,$BB5C,$1D40,$FF4E,$6006,$1D7C,4,$FF4E
-	dc.w	$4280,$102E,$FF63,$41EE,$FF6C,$2D56,$FFD4,$61FF,0,$ADEC,$102E,$FF62
-	dc.w	$6600,$0086,$2CAE,$FFD4,$082E,5,4,$6626,$206E,$FFD8,$4E60,$F22E,$D0C0
-	dc.w	$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$4E5E,$0817,7,$667A,$60FF
-	dc.w	$FFFF,$F722,$0C2E,8,$FF4A,$66D8,$F22E,$F080,$FF6C,$F22E,$D0C0,$FFDC
-	dc.w	$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$2C56,$2F6F,$00C4,$00B8,$2F6F
-	dc.w	$00C8,$00BC,$2F6F,$002C,$00C4,$2F6F,$0030,$00C8,$2F6F,$0034,$00CC
-	dc.w	$DFFC,0,$00B8,$0817,7,$6628,$60FF,$FFFF,$F6D0,$C02E,$FF66,$EDC0,$0608
-	dc.w	$662A,$082E,4,$FF66,$6700,$FF6A,$082E,1,$FF62,$6700,$FF60,$6000,$0166
-	dc.w	$3F7C,$2024,6,$F22F,$A400,8,$60FF,$FFFF,$F78E,$0480,0,$0018,$303B
-	dc.w	$020A,$4EFB,6,$4AFC,8,0,0,$003A,$0064,$0094,0,$0140,0,$F22E,$D0C0
-	dc.w	$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$3D7C,$30D8,10,$3D7C,$E006
-	dc.w	$FF6E,$F36E,$FF6C,$4E5E,$60FF,$FFFF,$F6D4,$F22E,$D0C0,$FFDC,$F22E
-	dc.w	$9C00,$FF60,$4CEE,$0303,$FF9C,$3D7C,$30D0,10,$3D7C,$E004,$FF6E,$F36E
-	dc.w	$FF6C,$4E5E,$60FF,$FFFF,$F694,$F22E,$F040,$FF6C,$F22E,$D0C0,$FFDC
-	dc.w	$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$3D7C,$30D4,10,$3D7C,$E005,$FF6E
-	dc.w	$F36E,$FF6C,$4E5E,$60FF,$FFFF,$F60C,$2CAE,$FFD4,$082E,5,4,$6600,$0038
-	dc.w	$206E,$FFD8,$4E60,$F22E,$F040,$FF6C,$F22E,$D0C0,$FFDC,$F22E,$9C00
-	dc.w	$FF60,$4CEE,$0303,$FF9C,$3D7C,$30CC,10,$3D7C,$E003,$FF6E,$F36E,$FF6C
-	dc.w	$4E5E,$60FF,$FFFF,$F5DE,$0C2E,8,$FF4A,$66C8,$F22E,$F080,$FF6C,$F22E
-	dc.w	$F040,$FF78,$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C
-	dc.w	$3D7C,$30CC,10,$3D7C,$E003,$FF7A,$F36E,$FF78,$2C56,$2F6F,$00C4,$00B8
-	dc.w	$2F6F,$00C8,$00BC,$2F6F,$00CC,$00C0,$2F6F,$002C,$00C4,$2F6F,$0030
-	dc.w	$00C8,$2F6F,$0034,$00CC,$DFFC,0,$00B8,$60FF,$FFFF,$F576,$F22E,$F040
-	dc.w	$FF6C,$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$3D7C
-	dc.w	$30C4,10,$3D7C,$E001,$FF6E,$F36E,$FF6C,$4E5E,$60FF,$FFFF,$F55C,$02AE
-	dcb.w	2,$00FF
-	dc.w	$FF64,$F23C,$9000,0,0,$F23C,$8800,0,0,$61FF,0,$BDBA,$41EE,$FF6C,$61FF
-	dc.w	0,$B962,$1D40,$FF4E,$E9EE,$0183,$FF42,$082E,5,$FF43,$6728,$0C2E,$003A
-	dc.w	$FF43,$6720,$61FF,0,$B4A0,$41EE,$FF78,$61FF,0,$B938,$0C00,6,$6606
-	dc.w	$61FF,0,$B89C,$1D40,$FF4F,$4280,$102E,$FF63,$E9EE,$1047,$FF43,$41EE
-	dc.w	$FF6C,$43EE,$FF78,$223B,$1D30,0,$68AA,$4EBB,$1930,0,$68A2,$102E,$FF62
-	dc.w	$6600,$008A,$102E,$FF43,$0200,$0038,$0C00,$0038,$670C,$E9EE,$0183
-	dc.w	$FF42,$61FF,0,$B4D0,$082E,5,4,$6600,$002A,$206E,$FFD8,$4E60,$F22E
-	dc.w	$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$4E5E,$0817,7,$6600
-	dc.w	$0126,$60FF,$FFFF,$F440,$082E,2,$FF4A,$67D6,$F22E,$D0C0,$FFDC,$F22E
-	dc.w	$9C00,$FF60,$4CEE,$0303,$FF9C,$4E5E,$2F6F,4,$0010,$2F6F,0,12,$DFFC,0
-	dc.w	12,$0817,7,$6600,$00EA,$60FF,$FFFF,$F404,$C02E,$FF66,$EDC0,$0608
-	dc.w	$6618,$082E,4,$FF66,$6700,$FF66,$082E,1,$FF62,$6700,$FF5C,$6000,$006E
-	dc.w	$0480,0,$0018,$0C00,6,$6D14,$082E,3,$FF66,$6600,$0060,$082E,4,$FF66
-	dc.w	$6600,$004E,$082E,5,4,$6600,$0054,$206E,$FFD8,$4E60,$3D7B,$022A,$FF6E
-	dc.w	$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$F36E,$FF6C
-	dc.w	$4E5E,$0817,7,$6600,$006C,$60FF,$FFFF,$F386,$E000,$E006,$E004,$E005
-	dc.w	$E003,$E002,$E001,$E001,$303C,3,$6000,$FFAE,$303C,4,$6000,$FFA6,$082E
-	dc.w	2,$FF4A,$67AC,$3D7B,$02D6,$FF6E,$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60
-	dc.w	$4CEE,$0303,$FF9C,$F36E,$FF6C,$4E5E,$2F6F,4,$0010,$2F6F,0,12,$DFFC,0
-	dc.w	12,$0817,7,$6606,$60FF,$FFFF,$F322,$3F7C,$2024,6,$F22F,$A400,8,$60FF
-	dc.w	$FFFF,$F402,$02AE,$FFFF,$00FF,$FF64,$F23C,$9000,0,0,$F23C,$8800,0,0
-	dc.w	$E9EE,$0183,$FF42,$61FF,0,$B22A,$41EE,$FF6C,$61FF,0,$B752,$0C00,6
-	dc.w	$6606,$61FF,0,$B6B6,$1D40,$FF4E,$4280,$102E,$FF63,$41EE,$FF6C,$2D56
-	dc.w	$FFD4,$61FF,0,$A94E,$102E,$FF62,$6600,$0084,$2CAE,$FFD4,$082E,5,4
-	dc.w	$6628,$206E,$FFD8,$4E60,$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE
-	dc.w	$0303,$FF9C,$4E5E,$0817,7,$6600,$FF68,$60FF,$FFFF,$F282,$082E,3,$FF4A
-	dc.w	$67D6,$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$2C56
-	dc.w	$2F6F,$00C4,$00B8,$2F6F,$00C8,$00BC,$2F6F,$0038,$00C4,$2F6F,$003C
-	dc.w	$00C8,$2F6F,$0040,$00CC,$DFFC,0,$00B8,$0817,7,$6600,$FF1A,$60FF,$FFFF
-	dc.w	$F234,$C02E,$FF66,$EDC0,$0608,$6700,$FF74,$2CAE,$FFD4,$0C00,$001A
-	dc.w	$6E00,$00E8,$6700,$0072,$082E,5,4,$660A,$206E,$FFD8,$4E60,$6000,$FB8E
-	dc.w	$0C2E,8,$FF4A,$6600,$FB84,$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE
-	dc.w	$0303,$FF9C,$3D7C,$30D8,10,$3D7C,$E006,$FF6E,$F36E,$FF6C,$2C56,$2F6F
-	dc.w	$00C4,$00B8,$2F6F,$00C8,$00BC,$2F6F,$00CC,$00C0,$2F6F,$0038,$00C4
-	dc.w	$2F6F,$003C,$00C8,$2F6F,$0040,$00CC,$DFFC,0,$00B8,$60FF,$FFFF,$F22C
-	dc.w	$082E,5,4,$6600,12,$206E,$FFD8,$4E60,$6000,$FB46,$0C2E,8,$FF4A,$6600
-	dc.w	$FB3C,$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$3D7C
-	dc.w	$30D0,10,$3D7C,$E004,$FF6E,$F36E,$FF6C,$2C56,$2F6F,$00C4,$00B8,$2F6F
-	dc.w	$00C8,$00BC,$2F6F,$00CC,$00C0,$2F6F,$0038,$00C4,$2F6F,$003C,$00C8
-	dc.w	$2F6F,$0040,$00CC,$DFFC,0,$00B8,$60FF,$FFFF,$F1A4,$082E,5,4,$6600,12
-	dc.w	$206E,$FFD8,$4E60,$6000,$FBDA,$0C2E,8,$FF4A,$6600,$FBD0,$F22E,$D0C0
-	dc.w	$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$3D7C,$30C4,10,$3D7C,$E001
-	dc.w	$FF6E,$F36E,$FF6C,$2C56,$2F6F,$00C4,$00B8,$2F6F,$00C8,$00BC,$2F6F
-	dc.w	$00CC,$00C0,$2F6F,$0038,$00C4,$2F6F,$003C,$00C8,$2F6F,$0040,$00CC
-	dc.w	$DFFC,0,$00B8,$60FF,$FFFF,$F106,$E9EE,$00C3,$FF42,$0C00,1,$6708,$0C00
-	dc.w	5,$6734,$4E75,$302E,$FF6C,$0240,$7FFF,$6726,$0C40,$3F80,$6E20,$4440
-	dc.w	$0640,$3F81,$222E,$FF70,$E0A9,$08C1,$001F,$2D41,$FF70,$026E,$8000
-	dc.w	$FF6C,$006E,$3F80,$FF6C,$4E75,$302E,$FF6C,$0240,$7FFF,$673A,$0C40
-	dc.w	$3C00,$6E34,$4A2E,$FF6C,$5BEE,$FF6E,$3D40,$FF6C,$4280,$41EE,$FF6C
-	dc.w	$323C,$3C01,$61FF,0,$B156,$303C,$3C00,$4A2E,$FF6E,$6704,$08C0,15
-	dc.w	$08EE,7,$FF70,$3D40,$FF6C,$4E75,$082E,5,4,$67FF,$FFFF,$F176,$2D68,0
-	dc.w	$FF78,$2D68,4,$FF7C,$2D68,8,$FF80,$4281,$4E75
-lbW001684:	dc.w	$2F00,$4E7A,$0808,$0800,1,$6600,$0460,$201F,$4E56,$FF40,$48EE,$0303
-	dc.w	$FF9C,$F22E,$BC00,$FF60,$F22E,$F0C0,$FFDC,$2D6E,6,$FF44,$206E,$FF44
-	dc.w	$58AE,$FF44,$61FF,$FFFF,$F152,$2D40,$FF40,$4A40,$6B00,$020E,$02AE
-	dcb.w	2,$00FF
-	dc.w	$FF64,$0800,10,$6618,$206E,$FF44,$43EE,$FF6C,$700C,$61FF,$FFFF,$F0D2
-	dc.w	$4A81,$6600,$0492,$6048,$206E,$FF44,$43EE,$FF6C,$700C,$61FF,$FFFF
-	dc.w	$F0BA,$4A81,$6600,$047A,$E9EE,$004F,$FF6C,$0C40,$7FFF,$6726,$102E
-	dc.w	$FF6F,$0200,15,$660C,$4AAE,$FF70,$6606,$4AAE,$FF74,$6710,$41EE,$FF6C
-	dc.w	$61FF,0,$B88C,$F22E,$F080,$FF6C,$06AE,0,12,$FF44,$41EE,$FF6C,$61FF,0
-	dc.w	$B3C2,$1D40,$FF4E,$0C00,6,$660A,$61FF,0,$B322,$1D40,$FF4E,$422E,$FF53
-	dc.w	$082E,5,$FF43,$6748,$082E,4,$FF43,$662C,$E9EE,$0183,$FF42,$61FF,0
-	dc.w	$AEEC,$41EE,$FF78,$61FF,0,$B384,$1D40,$FF4F,$0C00,6,$6620,$61FF,0
-	dc.w	$B2E4,$1D40,$FF4F,$6014,$082E,3,$FF43,$670C,$50EE,$FF53,$082E,1,$FF43
-	dc.w	$67C0,$4280,$102E,$FF63,$122E,$FF43,$0241,$007F,$F23C,$9000,0,0,$F23C
-	dc.w	$8800,0,0,$41EE,$FF6C,$43EE,$FF78,$223B,$1530,0,$62CA,$4EBB,$1930,0
-	dc.w	$62C2,$102E,$FF62,$6640,$4A2E,$FF53,$660C,$E9EE,$0183,$FF42,$61FF,0
-	dc.w	$AEFA,$2D6E,6,$FF68,$2D6E,$FF44,6,$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60
-	dc.w	$4CEE,$0303,$FF9C,$4E5E,$0817,7,$6600,$0096,$60FF,$FFFF,$EE6E,$C02E
-	dc.w	$FF66,$EDC0,$0608,$6612,$082E,4,$FF66,$67AE,$082E,1,$FF62,$67AC,$6034
-	dc.w	$0480,0,$0018,$0C00,6,$6610,$082E,4,$FF66,$6620,$082E,3,$FF66,$6620
-	dc.w	$3D7B,$0206,$FF6E,$601E,$E002,$E006,$E004,$E005,$E003,$E002,$E001
-	dc.w	$E001,$3D7C,$E005,$FF6E,$6006,$3D7C,$E003,$FF6E,$2D6E,6,$FF68,$2D6E
-	dc.w	$FF44,6,$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$F36E
-	dc.w	$FF6C,$4E5E,$0817,7,$6606,$60FF,$FFFF,$EDE0,$2F17,$3F6F,8,4,$3F7C
-	dc.w	$2024,6,$F22F,$A400,8,$60FF,$FFFF,$EEB8,$0800,14,$6700,$01C2,$082E,5
-	dc.w	4,$6616,$4E68,$2D48,$FFD8,$61FF,0,$9564,$206E,$FFD8,$4E60,$6000,$01AA
-	dc.w	$422E,$FF4A,$41EE,12,$2D48,$FFD8,$61FF,0,$9548,$0C2E,8,$FF4A,$6700
-	dc.w	$0086,$0C2E,4,$FF4A,$6600,$0184,$082E,7,4,$6636,$3DAE,4,$0804,$2DAE
-	dc.w	$FF44,$0806,$3DBC,$00F0,$080A,$41F6,$0804,$2D48,4,$F22E,$D0C0,$FFDC
-	dc.w	$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$4E5E,$2E5F,$60FF,$FFFF,$ED3C
-	dc.w	$3DAE,4,$0800,$2DAE,$FF44,$0802,$3DBC,$2024,$0806,$2DAE,6,$0808,$41F6
-	dc.w	$0800,$2D48,4,$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C
-	dc.w	$4E5E,$2E5F,$60FF,$FFFF,$EDF2,$1D41,10,$1D40,11,$F22E,$D0C0,$FFDC
-	dc.w	$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$2F16,$2F00,$2F01,$2F2E,$FF44
-	dc.w	$4280,$102E,11,$4480,$082E,7,4,$671C,$3DAE,4,$0800,$2DAE,6,$0808
-	dc.w	$2D9F,$0802,$3DBC,$2024,$0806,$4876,$0800,$6014,$3DAE,4,$0804,$2D9F
-	dc.w	$0806,$3DBC,$00F0,$080A,$4876,$0804,$4281,$122E,10,$4A01,$6A0C,$F236
-	dc.w	$F080,$080C,$0680,0,12,$E309,$6A0C,$F236,$F040,$080C,$0680,0,12,$E309
-	dc.w	$6A0C,$F236,$F020,$080C,$0680,0,12,$E309,$6A0C,$F236,$F010,$080C
-	dc.w	$0680,0,12,$E309,$6A0C,$F236,$F008,$080C,$0680,0,12,$E309,$6A0C,$F236
-	dc.w	$F004,$080C,$0680,0,12,$E309,$6A0C,$F236,$F002,$080C,$0680,0,12,$E309
-	dc.w	$6A06,$F236,$F001,$080C,$222F,4,$202F,8,$2C6F,12,$2E5F,$0817,7,$67FF
-	dc.w	$FFFF,$EC04,$60FF,$FFFF,$ECF0,$61FF,0,$9BDA,$F22E,$D0C0,$FFDC,$F22E
-	dc.w	$9C00,$FF60,$4CEE,$0303,$FF9C,$082E,7,4,$660E,$2D6E,$FF44,6,$4E5E
-	dc.w	$60FF,$FFFF,$EBD0,$2C56,$3F6F,$00C4,$00C0,$2F6F,$00C6,$00C8,$2F6F,4
-	dc.w	$00C2,$3F7C,$2024,$00C6,$DFFC,0,$00C0,$60FF,$FFFF,$EC9C,$201F,$4E56
-	dc.w	$FF40,$48EE,$0303,$FF9C,$2D6E,6,$FF44,$206E,$FF44,$58AE,$FF44,$61FF
-	dc.w	$FFFF,$ED00,$2D40,$FF40,$4A40,$6B04,$7010,$6026,$0800,14,$6610,$E9C0
-	dc.w	$14C3,$700C,$0C01,7,$6614,$5880,$6010,$4280,$61FF,0,$967C,$202E,$FF44
-	dc.w	$90AE,6,$3D40,10,$4CEE,$0303,$FF9C,$4E5E,$518F,$2F00,$3F6F,12,4,$2F6F
-	dc.w	14,6,$4280,$302F,$0012,$2F6F,6,$0010,$D1AF,6,$3F7C,$402C,10,$201F
-	dc.w	$60FF,$FFFF,$EBE4,$4E7A,$0808,$0800,1,$660C,$F22E,$9C00,$FF60,$F22E
-	dc.w	$D0C0,$FFDC,$4CEE,$0303,$FF9C,$4E5E,$514F,$2EAF,8,$3F6F,12,4,$3F7C
-	dc.w	$4008,6,$2F6F,2,8,$2F7C,$0942,$8001,12,$0817,5,$6706,$08EF,2,13,$60FF
-	dc.w	$FFFF,$EBD6,$4FEE,$FF40,$4E7A,$1808,$0801,1,$660C,$F22E,$D0C0,$FFDC
-	dc.w	$F22F,$9C00,$0020,$2C56,$2F6F,$00C4,$00BC,$3F6F,$00C8,$00C0,$3F7C
-	dc.w	$4008,$00C2,$2F48,$00C4,$3F40,$00C8,$3F7C,1,$00CA,$4CEF,$0303,$005C
-	dc.w	$DEFC,$00BC,$60A6
-lbW001C14:	dc.w	$4E56,$FF40,$F32E,$FF6C,$48EE,$0303,$FF9C,$F22E,$BC00,$FF60,$F22E
-	dc.w	$F0C0,$FFDC,$2D6E,$FF68,$FF44,$206E,$FF44,$58AE,$FF44,$61FF,$FFFF
-	dc.w	$EBCE,$2D40,$FF40,$0800,13,$6628,$41EE,$FF6C,$61FF,$FFFF,$F1EA,$F22E
-	dc.w	$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$F36E,$FF6C,$4E5E
-	dc.w	$60FF,$FFFF,$EA94,$322E,$FF6C,$0241,$7FFF,$0C41,$7FFF,$661A,$4AAE
-	dc.w	$FF74,$660C,$222E,$FF70,$0281,$7FFF,$FFFF,$6708,$2D6E,$FF70,$FF54
-	dc.w	$6012,$223C,$7FFF,$FFFF,$4A2E,$FF6C,$6A02,$5281,$2D41,$FF54,$E9C0
-	dc.w	$04C3,$122E,$FF41,$307B,$0206,$4EFB,$8802,$006C,0,0,$FF98,$003E,0
-	dc.w	$0010,0,$102E,$FF54,$0C01,7,$6F16,$206E,12,$61FF,$FFFF,$EB86,$4A81
-	dc.w	$66FF,0,$BCA8,$6000,$FF6A,$0241,7,$61FF,0,$A804,$6000,$FF5C,$302E
-	dc.w	$FF54,$0C01,7,$6F16,$206E,12,$61FF,$FFFF,$EB6E,$4A81,$66FF,0,$BC88
-	dc.w	$6000,$FF3C,$0241,7,$61FF,0,$A79A,$6000,$FF2E,$202E,$FF54,$0C01,7
-	dc.w	$6F16,$206E,12,$61FF,$FFFF,$EB56,$4A81,$66FF,0,$BC68,$6000,$FF0E
-	dc.w	$0241,7,$61FF,0,$A730,$6000,$FF00
-lbW001D58:	dc.w	$4E56,$FF40,$F32E,$FF6C,$48EE,$0303,$FF9C,$F22E,$BC00,$FF60,$F22E
-	dc.w	$F0C0,$FFDC,$2D6E,$FF68,$FF44,$206E,$FF44,$58AE,$FF44,$61FF,$FFFF
-	dc.w	$EA8A,$2D40,$FF40,$0800,13,$6600,$002A,$41EE,$FF6C,$61FF,$FFFF,$F0A4
-	dc.w	$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$F36E,$FF6C
-	dc.w	$4E5E,$60FF,$FFFF,$E964,$E9C0,$04C3,$122E,$FF41,$307B,$0206,$4EFB
-	dc.w	$8802,$0074,$00A6,$015A,0,$0042,$0104,$0010,0,$102E,$FF70,$08C0,6
-	dc.w	$0C01,7,$6F16,$206E,12,$61FF,$FFFF,$EA76,$4A81,$66FF,0,$BB98,$6000
-	dc.w	$FFA0,$0241,7,$61FF,0,$A6F4,$6000,$FF92,$302E,$FF70,$08C0,14,$0C01,7
-	dc.w	$6F16,$206E,12,$61FF,$FFFF,$EA5A,$4A81,$66FF,0,$BB74,$6000,$FF6E
-	dc.w	$0241,7,$61FF,0,$A686,$6000,$FF60,$202E,$FF70,$08C0,$001E,$0C01,7
-	dc.w	$6F16,$206E,12,$61FF,$FFFF,$EA3E,$4A81,$66FF,0,$BB50,$6000,$FF3C
-	dc.w	$0241,7,$61FF,0,$A618,$6000,$FF2E,$0C01,7,$6F2E,$202E,$FF6C,$0280
-	dc.w	$8000,0,$0080,$7FC0,0,$222E,$FF70,$E089,$8081,$206E,12,$61FF,$FFFF
-	dc.w	$E9FC,$4A81,$66FF,0,$BB0E,$6000,$FEFA,$202E,$FF6C,$0280,$8000,0,$0080
-	dc.w	$7FC0,0,$2F01,$222E,$FF70,$E089,$8081,$221F,$0241,7,$61FF,0,$A5BA
-	dc.w	$6000,$FED0,$202E,$FF6C,$0280,$8000,0,$0080,$7FF8,0,$222E,$FF70,$2D40
-	dc.w	$FF84,$700B,$E0A9,$83AE,$FF84,$222E,$FF70,$0281,0,$07FF,$E0B9,$2D41
-	dc.w	$FF88,$222E,$FF74,$E0A9,$83AE,$FF88,$41EE,$FF84,$226E,12,$7008,$61FF
-	dc.w	$FFFF,$E8CC,$4A81,$66FF,0,$BA9C,$6000,$FE7A,$422E,$FF4A,$3D6E,$FF6C
-	dc.w	$FF84,$426E,$FF86,$202E,$FF70,$08C0,$001E,$2D40,$FF88,$2D6E,$FF74
-	dc.w	$FF8C,$082E,5,4,$6638,$4E68,$2D48,$FFD8,$2D56,$FFD4,$61FF,0,$9892
-	dc.w	$2248,$2D48,12,$206E,$FFD8,$4E60,$2CAE,$FFD4,$41EE,$FF84,$700C,$61FF
-	dc.w	$FFFF,$E86C,$4A81,$66FF,0,$BA4A,$6000,$FE1A,$2D56,$FFD4,$61FF,0,$9860
-	dc.w	$2248,$2D48,12,$2CAE,$FFD4,$0C2E,8,$FF4A,$66CC,$F22E,$D0C0,$FFDC
-	dc.w	$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$F36E,$FF6C,$2C6E,$FFD4,$2F6F
-	dc.w	$00C4,$00B8,$2F6F,$00C8,$00BC,$2F6F,$00CC,$00C0,$2F6F,$0044,$00C4
-	dc.w	$2F6F,$0048,$00C8,$2F6F,$004C,$00CC,$DFFC,0,$00B8,$60FF,$FFFF,$E734
-lbW001FEA:	dc.w	$4E56,$FF40,$F32E,$FF6C,$48EE,$0303,$FF9C,$F22E,$BC00,$FF60,$F22E
-	dc.w	$F0C0,$FFDC,$2D6E,$FF68,$FF44,$206E,$FF44,$58AE,$FF44,$61FF,$FFFF
-	dc.w	$E7F8,$2D40,$FF40,$0800,13,$6600,$0106,$E9C0,$04C3,$6622,$0C6E,$401E
-	dc.w	$FF6C,$661A,$F23C,$9000,0,0,$F22E,$4000,$FF70,$F22E,$6800,$FF6C,$3D7C
-	dc.w	$E001,$FF6E,$41EE,$FF6C,$61FF,$FFFF,$EDEA,$02AE,$00FF,$01FF,$FF64
-	dc.w	$F23C,$9000,0,0,$F23C,$8800,0,0,$E9EE,$1006,$FF42,$0C01,$0017,$6700
-	dc.w	$0096,$41EE,$FF6C,$61FF,0,$AA84,$1D40,$FF4E,$082E,5,$FF43,$672E,$082E
-	dc.w	4,$FF43,$6626,$E9EE,$0183,$FF42,$61FF,0,$A5C2,$41EE,$FF78,$61FF,0
-	dc.w	$AA5A,$0C00,6,$6606,$61FF,0,$A9BE,$1D40,$FF4F,$4280,$102E,$FF63,$122E
-	dc.w	$FF43,$0241,$007F,$41EE,$FF6C,$43EE,$FF78,$223B,$1530,0,$59CA,$4EBB
-	dc.w	$1930,0,$59C2,$E9EE,$0183,$FF42,$61FF,0,$A606,$F22E,$D0C0,$FFDC,$F22E
-	dc.w	$9C00,$FF60,$4CEE,$0303,$FF9C,$F36E,$FF6C,$4E5E,$60FF,$FFFF,$E5CC
-	dc.w	$4280,$102E,$FF63,$122E,$FF43,$0281,0,$007F,$61FF,0,$43CE,$60BE,$1D7C
-	dc.w	0,$FF4E,$4280,$102E,$FF63,$02AE,$FFFF,$00FF,$FF64,$41EE,$FF6C,$61FF,0
-	dc.w	$9BE4,$60AA
-lbW002148:	dc.w	$4E56,$FF40,$F32E,$FF6C,$48EE,$0303,$FF9C,$F22E,$BC00,$FF60,$F22E
-	dc.w	$F0C0,$FFDC,$2D6E,$FF68,$FF44,$206E,$FF44,$58AE,$FF44,$61FF,$FFFF
-	dc.w	$E69A,$2D40,$FF40,$41EE,$FF6C,$61FF,$FFFF,$ECBC,$F22E,$D0C0,$FFDC
-	dc.w	$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$F36E,$FF6C,$4E5E,$60FF,$FFFF
-	dc.w	$E592
-lbW0021A2:	dc.w	$0C6F,$202C,6,$67FF,0,$00AA,$0C6F,$402C,6,$67FF,$FFFF,$E5A6,$4E56
-	dc.w	$FF40,$48EE,$0303,$FF9C,$2D6E,6,$FF44,$206E,$FF44,$58AE,$FF44,$61FF
-	dc.w	$FFFF,$E638,$E9C0,$100A,$0C41,$03C8,$6664,$E9C0,$1406,$0C01,$0017
-	dc.w	$665A,$4E7A,$0808,$0800,1,$672A,$4CEE,$0303,$FF9C,$4E5E,$518F,$3EAF,8
-	dc.w	$2F6F,10,2,$3F7C,$402C,6,$2F6F,2,12,$58AF,2,$60FF,$FFFF,$E540,$4CEE
-	dc.w	$0303,$FF9C,$4E5E,$F22F,$8400,2,$58AF,2,$2F17,$2F6F,8,4,$1F7C,$0020,6
-	dc.w	$60FF,0,$0012,$4CEE,$0303,$FF9C,$4E5E,$60FF,$FFFF,$E4F6,$4E56,$FF40
-	dc.w	$48EE,$0303,$FF9C,$F22E,$BC00,$FF60,$F22E,$F0C0,$FFDC,$082E,5,4,$6608
-	dc.w	$4E68,$2D48,$FFD8,$600C,$41EE,$0010,$2D48,$FFD8,$2D48,$FFD4,$2D6E
-	dc.w	$FF68,$FF44,$206E,$FF44,$58AE,$FF44,$61FF,$FFFF,$E576,$2D40,$FF40
-	dc.w	$F23C,$9000,0,0,$F23C,$8800,0,0,$422E,$FF4A,$0800,$0016,$6600,$0182
-	dc.w	$422E,$FF53,$02AE,$00FF,$00FF,$FF64,$E9C0,$1406,$0C01,$0017,$6700
-	dc.w	$00BE,$61FF,0,$95FC,$4280,$102E,$FF63,$122E,$FF43,$0241,$003F,$E749
-	dc.w	$822E,$FF4E,$43EE,$FF78,$41EE,$FF6C,$323B,$1320,$02B2,$4EBB,$1120
-	dc.w	$02AC,$102E,$FF62,$6600,$00A2,$E9EE,$0183,$FF42,$61FF,0,$A3E4,$F22E
-	dc.w	$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$0C2E,4,$FF4A,$672A
-	dc.w	$0C2E,8,$FF4A,$6722,$4E5E,$0817,7,$67FF,$FFFF,$E358,$F327,$F22F,$A400
-	dc.w	$0014,$F35F,$3F7C,$2024,6,$60FF,$FFFF,$E434,$082E,5,4,$660C,$2F08
-	dc.w	$206E,$FFD8,$4E60,$205F,$60CA,$2F00,$202E,$FFD8,$90AE,$FFD4,$2DAE,8
-	dc.w	$0808,$2DAE,4,$0804,$3D40,4,$201F,$4E5E,$DED7,$60AA,$4280,$102E,$FF63
-	dc.w	$122E,$FF43,$0281,0,$007F,$61FF,0,$4150,$6000,$FF5A,$C02E,$FF66,$EDC0
-	dc.w	$0608,$6616,$082E,4,$FF66,$6700,$FF4E,$082E,1,$FF62,$6700,$FF44,$603E
-	dc.w	$0480,0,$0018,$0C00,6,$6610,$082E,4,$FF66,$662A,$082E,3,$FF66,$6630
-	dc.w	$2F00,$61FF,$FFFF,$F1EE,$201F,$3D7B,$0206,$FF6E,$602A,$E002,$E006
-	dc.w	$E004,$E005,$E003,$E002,$E001,$E001,$61FF,$FFFF,$F1CE,$3D7C,$E005
-	dc.w	$FF6E,$600C,$61FF,$FFFF,$F1C0,$3D7C,$E003,$FF6E,$F22E,$D0C0,$FFDC
-	dc.w	$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$F36E,$FF6C,$6000,$FEEE,$E9C0
-	dc.w	$1283,$0C01,1,$6700,$0056,$0C01,7,$6600,$0078,$E9C0,$1343,$0C01,2
-	dc.w	$6D00,$006C,$61FF,0,$8278,$0C2E,2,$FF4A,$6700,$00D2,$0C2E,1,$FF4A
-	dc.w	$6600,$0100,$2D6E,$FF68,12,$3D7C,$201C,10,$F22E,$D0C0,$FFDC,$F22E
-	dc.w	$9C00,$FF60,$4CEE,$0303,$FF9C,$4E5E,$60FF,$FFFF,$E2DC,$206E,$FF44
-	dc.w	$54AE,$FF44,$61FF,$FFFF,$E352,$4A81,$6600,$047C,$48C0,$61FF,0,$7E60
-	dc.w	$0C2E,2,$FF4A,$6700,$007C,$6000,$00B0,$61FF,0,$8562,$0C2E,2,$FF4A
-	dc.w	$6700,$0068,$082E,5,4,$660A,$206E,$FFD8,$4E60,$6000,$008E,$0C2E,8
-	dc.w	$FF4A,$6600,$0084,$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303
-	dc.w	$FF9C,$4E5E,$0817,7,$6612,$558F,$2EAF,2,$2F6F,6,4,$60FF,$FFFF,$E17E
-	dc.w	$558F,$2EAF,2,$3F6F,6,4,$3F7C,$2024,6,$F22F,$A400,8,$60FF,$FFFF,$E252
-	dc.w	$3D7C,$00C0,14,$2D6E,$FF68,10,$3D6E,4,8,$3D7C,$E000,$FF6E,$F22E,$D0C0
-	dc.w	$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$F36E,$FF6C,$4E5E,$588F
-	dc.w	$60FF,$FFFF,$E180,$F22E,$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303
-	dc.w	$FF9C,$4E5E,$0817,7,$6606,$60FF,$FFFF,$E108,$F22F,$A400,8,$1F7C,$0024
-	dc.w	7,$60FF,$FFFF,$E1E8,$4AFC,$01C0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,$28A4
-	dc.w	$4B1E,$4B4C,$4F4C,$2982,$4F3C,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-	dcb.w	6,0
-	dc.w	$35C6,$4B1E,$4B82,$4F4C,$371A,$4F3C,0,0,0,0,0,0,0,0,0,0,$24B0,$4B1E
-	dc.w	$4B8C,$4F4C,$2766,$4F3C,0,0,$2988,$4B1E,$4B94,$4F4C,$2AF0,$4F3C,0,0
-	dc.w	$1AB8,$4B1E,$4BD0,$4F4C,$1CF6,$4F3C,0,0,0,0,0,0,0,0,0,0,$1CFC,$4B1E
-	dc.w	$4744,$4F4C,$1DAA,$4F3C,0,0,$3720,$4B1E,$4744,$4F4C,$37A2,$4F3C,0,0
-	dc.w	$0468,$4B1E,$4744,$4F4C,$064C,$4F3C,0,0,$0F2A,$4B1E,$4744,$4F4C,$108E
-	dc.w	$4F3C,0,0,$22E0,$4B9A,$4B7A,$4F4C,$248C,$4F3C,0,0,$3D02,$4B9A,$4B7A
-	dc.w	$4F4C,$3DDC,$4F3C,0,0,$3DFA,$4B9A,$4B7A,$4F4C,$3F2A,$4F3C,0,0,0,0,0,0
-	dcb.w	4,0
-	dc.w	$3386,$4732,$4B82,$4F4C,$3538,$4F3C,0,0,$37C8,$4732,$4B82,$4F4C,$37F8
-	dc.w	$4F3C,0,0,$3818,$4732,$4B82,$4F4C,$3872,$4F3C,0,0,0,0,0,0,0,0,0,0,0,0
-	dcb.w	6,0
-	dc.w	$27E6,$4B9A,$4B52,$4F4C,$288A,$4F3C,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-	dc.w	0,$1DB0,$4BD6,$4744,$4F4C,$1E40,$4F3C,0,0,$0472,$4B9A,$4744,$4F4C
-	dc.w	$0652,$4F3C,0,0,$276C,$4B1E,$4744,$4F4C,$2788,$4F3C,0,0,$27A0,$4B1E
-	dc.w	$4744,$4F4C,$27CE,$4F3C,0,0,0,0,0,0,0,0,0,0,$4CA4,$4CDA,$4D12,$4EE2
-	dc.w	$4CA4,$4EF4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,$4DAC
-	dc.w	$4DE2,$4E1A,$4EE2,$4DAC,$4EF4,0,0,$4E4E,$4E86,$4EBE,$4EE2,$4E4E,$4EF4
-	dcb.w	$0000003F,0
-	dcb.w	11,0
-	dc.w	$0660,$4BF2,$4C20,$4C30,$08F6,$4C40,0,0,$0660,$4BF2,$4C20,$4C30,$08F6
-	dc.w	$4C40,0,0,$0660,$4BF2,$4C20,$4C30,$08F6,$4C40,0,0,$0660,$4BF2,$4C20
-	dc.w	$4C30,$08F6,$4C40,0,0,$0660,$4BF2,$4C20,$4C30,$08F6,$4C40,0,0,$0660
-	dc.w	$4BF2,$4C20,$4C30,$08F6,$4C40,0,0,$0660,$4BF2,$4C20,$4C30,$08F6,$4C40
-	dcb.w	2,0
-	dc.w	$0660,$4BF2,$4C20,$4C30,$08F6,$4C40,0,0,$4CEE,$0303,$FF9C,$F22E,$9C00
-	dc.w	$FF60,$F22E,$D0C0,$FFDC,$2D6E,$FF68,6,$4E5E,$2F17,$3F6F,8,4,$3F7C
-	dc.w	$4008,6,$2F6F,2,8,$2F7C,$0942,$8001,12,$0817,5,$6706,$08EF,2,13,$60FF
-	dc.w	$FFFF,$DE32,$BD6A,$AA77,$CCC9,$94F5,$3DE6,$1209,$7AAE,$8DA1,$BE5A
-	dc.w	$E645,$2A11,$8AE4,$3EC7,$1DE3,$A534,$1531,$BF2A,$01A0,$1A01,$8B59,0,0
-	dcb.w	2,0
-	dc.w	$3FF8,0,$8888,$8888,$8888,$59AF,0,0,$BFFC,0,$AAAA,$AAAA,$AAAA,$AA99,0
-	dc.w	0,$3D2A,$C4D0,$D601,$1EE3,$BDA9,$396F,$9F45,$AC19,$3E21,$EED9,$0612
-	dc.w	$C972,$BE92,$7E4F,$B79D,$9FCF,$3EFA,$01A0,$1A01,$D423,0,0,0,0,$BFF5,0
-	dc.w	$B60B,$60B6,$0B61,$D438,0,0,$3FFA,0,$AAAA,$AAAA,$AAAA,$AB5E,$BF00,0
-	dc.w	$2D7C,0,0,$FF5C,$6008,$2D7C,0,1,$FF5C,$F210,$4800,$F22E,$6800,$FF84
-	dc.w	$2210,$3228,4,$0281,$7FFF,$FFFF,$0C81,$3FD7,$8000,$6C04,$6000,$0178
-	dc.w	$0C81,$4004,$BC7E,$6D04,$6000,$0468,$F200,$0080,$F23A,$54A3,$DE7E
-	dc.w	$43FB,$0170,0,$0866,$F22E,$6080,$FF58,$222E,$FF58,$E981,$D3C1,$F219
-	dc.w	$4828,$F211,$4428,$222E,$FF58,$D2AE,$FF5C,$E299,$0C81,0,0,$6D00,$0088
-	dc.w	$F227,$E00C,$F22E,$6800,$FF84,$F200,$0023,$F23A,$5580,$FED2,$F23A
-	dc.w	$5500,$FED4,$F200,$0080,$F200,$04A3,$E299,$0281,$8000,0,$B3AE,$FF84
-	dc.w	$F200,$05A3,$F200,$0523,$F23A,$55A2,$FEBA,$F23A,$5522,$FEBC,$F200
-	dc.w	$05A3,$F200,$0523,$F23A,$55A2,$FEB6,$F23A,$4922,$FEC0,$F200,$0CA3
-	dc.w	$F200,$0123,$F23A,$48A2,$FEC2,$F22E,$4823,$FF84,$F200,$08A2,$F200
-	dc.w	$0423,$F21F,$D030,$F200,$9000,$F22E,$4822,$FF84,$60FF,0,$4364,$F227
-	dc.w	$E00C,$F200,$0023,$F23A,$5500,$FEA2,$F23A,$5580,$FEA4,$F200,$0080
-	dc.w	$F200,$04A3,$F22E,$6800,$FF84,$E299,$0281,$8000,0,$F200,$0523,$B3AE
-	dc.w	$FF84,$0281,$8000,0,$F200,$05A3,$0081,$3F80,0,$2D41,$FF54,$F23A,$5522
-	dc.w	$FE74,$F23A,$55A2,$FE76,$F200,$0523,$F200,$05A3,$F23A,$5522,$FE70
-	dc.w	$F23A,$49A2,$FE7A,$F200,$0523,$F200,$0CA3,$F23A,$4922,$FE7C,$F23A
-	dc.w	$44A2,$FE82,$F200,$0823,$F200,$0422,$F22E,$4823,$FF84,$F21F,$D030
-	dc.w	$F200,$9000,$F22E,$4422,$FF54,$60FF,0,$42C8,$0C81,$3FFF,$8000,$6EFF,0
-	dc.w	$0300,$222E,$FF5C,$0C81,0,0,$6E14,$F200,$9000,$123C,3,$F22E,$4800
-	dc.w	$FF84,$60FF,0,$428E,$F23C,$4400,$3F80,0,$F200,$9000,$F23C,$4422,$8080
-	dc.w	0,$60FF,0,$428A,$60FF,0,$4110,$F23C,$4400,$3F80,0,$60FF,0,$4276,$2D7C
-	dc.w	0,4,$FF5C,$F210,$4800,$F22E,$6800,$FF84,$2210,$3228,4,$0281,$7FFF
-	dc.w	$FFFF,$0C81,$3FD7,$8000,$6C04,$6000,$0240,$0C81,$4004,$BC7E,$6D04
-	dc.w	$6000,$027A,$F200,$0080,$F23A,$54A3,$DC90,$43FB,$0170,0,$0678,$F22E
-	dc.w	$6080,$FF58,$222E,$FF58,$E981,$D3C1,$F219,$4828,$F211,$4428,$222E
-	dc.w	$FF58,$E299,$0C81,0,0,$6C00,$0106,$F227,$E004,$F22E,$6800,$FF84,$F200
-	dc.w	$0023,$F23A,$5480,$FCE8,$F23A,$5500,$FD32,$F200,$00A3,$F200,$0123
-	dc.w	$2F02,$2401,$E29A,$0282,$8000,0,$B382,$0282,$8000,0,$F23A,$54A2,$FCC8
-	dc.w	$F23A,$5522,$FD12,$F200,$00A3,$B5AE,$FF84,$241F,$F200,$0123,$E299
-	dc.w	$0281,$8000,0,$2D7C,$3F80,0,$FF54,$B3AE,$FF54,$F23A,$54A2,$FCA2,$F23A
-	dc.w	$5522,$FCEC,$F200,$00A3,$F200,$0123,$F22E,$6800,$FF90,$F23A,$54A2
-	dc.w	$FC90,$B3AE,$FF90,$F23A,$5522,$FCD6,$F200,$00A3,$F200,$0123,$F23A
-	dc.w	$54A2,$FC80,$F23A,$5522,$FCCA,$F200,$00A3,$F200,$0123,$F23A,$48A2
-	dc.w	$FC7C,$F23A,$4922,$FCC6,$F200,$00A3,$F200,$0123,$F23A,$48A2,$FC78
-	dc.w	$F23A,$4922,$FCC2,$F200,$00A3,$F200,$0823,$F22E,$48A3,$FF84,$F23A
-	dc.w	$4422,$FCBA,$F22E,$4823,$FF90,$F21F,$D020,$F200,$9000,$F22E,$48A2
-	dc.w	$FF84,$61FF,0,$448E,$F22E,$4422,$FF54,$60FF,0,$40FC,$F227,$E004,$F22E
-	dc.w	$6800,$FF84,$F200,$0023,$F23A,$5480,$FC34,$F23A,$5500,$FBDE,$F200
-	dc.w	$00A3,$F22E,$6800,$FF90,$F200,$0123,$E299,$0281,$8000,0,$F23A,$54A2
-	dc.w	$FC1A,$F23A,$5522,$FBC4,$B3AE,$FF84,$B3AE,$FF90,$F200,$00A3,$0081
-	dc.w	$3F80,0,$2D41,$FF54,$F200,$0123,$F23A,$54A2,$FBFC,$F23A,$5522,$FBA6
-	dc.w	$F200,$00A3,$F200,$0123,$F23A,$54A2,$FBF0,$F23A,$5522,$FB9A,$F200
-	dc.w	$00A3,$F200,$0123,$F23A,$54A2,$FBE4,$F23A,$5522,$FB8E,$F200,$00A3
-	dc.w	$F200,$0123,$F23A,$48A2,$FBE0,$F23A,$4922,$FB8A,$F200,$00A3,$F200
-	dc.w	$0123,$F23A,$48A2,$FBDC,$F23A,$4922,$FB86,$F200,$00A3,$F200,$0823
-	dc.w	$F23A,$44A2,$FBD4,$F22E,$4823,$FF84,$F22E,$48A3,$FF90,$F21F,$D020
-	dc.w	$F200,$9000,$F22E,$44A2,$FF54,$61FF,0,$43A2,$F22E,$4822,$FF84,$60FF,0
-	dc.w	$4010,$0C81,$3FFF,$8000,$6E00,$0048,$F23C,$4480,$3F80,0,$F200,$9000
-	dc.w	$F23C,$44A8,$0080,0,$61FF,0,$4372,$F200,$B000,$123C,3,$F22E,$4800
-	dc.w	$FF84,$60FF,0,$3FCA,$2F00,$F23C,$4480,$3F80,0,$61FF,0,$434E,$201F
-	dc.w	$60FF,0,$3E54,$F227,$E03C,$2F02,$F23C,$4480,0,0,$0C81,$7FFE,$FFFF
-	dc.w	$6652,$3D7C,$7FFE,$FF84,$2D7C,$C90F,$DAA2,$FF88,$42AE,$FF8C,$3D7C
-	dc.w	$7FDC,$FF90,$2D7C,$85A3,$08D3,$FF94,$42AE,$FF98,$F200,$003A,$F294,14
-	dc.w	$002E,$0080,$FF84,$002E,$0080,$FF90,$F22E,$4822,$FF84,$F200,$0080
-	dc.w	$F22E,$4822,$FF90,$F200,$00A8,$F22E,$48A2,$FF90,$F22E,$6800,$FF84
-	dc.w	$322E,$FF84,$2241,$0281,0,$7FFF,$0481,0,$3FFF,$0C81,0,$001C,$6F0E
-	dc.w	$0481,0,$001B,$1D7C,0,$FF58,$6008,$4281,$1D7C,1,$FF58,$243C,0,$3FFE
-	dc.w	$9481,$2D7C,$A2F9,$836E,$FF88,$2D7C,$4E44,$152A,$FF8C,$3D42,$FF84
-	dc.w	$F200,$0100,$F22E,$4923,$FF84,$2409,$4842,$0282,$8000,0,$0082,$5F00,0
-	dc.w	$2D42,$FF54,$F22E,$4522,$FF54,$F22E,$4528,$FF54,$2401,$0682,0,$3FFF
-	dc.w	$3D42,$FF84,$2D7C,$C90F,$DAA2,$FF88,$42AE,$FF8C,$0681,0,$3FDD,$3D41
-	dc.w	$FF90,$2D7C,$85A3,$08D3,$FF94,$42AE,$FF98,$122E,$FF58,$F200,$0A00
-	dc.w	$F22E,$4A23,$FF84,$F200,$0A80,$F22E,$4AA3,$FF90,$F200,$1180,$F200
-	dc.w	$15A2,$F200,$0E28,$F200,$0C28,$F200,$1622,$F200,$0180,$F200,$10A8
-	dc.w	$F200,$0422,$0C01,0,$6E00,14,$F200,$01A8,$F200,$0CA2,$6000,$FF0C
-	dc.w	$F22E,$6100,$FF58,$241F,$F21F,$D03C,$222E,$FF5C,$0C81,0,4,$6D00,$FA4C
-	dc.w	$6000,$FC36,$3EA0,$B759,$F50F,$8688,$BEF2,$BAA5,$A892,$4F04,$BF34
-	dc.w	$6F59,$B39B,$A65F,0,0,0,0,$3FF6,0,$E073,$D3FC,$199C,$4A00,0,0,$3FF9,0
-	dc.w	$D23C,$D684,$15D9,$5FA1,0,0,$BFFC,0,$8895,$A6C5,$FB42,$3BCA,0,0,$BFFD
-	dc.w	0,$EEF5,$7E0D,$A84B,$C8CE,0,0,$3FFC,0,$A2F9,$836E,$4E44,$152A,0,0
-	dc.w	$4001,0,$C90F,$DAA2,0,0,0,0,$3FDF,0,$85A3,$08D4,0,0,0,0,$C004,0,$C90F
-	dc.w	$DAA2,$2168,$C235,$2180,0,$C004,0,$C2C7,$5BCD,$105D,$7C23,$A0D0,0
-	dc.w	$C004,0,$BC7E,$DCF7,$FF52,$3611,$A1E8,0,$C004,0,$B636,$5E22,$EE46
-	dc.w	$F000,$2148,0,$C004,0,$AFED,$DF4D,$DD3B,$A9EE,$A120,0,$C004,0,$A9A5
-	dc.w	$6078,$CC30,$63DD,$21FC,0,$C004,0,$A35C,$E1A3,$BB25,$1DCB,$2110,0
-	dc.w	$C004,0,$9D14,$62CE,$AA19,$D7B9,$A158,0,$C004,0,$96CB,$E3F9,$990E
-	dc.w	$91A8,$21E0,0,$C004,0,$9083,$6524,$8803,$4B96,$20B0,0,$C004,0,$8A3A
-	dc.w	$E64F,$76F8,$0584,$A188,0,$C004,0,$83F2,$677A,$65EC,$BF73,$21C4,0
-	dc.w	$C003,0,$FB53,$D14A,$A9C2,$F2C2,$2000,0,$C003,0,$EEC2,$D3A0,$87AC
-	dc.w	$669F,$2138,0,$C003,0,$E231,$D5F6,$6595,$DA7B,$A130,0,$C003,0,$D5A0
-	dc.w	$D84C,$437F,$4E58,$9FC0,0,$C003,0,$C90F,$DAA2,$2168,$C235,$2100,0
-	dc.w	$C003,0,$BC7E,$DCF7,$FF52,$3611,$A168,0,$C003,0,$AFED,$DF4D,$DD3B
-	dc.w	$A9EE,$A0A0,0,$C003,0,$A35C,$E1A3,$BB25,$1DCB,$2090,0,$C003,0,$96CB
-	dc.w	$E3F9,$990E,$91A8,$2160,0,$C003,0,$8A3A,$E64F,$76F8,$0584,$A108,0
-	dc.w	$C002,0,$FB53,$D14A,$A9C2,$F2C2,$1F80,0,$C002,0,$E231,$D5F6,$6595
-	dc.w	$DA7B,$A0B0,0,$C002,0,$C90F,$DAA2,$2168,$C235,$2080,0,$C002,0,$AFED
-	dc.w	$DF4D,$DD3B,$A9EE,$A020,0,$C002,0,$96CB,$E3F9,$990E,$91A8,$20E0,0
-	dc.w	$C001,0,$FB53,$D14A,$A9C2,$F2C2,$1F00,0,$C001,0,$C90F,$DAA2,$2168
-	dc.w	$C235,$2000,0,$C001,0,$96CB,$E3F9,$990E,$91A8,$2060,0,$C000,0,$C90F
-	dc.w	$DAA2,$2168,$C235,$1F80,0,$BFFF,0,$C90F,$DAA2,$2168,$C235,$1F00,0,0,0
-	dcb.w	6,0
-	dc.w	$3FFF,0,$C90F,$DAA2,$2168,$C235,$9F00,0,$4000,0,$C90F,$DAA2,$2168
-	dc.w	$C235,$9F80,0,$4001,0,$96CB,$E3F9,$990E,$91A8,$A060,0,$4001,0,$C90F
-	dc.w	$DAA2,$2168,$C235,$A000,0,$4001,0,$FB53,$D14A,$A9C2,$F2C2,$9F00,0
-	dc.w	$4002,0,$96CB,$E3F9,$990E,$91A8,$A0E0,0,$4002,0,$AFED,$DF4D,$DD3B
-	dc.w	$A9EE,$2020,0,$4002,0,$C90F,$DAA2,$2168,$C235,$A080,0,$4002,0,$E231
-	dc.w	$D5F6,$6595,$DA7B,$20B0,0,$4002,0,$FB53,$D14A,$A9C2,$F2C2,$9F80,0
-	dc.w	$4003,0,$8A3A,$E64F,$76F8,$0584,$2108,0,$4003,0,$96CB,$E3F9,$990E
-	dc.w	$91A8,$A160,0,$4003,0,$A35C,$E1A3,$BB25,$1DCB,$A090,0,$4003,0,$AFED
-	dc.w	$DF4D,$DD3B,$A9EE,$20A0,0,$4003,0,$BC7E,$DCF7,$FF52,$3611,$2168,0
-	dc.w	$4003,0,$C90F,$DAA2,$2168,$C235,$A100,0,$4003,0,$D5A0,$D84C,$437F
-	dc.w	$4E58,$1FC0,0,$4003,0,$E231,$D5F6,$6595,$DA7B,$2130,0,$4003,0,$EEC2
-	dc.w	$D3A0,$87AC,$669F,$A138,0,$4003,0,$FB53,$D14A,$A9C2,$F2C2,$A000,0
-	dc.w	$4004,0,$83F2,$677A,$65EC,$BF73,$A1C4,0,$4004,0,$8A3A,$E64F,$76F8
-	dc.w	$0584,$2188,0,$4004,0,$9083,$6524,$8803,$4B96,$A0B0,0,$4004,0,$96CB
-	dc.w	$E3F9,$990E,$91A8,$A1E0,0,$4004,0,$9D14,$62CE,$AA19,$D7B9,$2158,0
-	dc.w	$4004,0,$A35C,$E1A3,$BB25,$1DCB,$A110,0,$4004,0,$A9A5,$6078,$CC30
-	dc.w	$63DD,$A1FC,0,$4004,0,$AFED,$DF4D,$DD3B,$A9EE,$2120,0,$4004,0,$B636
-	dc.w	$5E22,$EE46,$F000,$A148,0,$4004,0,$BC7E,$DCF7,$FF52,$3611,$21E8,0
-	dc.w	$4004,0,$C2C7,$5BCD,$105D,$7C23,$20D0,0,$4004,0,$C90F,$DAA2,$2168
-	dc.w	$C235,$A180,0,$F210,$4800,$2210,$3228,4,$0281,$7FFF,$FFFF,$0C81,$3FD7
-	dc.w	$8000,$6C04,$6000,$0134,$0C81,$4004,$BC7E,$6D04,$6000,$0144,$F200
-	dc.w	$0080,$F23A,$54A3,$D3D4,$43FA,$FDBC,$F201,$6080,$E981,$D3C1,$F219
-	dc.w	$4828,$F211,$4428,$EA99,$0281,$8000,0,$F227,$E00C,$0C81,0,0,$6D00
-	dc.w	$0072,$F200,$0080,$F200,$04A3,$F23A,$5580,$FAF8,$F23A,$5500,$FAFA
-	dc.w	$F200,$05A3,$F200,$0523,$F23A,$55A2,$FAF4,$F23A,$4922,$FAFE,$F200
-	dc.w	$05A3,$F200,$0523,$F23A,$49A2,$FB00,$F23A,$4922,$FB0A,$F200,$05A3
-	dc.w	$F200,$0523,$F23A,$49A2,$FB0C,$F200,$0123,$F200,$0CA3,$F200,$0822
-	dc.w	$F23C,$44A2,$3F80,0,$F21F,$D030,$F200,$9000,$F200,$0420,$60FF,0,$38D8
-	dc.w	$F200,$0080,$F200,$0023,$F23A,$5580,$FA88,$F23A,$5500,$FA8A,$F200
-	dc.w	$01A3,$F200,$0123,$F23A,$55A2,$FA84,$F23A,$4922,$FA8E,$F200,$01A3
-	dc.w	$F200,$0123,$F23A,$49A2,$FA90,$F23A,$4922,$FA9A,$F200,$01A3,$F200
-	dc.w	$0123,$F23A,$49A2,$FA9C,$F200,$0523,$F200,$0C23,$F200,$08A2,$F23C
-	dc.w	$4422,$3F80,0,$F21F,$D030,$F227,$6880,$0A97,$8000,0,$F200,$9000,$F21F
-	dc.w	$4820,$60FF,0,$385E,$0C81,$3FFF,$8000,$6E1C,$F227,$6800,$F200,$9000
-	dc.w	$123C,3,$F21F,$4800,$60FF,0,$3832,$60FF,0,$36CE,$F227,$E03C,$2F02
-	dc.w	$F23C,$4480,0,0,$0C81,$7FFE,$FFFF,$6652,$3D7C,$7FFE,$FF84,$2D7C,$C90F
-	dc.w	$DAA2,$FF88,$42AE,$FF8C,$3D7C,$7FDC,$FF90,$2D7C,$85A3,$08D3,$FF94
-	dc.w	$42AE,$FF98,$F200,$003A,$F294,14,$002E,$0080,$FF84,$002E,$0080,$FF90
-	dc.w	$F22E,$4822,$FF84,$F200,$0080,$F22E,$4822,$FF90,$F200,$00A8,$F22E
-	dc.w	$48A2,$FF90,$F22E,$6800,$FF84,$322E,$FF84,$2241,$0281,0,$7FFF,$0481,0
-	dc.w	$3FFF,$0C81,0,$001C,$6F0E,$0481,0,$001B,$1D7C,0,$FF58,$6008,$4281
-	dc.w	$1D7C,1,$FF58,$243C,0,$3FFE,$9481,$2D7C,$A2F9,$836E,$FF88,$2D7C,$4E44
-	dc.w	$152A,$FF8C,$3D42,$FF84,$F200,$0100,$F22E,$4923,$FF84,$2409,$4842
-	dc.w	$0282,$8000,0,$0082,$5F00,0,$2D42,$FF54,$F22E,$4522,$FF54,$F22E,$4528
-	dc.w	$FF54,$2401,$0682,0,$3FFF,$3D42,$FF84,$2D7C,$C90F,$DAA2,$FF88,$42AE
-	dc.w	$FF8C,$0681,0,$3FDD,$3D41,$FF90,$2D7C,$85A3,$08D3,$FF94,$42AE,$FF98
-	dc.w	$122E,$FF58,$F200,$0A00,$F22E,$4A23,$FF84,$F200,$0A80,$F22E,$4AA3
-	dc.w	$FF90,$F200,$1180,$F200,$15A2,$F200,$0E28,$F200,$0C28,$F200,$1622
-	dc.w	$F200,$0180,$F200,$10A8,$F200,$0422,$0C01,0,$6E00,14,$F200,$01A8
-	dc.w	$F200,$0CA2,$6000,$FF0C,$F22E,$6100,$FF54,$241F,$F21F,$D03C,$222E
-	dc.w	$FF54,$E299,$6000,$FD72,$BFF6,$687E,$3149,$87D8,$4002,$AC69,$34A2
-	dc.w	$6DB3,$BFC2,$476F,$4E1D,$A28E,$3FB3,$4444,$7F87,$6989,$BFB7,$44EE
-	dc.w	$7FAF,$45DB,$3FBC,$71C6,$4694,$0220,$BFC2,$4924,$9218,$72F9,$3FC9
-	dcb.w	2,$9999
-	dc.w	$8FA9,$BFD5,$5555,$5555,$5555,$BFB7,$0BF3,$9853,$9E6A,$3FBC,$7187
-	dc.w	$962D,$1D7D,$BFC2,$4924,$8271,$07B8,$3FC9,$9999,$9996,$263E,$BFD5
-	dcb.w	2,$5555
-	dc.w	$5536,$3FFF,0,$C90F,$DAA2,$2168,$C235,0,0,$BFFF,0,$C90F,$DAA2,$2168
-	dc.w	$C235,0,0,1,0,$8000,0,0,0,0,0,$8001,0,$8000,0,0,0,0,0,$3FFB,0,$83D1
-	dc.w	$52C5,$060B,$7A51,0,0,$3FFB,0,$8BC8,$5445,$6549,$8B8B,0,0,$3FFB,0
-	dc.w	$93BE,$4060,$1762,$6B0D,0,0,$3FFB,0,$9BB3,$078D,$35AE,$C202,0,0,$3FFB
-	dc.w	0,$A3A6,$9A52,$5DDC,$E7DE,0,0,$3FFB,0,$AB98,$E943,$6276,$5619,0,0
-	dc.w	$3FFB,0,$B389,$E502,$F9C5,$9862,0,0,$3FFB,0,$BB79,$7E43,$6B09,$E6FB,0
-	dc.w	0,$3FFB,0,$C367,$A5C7,$39E5,$F446,0,0,$3FFB,0,$CB54,$4C61,$CFF7,$D5C6
-	dcb.w	2,0
-	dc.w	$3FFB,0,$D33F,$62F8,$2488,$533E,0,0,$3FFB,0,$DB28,$DA81,$6240,$4C77,0
-	dc.w	0,$3FFB,0,$E310,$A407,$8AD3,$4F18,0,0,$3FFB,0,$EAF6,$B0A8,$188E,$E1EB
-	dcb.w	2,0
-	dc.w	$3FFB,0,$F2DA,$F194,$9DBE,$79D5,0,0,$3FFB,0,$FABD,$5813,$61D4,$7E3E,0
-	dc.w	0,$3FFC,0,$8346,$AC21,$0959,$ECC4,0,0,$3FFC,0,$8B23,$2A08,$3042,$82D8
-	dcb.w	2,0
-	dc.w	$3FFC,0,$92FB,$70B8,$D29A,$E2F9,0,0,$3FFC,0,$9ACF,$476F,$5CCD,$1CB4,0
-	dc.w	0,$3FFC,0,$A29E,$7630,$4954,$F23F,0,0,$3FFC,0,$AA68,$C5D0,$8AB8,$5230
-	dcb.w	2,0
-	dc.w	$3FFC,0,$B22D,$FFFD,$9D53,$9F83,0,0,$3FFC,0,$B9ED,$EF45,$3E90,$0EA5,0
-	dc.w	0,$3FFC,0,$C1A8,$5F1C,$C75E,$3EA5,0,0,$3FFC,0,$C95D,$1BE8,$2813,$8DE6
-	dcb.w	2,0
-	dc.w	$3FFC,0,$D10B,$F300,$840D,$2DE4,0,0,$3FFC,0,$D8B4,$B2BA,$6BC0,$5E7A,0
-	dc.w	0,$3FFC,0,$E057,$2A6B,$B423,$35F6,0,0,$3FFC,0,$E7F3,$2A70,$EA9C,$AA8F
-	dcb.w	2,0
-	dc.w	$3FFC,0,$EF88,$8432,$64EC,$EFAA,0,0,$3FFC,0,$F717,$0A28,$ECC0,$6666,0
-	dc.w	0,$3FFD,0,$812F,$D288,$332D,$AD32,0,0,$3FFD,0,$88A8,$D1B1,$218E,$4D64
-	dcb.w	2,0
-	dc.w	$3FFD,0,$9012,$AB3F,$23E4,$AEE8,0,0,$3FFD,0,$976C,$C3D4,$11E7,$F1B9,0
-	dc.w	0,$3FFD,0,$9EB6,$8949,$3889,$A227,0,0,$3FFD,0,$A5EF,$72C3,$4487,$361B
-	dcb.w	2,0
-	dc.w	$3FFD,0,$AD17,$00BA,$F07A,$7227,0,0,$3FFD,0,$B42C,$BCFA,$FD37,$EFB7,0
-	dc.w	0,$3FFD,0,$BB30,$3A94,$0BA8,$0F89,0,0,$3FFD,0,$C221,$15C6,$FCAE,$BBAF
-	dcb.w	2,0
-	dc.w	$3FFD,0,$C8FE,$F3E6,$8633,$1221,0,0,$3FFD,0,$CFC9,$8330,$B400,$0C70,0
-	dc.w	0,$3FFD,0,$D680,$7AA1,$102C,$5BF9,0,0,$3FFD,0,$DD23,$99BC,$3125,$2AA3
-	dcb.w	2,0
-	dc.w	$3FFD,0,$E3B2,$A855,$6B8F,$C517,0,0,$3FFD,0,$EA2D,$764F,$6431,$5989,0
-	dc.w	0,$3FFD,0,$F3BF,$5BF8,$BAD1,$A21D,0,0,$3FFE,0,$801C,$E39E,$0D20,$5C9A
-	dcb.w	2,0
-	dc.w	$3FFE,0,$8630,$A2DA,$DA1E,$D066,0,0,$3FFE,0,$8C1A,$D445,$F3E0,$9B8C,0
-	dc.w	0,$3FFE,0,$91DB,$8F16,$64F3,$50E2,0,0,$3FFE,0,$9773,$1420,$365E,$538C
-	dcb.w	2,0
-	dc.w	$3FFE,0,$9CE1,$C8E6,$A0B8,$CDBA,0,0,$3FFE,0,$A228,$32DB,$CADA,$AE09,0
-	dc.w	0,$3FFE,0,$A746,$F2DD,$B760,$2294,0,0,$3FFE,0,$AC3E,$C0FB,$997D,$D6A2
-	dcb.w	2,0
-	dc.w	$3FFE,0,$B110,$688A,$EBDC,$6F6A,0,0,$3FFE,0,$B5BC,$C490,$59EC,$C4B0,0
-	dc.w	0,$3FFE,0,$BA44,$BC7D,$D470,$782F,0,0,$3FFE,0,$BEA9,$4144,$FD04,$9AAC
-	dcb.w	2,0
-	dc.w	$3FFE,0,$C2EB,$4ABB,$6616,$28B6,0,0,$3FFE,0,$C70B,$D54C,$E602,$EE14,0
-	dc.w	0,$3FFE,0,$CD00,$0549,$ADEC,$7159,0,0,$3FFE,0,$D484,$57D2,$D8EA,$4EA3
-	dcb.w	2,0
-	dc.w	$3FFE,0,$DB94,$8DA7,$12DE,$CE3B,0,0,$3FFE,0,$E238,$55F9,$69E8,$096A,0
-	dc.w	0,$3FFE,0,$E877,$1129,$C435,$3259,0,0,$3FFE,0,$EE57,$C16E,$0D37,$9C0D
-	dcb.w	2,0
-	dc.w	$3FFE,0,$F3E1,$0211,$A87C,$3779,0,0,$3FFE,0,$F919,$039D,$758B,$8D41,0
-	dc.w	0,$3FFE,0,$FE05,$8B8F,$6493,$5FB3,0,0,$3FFF,0,$8155,$FB49,$7B68,$5D04
-	dcb.w	2,0
-	dc.w	$3FFF,0,$8388,$9E35,$49D1,$08E1,0,0,$3FFF,0,$859C,$FA76,$511D,$724B,0
-	dc.w	0,$3FFF,0,$8795,$2ECF,$FF81,$31E7,0,0,$3FFF,0,$8973,$2FD1,$9557,$641B
-	dcb.w	2,0
-	dc.w	$3FFF,0,$8B38,$CAD1,$0193,$2A35,0,0,$3FFF,0,$8CE7,$A8D8,$301E,$E6B5,0
-	dc.w	0,$3FFF,0,$8F46,$A39E,$2EAE,$5281,0,0,$3FFF,0,$922D,$A7D7,$9188,$8487
-	dcb.w	2,0
-	dc.w	$3FFF,0,$94D1,$9FCB,$DEDF,$5241,0,0,$3FFF,0,$973A,$B944,$19D2,$A08B,0
-	dc.w	0,$3FFF,0,$996F,$F00E,$08E1,$0B96,0,0,$3FFF,0,$9B77,$3F95,$1232,$1DA7
-	dcb.w	2,0
-	dc.w	$3FFF,0,$9D55,$CC32,$0F93,$5624,0,0,$3FFF,0,$9F10,$0575,$006C,$C571,0
-	dc.w	0,$3FFF,0,$A0A9,$C290,$D97C,$C06C,0,0,$3FFF,0,$A226,$59EB,$EBC0,$630A
-	dcb.w	2,0
-	dc.w	$3FFF,0,$A388,$B4AF,$F6EF,$0EC9,0,0,$3FFF,0,$A4D3,$5F10,$61D2,$92C4,0
-	dc.w	0,$3FFF,0,$A608,$95DC,$FBE3,$187E,0,0,$3FFF,0,$A72A,$51DC,$7367,$BEAC
-	dcb.w	2,0
-	dc.w	$3FFF,0,$A83A,$5153,$0956,$168F,0,0,$3FFF,0,$A93A,$2007,$7539,$546E,0
-	dc.w	0,$3FFF,0,$AA9E,$7245,$023B,$2605,0,0,$3FFF,0,$AC4C,$84BA,$6FE4,$D58F
-	dcb.w	2,0
-	dc.w	$3FFF,0,$ADCE,$4A4A,$606B,$9712,0,0,$3FFF,0,$AF2A,$2DCD,$8D26,$3C9C,0
-	dc.w	0,$3FFF,0,$B065,$6F81,$F222,$65C7,0,0,$3FFF,0,$B184,$6515,$0F71,$496A
-	dcb.w	2,0
-	dc.w	$3FFF,0,$B28A,$AA15,$6F9A,$DA35,0,0,$3FFF,0,$B37B,$44FF,$3766,$B895,0
-	dc.w	0,$3FFF,0,$B458,$C3DC,$E963,$0433,0,0,$3FFF,0,$B525,$529D,$5622,$46BD
-	dcb.w	2,0
-	dc.w	$3FFF,0,$B5E2,$CCA9,$5F9D,$88CC,0,0,$3FFF,0,$B692,$CADA,$7ACA,$1ADA,0
-	dc.w	0,$3FFF,0,$B736,$AEA7,$A692,$5838,0,0,$3FFF,0,$B7CF,$AB28,$7E9F,$7B36
-	dcb.w	2,0
-	dc.w	$3FFF,0,$B85E,$CC66,$CB21,$9835,0,0,$3FFF,0,$B8E4,$FD5A,$20A5,$93DA,0
-	dc.w	0,$3FFF,0,$B99F,$41F6,$4AFF,$9BB5,0,0,$3FFF,0,$BA7F,$1E17,$842B,$BE7B
-	dcb.w	2,0
-	dc.w	$3FFF,0,$BB47,$1285,$7637,$E17D,0,0,$3FFF,0,$BBFA,$BE8A,$4788,$DF6F,0
-	dc.w	0,$3FFF,0,$BC9D,$0FAD,$2B68,$9D79,0,0,$3FFF,0,$BD30,$6A39,$471E,$CD86
-	dcb.w	2,0
-	dc.w	$3FFF,0,$BDB6,$C731,$856A,$F18A,0,0,$3FFF,0,$BE31,$CAC5,$02E8,$0D70,0
-	dc.w	0,$3FFF,0,$BEA2,$D55C,$E331,$94E2,0,0,$3FFF,0,$BF0B,$10B7,$C031,$28F0
-	dcb.w	2,0
-	dc.w	$3FFF,0,$BF6B,$7A18,$DACB,$778D,0,0,$3FFF,0,$BFC4,$EA46,$63FA,$18F6,0
-	dc.w	0,$3FFF,0,$C018,$1BDE,$8B89,$A454,0,0,$3FFF,0,$C065,$B066,$CFBF,$6439
-	dcb.w	2,0
-	dc.w	$3FFF,0,$C0AE,$345F,$5634,$0AE6,0,0,$3FFF,0,$C0F2,$2291,$9CB9,$E6A7,0
-	dc.w	0,$F210,$4800,$2210,$3228,4,$F22E,$6800,$FF84,$0281,$7FFF,$FFFF,$0C81
-	dc.w	$3FFB,$8000,$6C04,$6000,$00D0,$0C81,$4002,$FFFF,$6F04,$6000,$014C
-	dc.w	$02AE,$F800,0,$FF88,$00AE,$0400,0,$FF88,$2D7C,0,0,$FF8C,$F200,$0080
-	dc.w	$F22E,$48A3,$FF84,$F22E,$4828,$FF84,$F23C,$44A2,$3F80,0,$F200,$0420
-	dc.w	$2F02,$2401,$0281,0,$7800,$0282,$7FFF,0,$0482,$3FFB,0,$E282,$D282
-	dc.w	$EE81,$43FA,$F780,$D3C1,$2D59,$FF90,$2D59,$FF94,$2D59,$FF98,$222E
-	dc.w	$FF84,$0281,$8000,0,$83AE,$FF90,$241F,$F227,$E004,$F200,$0080,$F200
-	dc.w	$04A3,$F23A,$5500,$F6A0,$F200,$0522,$F200,$0523,$F200,$00A3,$F23A
-	dc.w	$5522,$F696,$F23A,$54A3,$F698,$F200,$08A3,$F200,$0422,$F21F,$D020
-	dc.w	$F200,$9000,$F22E,$4822,$FF90,$60FF,0,$2D30,$0C81,$3FFF,$8000,$6E00
-	dc.w	$008A,$0C81,$3FD7,$8000,$6D00,$006C,$F227,$E00C,$F200,$0023,$F200
-	dc.w	$0080,$F200,$04A3,$F23A,$5500,$F65A,$F23A,$5580,$F65C,$F200,$0523
-	dc.w	$F200,$05A3,$F23A,$5522,$F656,$F23A,$55A2,$F658,$F200,$0523,$F200
-	dc.w	$0CA3,$F23A,$5522,$F652,$F23A,$54A2,$F654,$F200,$0123,$F22E,$4823
-	dc.w	$FF84,$F200,$08A2,$F200,$0423,$F21F,$D030,$F200,$9000,$F22E,$4822
-	dc.w	$FF84,$60FF,0,$2CB2,$F200,$9000,$123C,3,$F22E,$4800,$FF84,$60FF,0
-	dc.w	$2C90,$0C81,$4063,$8000,$6E00,$008E,$F227,$E00C,$F23C,$4480,$BF80,0
-	dc.w	$F200,$00A0,$F200,$0400,$F200,$0023,$F22E,$6880,$FF84,$F200,$0080
-	dc.w	$F200,$04A3,$F23A,$5580,$F5EC,$F23A,$5500,$F5EE,$F200,$05A3,$F200
-	dc.w	$0523,$F23A,$55A2,$F5E8,$F23A,$5522,$F5EA,$F200,$0CA3,$F200,$0123
-	dc.w	$F23A,$54A2,$F5E4,$F22E,$4823,$FF84,$F200,$08A2,$F200,$0423,$F22E
-	dc.w	$4822,$FF84,$F21F,$D030,$F200,$9000,$4A10,$6A0C,$F23A,$4822,$F5D6
-	dc.w	$60FF,0,$2C24,$F23A,$4822,$F5BA,$60FF,0,$2C10,$4A10,$6A16,$F23A,$4800
-	dc.w	$F5BA,$F200,$9000,$F23A,$4822,$F5C0,$60FF,0,$2BFE,$F23A,$4800,$F594
-	dc.w	$F200,$9000,$F23A,$4822,$F5BA,$60FF,0,$2BE0,$60FF,0,$2A66,$F210,$4800
-	dc.w	$2210,$3228,4,$0281,$7FFF,$FFFF,$0C81,$3FFF,$8000,$6C4E,$0C81,$3FD7
-	dc.w	$8000,$6D00,$007C,$F23C,$4480,$3F80,0,$F200,$00A8,$F227,$E004,$F23C
-	dc.w	$4500,$3F80,0,$F200,$0122,$F200,$08A3,$F21F,$D020,$F200,$0484,$F200
-	dc.w	$0420,$F227,$E001,$41D7,$61FF,$FFFF,$FD66,$DFFC,0,12,$60FF,0,$2B6C
-	dc.w	$F200,$0018,$F23C,$4438,$3F80,0,$F2D2,0,$29D4,$F23A,$4800,$C5A6,$2210
-	dc.w	$0281,$8000,0,$0081,$3F80,0,$2F01,$F200,$9000,$F21F,$4423,$60FF,0
-	dc.w	$2B36,$F200,$9000,$123C,3,$F210,$4800,$60FF,0,$2B16,$60FF,0,$29B2
-	dc.w	$F210,$4800,$2210,$3228,4,$0281,$7FFF,$FFFF,$0C81,$3FFF,$8000,$6C44
-	dc.w	$F23C,$4480,$3F80,0,$F200,$00A2,$F200,$001A,$F23C,$4422,$3F80,0,$F200
-	dc.w	$0420,$F200,4,$2F00,$4280,$F227,$E001,$41D7,$61FF,$FFFF,$FCC4,$DFFC,0
-	dc.w	12,$F21F,$9000,$F200,$0022,$60FF,0,$2ACA,$F200,$0018,$F23C,$4438
-	dc.w	$3F80,0,$F2D2,0,$292A,$4A10,$6A18,$F23A,$4800,$C4E8,$F200,$9000,$F23C
-	dc.w	$4422,$0080,0,$60FF,0,$2A9C,$60FF,0,$2CE8,$F200,$9000,$F23A,$4800
-	dc.w	$C4D6,$60FF,0,$2A86,$3FDC,0,$82E3,$0865,$4361,$C4C6,0,0,$3FA5,$5555
-	dc.w	$5555,$4CC1,$3FC5,$5555,$5555,$4A54,$3F81,$1111,$1117,$4385,$3FA5
-	dcb.w	2,$5555
-	dc.w	$4F5A,$3FC5,$5555,$5555,$5555,0,0,0,0,$3EC7,$1DE3,$A577,$4682,$3EFA
-	dc.w	$01A0,$19D7,$CB68,$3F2A,$01A0,$1A01,$9DF3,$3F56,$C16C,$16C1,$70E2
-	dc.w	$3F81,$1111,$1111,$1111,$3FA5,$5555,$5555,$5555,$3FFC,0,$AAAA,$AAAA
-	dc.w	$AAAA,$AAAB,0,0,$48B0,0,0,0,$3730,0,0,0,$3FFF,0,$8000,0,0,0,0,0,$3FFF
-	dc.w	0,$8164,$D1F3,$BC03,$0774,$9F84,$1A9B,$3FFF,0,$82CD,$8698,$AC2B,$A1D8
-	dc.w	$9FC1,$D5B9,$3FFF,0,$843A,$28C3,$ACDE,$4048,$A072,$8369,$3FFF,0,$85AA
-	dc.w	$C367,$CC48,$7B14,$1FC5,$C95C,$3FFF,0,$871F,$6196,$9E8D,$1010,$1EE8
-	dc.w	$5C9F,$3FFF,0,$8898,$0E80,$92DA,$8528,$9FA2,$0729,$3FFF,0,$8A14,$D575
-	dc.w	$496E,$FD9C,$A07B,$F9AF,$3FFF,0,$8B95,$C1E3,$EA8B,$D6E8,$A002,$0DCF
-	dc.w	$3FFF,0,$8D1A,$DF5B,$7E5B,$A9E4,$205A,$63DA,$3FFF,0,$8EA4,$398B,$45CD
-	dc.w	$53C0,$1EB7,$0051,$3FFF,0,$9031,$DC43,$1466,$B1DC,$1F6E,$B029,$3FFF,0
-	dc.w	$91C3,$D373,$AB11,$C338,$A078,$1494,$3FFF,0,$935A,$2B2F,$13E6,$E92C
-	dc.w	$9EB3,$19B0,$3FFF,0,$94F4,$EFA8,$FEF7,$0960,$2017,$457D,$3FFF,0,$9694
-	dc.w	$2D37,$2018,$5A00,$1F11,$D537,$3FFF,0,$9837,$F051,$8DB8,$A970,$9FB9
-	dc.w	$52DD,$3FFF,0,$99E0,$4593,$20B7,$FA64,$1FE4,$3087,$3FFF,0,$9B8D,$39B9
-	dc.w	$D54E,$5538,$1FA2,$A818,$3FFF,0,$9D3E,$D9A7,$2CFF,$B750,$1FDE,$494D
-	dc.w	$3FFF,0,$9EF5,$3260,$91A1,$11AC,$2050,$4890,$3FFF,0,$A0B0,$510F,$B971
-	dc.w	$4FC4,$A073,$691C,$3FFF,0,$A270,$4303,$0C49,$6818,$1F9B,$7A05,$3FFF,0
-	dc.w	$A435,$15AE,$09E6,$80A0,$A079,$7126,$3FFF,0,$A5FE,$D6A9,$B151,$38EC
-	dc.w	$A071,$A140,$3FFF,0,$A7CD,$93B4,$E965,$3568,$204F,$62DA,$3FFF,0,$A9A1
-	dc.w	$5AB4,$EA7C,$0EF8,$1F28,$3C4A,$3FFF,0,$AB7A,$39B5,$A93E,$D338,$9F9A
-	dc.w	$7FDC,$3FFF,0,$AD58,$3EEA,$42A1,$4AC8,$A05B,$3FAC,$3FFF,0,$AF3B,$78AD
-	dc.w	$690A,$4374,$1FDF,$2610,$3FFF,0,$B123,$F581,$D2AC,$2590,$9F70,$5F90
-	dc.w	$3FFF,0,$B311,$C412,$A911,$2488,$201F,$678A,$3FFF,0,$B504,$F333,$F9DE
-	dc.w	$6484,$1F32,$FB13,$3FFF,0,$B6FD,$91E3,$28D1,$7790,$2003,$8B30,$3FFF,0
-	dc.w	$B8FB,$AF47,$62FB,$9EE8,$200D,$C3CC,$3FFF,0,$BAFF,$5AB2,$133E,$45FC
-	dc.w	$9F8B,$2AE6,$3FFF,0,$BD08,$A39F,$580C,$36C0,$A02B,$BF70,$3FFF,0,$BF17
-	dc.w	$99B6,$7A73,$1084,$A00B,$F518,$3FFF,0,$C12C,$4CCA,$6670,$9458,$A041
-	dc.w	$DD41,$3FFF,0,$C346,$CCDA,$2497,$6408,$9FDF,$137B,$3FFF,0,$C567,$2A11
-	dc.w	$5506,$DADC,$201F,$1568,$3FFF,0,$C78D,$74C8,$ABB9,$B15C,$1FC1,$3A2E
-	dc.w	$3FFF,0,$C9B9,$BD86,$6E2F,$27A4,$A03F,$8F03,$3FFF,0,$CBEC,$14FE,$F272
-	dc.w	$7C5C,$1FF4,$907D,$3FFF,0,$CE24,$8C15,$1F84,$80E4,$9E6E,$53E4,$3FFF,0
-	dc.w	$D063,$33DA,$EF2B,$2594,$1FD6,$D45C,$3FFF,0,$D2A8,$1D91,$F12A,$E45C
-	dc.w	$A076,$EDB9,$3FFF,0,$D4F3,$5AAB,$CFED,$FA20,$9FA6,$DE21,$3FFF,0,$D744
-	dc.w	$FCCA,$D69D,$6AF4,$1EE6,$9A2F,$3FFF,0,$D99D,$15C2,$78AF,$D7B4,$207F
-	dc.w	$439F,$3FFF,0,$DBFB,$B797,$DAF2,$3754,$201E,$C207,$3FFF,0,$DE60,$F482
-	dc.w	$5E0E,$9124,$9E8B,$E175,$3FFF,0,$E0CC,$DEEC,$2A94,$E110,$2003,$2C4B
-	dc.w	$3FFF,0,$E33F,$8972,$BE8A,$5A50,$2004,$DFF5,$3FFF,0,$E5B9,$06E7,$7C83
-	dc.w	$48A8,$1E72,$F47A,$3FFF,0,$E839,$6A50,$3C4B,$DC68,$1F72,$2F22,$3FFF,0
-	dc.w	$EAC0,$C6E7,$DD24,$3930,$A017,$E945,$3FFF,0,$ED4F,$301E,$D994,$2B84
-	dc.w	$1F40,$1A5B,$3FFF,0,$EFE4,$B99B,$DCDA,$F5CC,$9FB9,$A9E3,$3FFF,0,$F281
-	dc.w	$773C,$59FF,$B138,$2074,$4C05,$3FFF,0,$F525,$7D15,$2486,$CC2C,$1F77
-	dc.w	$3A19,$3FFF,0,$F7D0,$DF73,$0AD1,$3BB8,$1FFE,$90D5,$3FFF,0,$FA83,$B2DB
-	dc.w	$722A,$033C,$A041,$ED22,$3FFF,0,$FD3E,$0C0C,$F486,$C174,$1F85,$3F3A
-	dc.w	$2210,$0281,$7FFF,0,$0C81,$3FBE,0,$6C06,$60FF,0,$0108,$3228,4,$0C81
-	dc.w	$400C,$B167,$6D06,$60FF,0,$010C,$F210,$4800,$F200,$0080,$F23C,$4423
-	dc.w	$42B8,$AA3B,$F227,$E00C,$2D7C,0,0,$FF58,$F201,$6000,$43FA,$FBB6,$F201
-	dc.w	$4000,$2D41,$FF54,$0281,0,$003F,$E989,$D3C1,$222E,$FF54,$EC81,$0641
-	dc.w	$3FFF,$3D7A,$FB06,$FF54,$F200,$0100,$F23C,$4423,$BC31,$7218,$F23A
-	dc.w	$4923,$FAF2,$F200,$0422,$F200,$0822,$F200,$0080,$F200,$04A3,$F23C
-	dc.w	$4500,$3AB6,$0B70,$F200,$0523,$F200,$0580,$F23C,$45A3,$3C08,$8895
-	dc.w	$F23A,$5522,$FAD4,$F23A,$55A2,$FAD6,$F200,$0523,$3D41,$FF84,$2D7C
-	dc.w	$8000,0,$FF88,$42AE,$FF8C,$F200,$05A3,$F23C,$4522,$3F00,0,$F200,$01A3
-	dc.w	$F200,$0523,$F200,$0C22,$F219,$4880,$F200,$0822,$F200,$0423,$F21F
-	dc.w	$D030,$F211,$4422,$F200,$0422,$222E,$FF58,$4A81,$6706,$F22E,$4823
-	dc.w	$FF90,$F200,$9000,$123C,0,$F22E,$4823,$FF84,$60FF,0,$24C6,$F210,$D080
-	dc.w	$F200,$9000,$F23C,$4422,$3F80,0,$60FF,0,$24C6,$0C81,$400C,$B27C,$6E66
-	dc.w	$F210,$4800,$F200,$0080,$F23C,$4423,$42B8,$AA3B,$F227,$E00C,$2D7C,0,1
-	dc.w	$FF58,$F201,$6000,$43FA,$FAA6,$F201,$4000,$2D41,$FF54,$0281,0,$003F
-	dc.w	$E989,$D3C1,$222E,$FF54,$EC81,$2D41,$FF54,$E281,$93AE,$FF54,$0641
-	dc.w	$3FFF,$3D41,$FF90,$2D7C,$8000,0,$FF94,$42AE,$FF98,$222E,$FF54,$0641
-	dc.w	$3FFF,$6000,$FED2,$4A10,$6BFF,0,$2370,$60FF,0,$2412,$2F10,$0297,$8000
-	dc.w	0,$0097,$0080,0,$F23C,$4400,$3F80,0,$F200,$9000,$F21F,$4422,$60FF,0
-	dc.w	$2426,$2210,$0281,$7FFF,0,$0C81,$3FFD,0,$6C06,$60FF,0,$015E,$3228,4
-	dc.w	$0C81,$4004,$C215,$6F06,$60FF,0,$026C,$F210,$4800,$F200,$0080,$F23C
-	dc.w	$4423,$42B8,$AA3B,$F227,$E00C,$F201,$6000,$43FA,$F9EE,$F201,$4000
-	dc.w	$2D41,$FF54,$0281,0,$003F,$E989,$D3C1,$222E,$FF54,$EC81,$2D41,$FF54
-	dc.w	$F200,$0100,$F23C,$4423,$BC31,$7218,$F23A,$4923,$F930,$F200,$0422
-	dc.w	$F200,$0822,$0641,$3FFF,$F200,$0080,$F200,$04A3,$F23C,$4500,$3950
-	dc.w	$097B,$F200,$0523,$F200,$0580,$F23C,$45A3,$3AB6,$0B6A,$F23A,$5522
-	dc.w	$F91E,$F23A,$55A2,$F920,$3D41,$FF84,$2D7C,$8000,0,$FF88,$42AE,$FF8C
-	dc.w	$F200,$0523,$222E,$FF54,$4441,$F200,$05A3,$0641,$3FFF,$F23A,$5522
-	dc.w	$F900,$F23C,$45A2,$3F00,0,$F200,$0523,$0041,$8000,$3D41,$FF90,$2D7C
-	dc.w	$8000,0,$FF94,$42AE,$FF98,$F200,$0CA3,$F200,$0123,$F200,$0422,$F200
-	dc.w	$0822,$F21F,$D030,$F211,$4823,$222E,$FF54,$0C81,0,$003F,$6F1A,$F229
-	dc.w	$4480,12,$F22E,$48A2,$FF90,$F200,$0422,$F211,$4822,$60FF,0,$0034
-	dc.w	$0C81,$FFFF,$FFFD,$6C16,$F229,$4422,12,$F211,$4822,$F22E,$4822,$FF90
-	dc.w	$60FF,0,$0016,$F219,$4880,$F211,$4422,$F22E,$48A2,$FF90,$F200,$0422
-	dc.w	$F200,$9000,$F22E,$4823,$FF84,$60FF,0,$22AE,$0C81,$3FBE,0,$6C6C,$0C81
-	dc.w	$0033,0,$6D2C,$2D7C,$8001,0,$FF84,$2D7C,$8000,0,$FF88,$42AE,$FF8C
-	dc.w	$F210,$4800,$F200,$9000,$123C,2,$F22E,$4822,$FF84,$60FF,0,$2264,$F210
-	dc.w	$4800,$F23A,$5423,$F86C,$2D7C,$8001,0,$FF84,$2D7C,$8000,0,$FF88,$42AE
-	dc.w	$FF8C,$F22E,$4822,$FF84,$F200,$9000,$123C,0,$F23A,$5423,$F84C,$60FF,0
-	dc.w	$222C,$F210,$4800,$F200,$0023,$F227,$E00C,$F23C,$4480,$2F30,$CAA8
-	dc.w	$F200,$00A3,$F23C,$4500,$310F,$8290,$F23C,$44A2,$32D7,$3220,$F200
-	dc.w	$0123,$F200,$00A3,$F23C,$4522,$3493,$F281,$F23A,$54A2,$F7C0,$F200
-	dc.w	$0123,$F200,$00A3,$F23A,$5522,$F7BA,$F23A,$54A2,$F7BC,$F200,$0123
-	dc.w	$F200,$00A3,$F23A,$5522,$F7B6,$F23A,$54A2,$F7B8,$F200,$0123,$F200
-	dc.w	$00A3,$F23A,$5522,$F7B2,$F23A,$48A2,$F7B4,$F200,$0123,$F200,$00A3
-	dc.w	$F200,$0123,$F210,$48A3,$F23C,$4423,$3F00,0,$F200,$08A2,$F21F,$D030
-	dc.w	$F200,$0422,$F200,$9000,$F210,$4822,$60FF,0,$218E,$2210,$0C81,0,0
-	dc.w	$6E00,$FBAC,$F23C,$4400,$BF80,0,$F200,$9000,$F23C,$4422,$0080,0,$60FF
-	dc.w	0,$2178,$60FF,0,$1FF6,$3028,0,$0880,15,$0440,$3FFF,$F200,$5000,$6D02
-	dc.w	$4E75,$1D7C,8,$FF64,$4E75,$61FF,0,$7CFC,$4440,$0440,$3FFF,$F200,$5000
-	dc.w	$1D7C,8,$FF64,$4E75,$3028,0,$0040,$7FFF,$0880,14,$2D68,4,$FF88,$2D68
-	dc.w	8,$FF8C,$3D40,$FF84,$F22E,$4800,$FF84,$6B02,$4E75,$1D7C,8,$FF64,$4E75
-	dc.w	$61FF,0,$7CB6,$60CA,$7FFB,0,$8000,0,0,0,0,0,$F210,$4800,$2210,$3228,4
-	dc.w	$0281,$7FFF,$FFFF,$0C81,$400C,$B167,$6E42,$F200,$0018,$2F00,$4280
-	dc.w	$F227,$E001,$41D7,$61FF,$FFFF,$FAD2,$DFFC,0,12,$F23C,$4423,$3F00,0
-	dc.w	$201F,$F23C,$4480,$3E80,0,$F200,$00A0,$F200,$9000,$123C,2,$F200,$0422
-	dc.w	$60FF,0,$2080,$0C81,$400C,$B2B3,$6E3C,$F200,$0018,$F23A,$5428,$BAAE
-	dc.w	$F23A,$5428,$BAB0,$2F00,$4280,$F227,$E001,$41D7,$61FF,$FFFF,$FA7C
-	dc.w	$DFFC,0,12,$201F,$F200,$9000,$123C,0,$F23A,$4823,$FF5A,$60FF,0,$203C
-	dc.w	$60FF,0,$2014,$F23C,$4400,$3F80,0,$F200,$9000,$F23C,$4422,$0080,0
-	dc.w	$60FF,0,$2032,$F210,$4800,$2210,$3228,4,$2241,$0281,$7FFF,$FFFF,$0C81
-	dc.w	$400C,$B167,$6E62,$F200,$0018,$48E7,$8040,$F227,$E001,$41D7,$4280
-	dc.w	$61FF,$FFFF,$FBE0,$DFFC,0,12,$F23C,$9000,0,0,$4CDF,$0201,$F200,$0080
-	dc.w	$F23C,$44A2,$3F80,0,$F227,$6800,$F200,$0420,$2209,$0281,$8000,0,$0081
-	dc.w	$3F00,0,$F21F,$4822,$2F01,$F200,$9000,$123C,0,$F21F,$4423,$60FF,0
-	dc.w	$1FA0,$0C81,$400C,$B2B3,$6EFF,0,$1F4C,$F200,$0018,$F23A,$5428,$B9CA
-	dc.w	$2F3C,0,0,$2F3C,$8000,0,$2209,$0281,$8000,0,$0081,$7FFB,0,$2F01,$F23A
-	dc.w	$5428,$B9B0,$2F00,$4280,$F227,$E001,$41D7,$61FF,$FFFF,$F97C,$DFFC,0
-	dc.w	12,$201F,$F200,$9000,$123C,0,$F21F,$4823,$60FF,0,$1F3E,$60FF,0,$1DDA
-	dc.w	$F210,$4800,$F22E,$6800,$FF84,$2210,$3228,4,$2D41,$FF84,$0281,$7FFF
-	dc.w	$FFFF,$0C81,$3FD7,$8000,$6D00,$0074,$0C81,$3FFF,$DDCE,$6E00,$006A
-	dc.w	$222E,$FF84,$2D41,$FF5C,$0281,$7FFF,0,$0681,1,0,$2D41,$FF84,$02AE
-	dc.w	$8000,0,$FF5C,$F22E,$4800,$FF84,$2F00,$4280,$F227,$E001,$41D7,$61FF
-	dc.w	$FFFF,$FAC8,$DFFC,0,12,$201F,$F200,$0080,$F23C,$44A2,$4000,0,$222E
-	dc.w	$FF5C,$F22E,$6880,$FF84,$B3AE,$FF84,$F200,$9000,$F22E,$4820,$FF84
-	dc.w	$60FF,0,$1EB0,$0C81,$3FFF,$8000,$6D00,$0088,$0C81,$4004,$8AA1,$6E00
-	dc.w	$0092,$222E,$FF84,$2D41,$FF5C,$0281,$7FFF,0,$0681,1,0,$2D41,$FF84
-	dc.w	$02AE,$8000,0,$FF5C,$222E,$FF5C,$F22E,$4800,$FF84,$2F00,$4280,$F227
-	dc.w	$E001,$41D7,$61FF,$FFFF,$F878,$DFFC,0,12,$201F,$222E,$FF5C,$F23C
-	dc.w	$4422,$3F80,0,$0A81,$C000,0,$F201,$4480,$F200,$00A0,$222E,$FF5C,$0081
-	dc.w	$3F80,0,$F201,$4400,$F200,$9000,$123C,2,$F200,$0422,$60FF,0,$1E20
-	dc.w	$F200,$9000,$123C,3,$F22E,$4800,$FF84,$60FF,0,$1DFE,$222E,$FF84,$0281
-	dc.w	$8000,0,$0081,$3F80,0,$F201,$4400,$0281,$8000,0,$0A81,$8080,0,$F200
-	dc.w	$9000,$F201,$4422,$60FF,0,$1DDE,$60FF,0,$1C6C,$3FFE,0,$B172,$17F7
-	dc.w	$D1CF,$79AC,0,0,$3F80,0,0,0,$7F80,0,$BF80,0,$3FC2,$499A,$B5E4,$040B
-	dc.w	$BFC5,$55B5,$848C,$B7DB,$3FC9,$9999,$987D,$8730,$BFCF,$FFFF,$FF6F
-	dc.w	$7E97,$3FD5,$5555,$5555,$55A4,$BFE0,0,0,8,$3F17,$5496,$ADD7,$DAD6
-	dc.w	$3F3C,$71C2,$FE80,$C7E0,$3F62,$4924,$928B,$CCFF,$3F89,$9999,$9999
-	dc.w	$95EC,$3FB5,$5555,$5555,$5555,$4000,0,0,0,$3F99,0,$8000,0,0,0,0,0
-	dc.w	$3FFE,0,$FE03,$F80F,$E03F,$80FE,0,0,$3FF7,0,$FF01,$5358,$833C,$47E2,0
-	dc.w	0,$3FFE,0,$FA23,$2CF2,$5213,$8AC0,0,0,$3FF9,0,$BDC8,$D83E,$AD88,$D549
-	dcb.w	2,0
-	dc.w	$3FFE,0,$F660,$3D98,$0F66,$03DA,0,0,$3FFA,0,$9CF4,$3DCF,$F5EA,$FD48,0
-	dc.w	0,$3FFE,0,$F2B9,$D648,$0F2B,$9D65,0,0,$3FFA,0,$DA16,$EB88,$CB8D,$F614
-	dcb.w	2,0
-	dc.w	$3FFE,0,$EF2E,$B71F,$C434,$5238,0,0,$3FFB,0,$8B29,$B775,$1BD7,$0743,0
-	dc.w	0,$3FFE,0,$EBBD,$B2A5,$C161,$9C8C,0,0,$3FFB,0,$A8D8,$39F8,$30C1,$FB49
-	dcb.w	2,0
-	dc.w	$3FFE,0,$E865,$AC7B,$7603,$A197,0,0,$3FFB,0,$C61A,$2EB1,$8CD9,$07AD,0
-	dc.w	0,$3FFE,0,$E525,$982A,$F70C,$880E,0,0,$3FFB,0,$E2F2,$A47A,$DE3A,$18AF
-	dcb.w	2,0
-	dc.w	$3FFE,0,$E1FC,$780E,$1FC7,$80E2,0,0,$3FFB,0,$FF64,$898E,$DF55,$D551,0
-	dc.w	0,$3FFE,0,$DEE9,$5C4C,$A037,$BA57,0,0,$3FFC,0,$8DB9,$56A9,$7B3D,$0148
-	dcb.w	2,0
-	dc.w	$3FFE,0,$DBEB,$61EE,$D19C,$5958,0,0,$3FFC,0,$9B8F,$E100,$F47B,$A1DE,0
-	dc.w	0,$3FFE,0,$D901,$B203,$6406,$C80E,0,0,$3FFC,0,$A937,$2F1D,$0DA1,$BD17
-	dcb.w	2,0
-	dc.w	$3FFE,0,$D62B,$80D6,$2B80,$D62C,0,0,$3FFC,0,$B6B0,$7F38,$CE90,$E46B,0
-	dc.w	0,$3FFE,0,$D368,$0D36,$80D3,$680D,0,0,$3FFC,0,$C3FD,$0329,$0648,$8481
-	dcb.w	2,0
-	dc.w	$3FFE,0,$D0B6,$9FCB,$D258,$0D0B,0,0,$3FFC,0,$D11D,$E0FF,$15AB,$18CA,0
-	dc.w	0,$3FFE,0,$CE16,$8A77,$2508,$0CE1,0,0,$3FFC,0,$DE14,$33A1,$6C66,$B150
-	dcb.w	2,0
-	dc.w	$3FFE,0,$CB87,$27C0,$65C3,$93E0,0,0,$3FFC,0,$EAE1,$0B5A,$7DDC,$8ADD,0
-	dc.w	0,$3FFE,0,$C907,$DA4E,$8711,$46AD,0,0,$3FFC,0,$F785,$6E5E,$E2C9,$B291
-	dcb.w	2,0
-	dc.w	$3FFE,0,$C698,$0C69,$80C6,$980C,0,0,$3FFD,0,$8201,$2CA5,$A682,$06D7,0
-	dc.w	0,$3FFE,0,$C437,$2F85,$5D82,$4CA6,0,0,$3FFD,0,$882C,$5FCD,$7256,$A8C5
-	dcb.w	2,0
-	dc.w	$3FFE,0,$C1E4,$BBD5,$95F6,$E947,0,0,$3FFD,0,$8E44,$C60B,$4CCF,$D7DE,0
-	dc.w	0,$3FFE,0,$BFA0,$2FE8,$0BFA,$02FF,0,0,$3FFD,0,$944A,$D09E,$F435,$1AF6
-	dcb.w	2,0
-	dc.w	$3FFE,0,$BD69,$1047,$0766,$1AA3,0,0,$3FFD,0,$9A3E,$ECD4,$C3EA,$A6B2,0
-	dc.w	0,$3FFE,0,$BB3E,$E721,$A54D,$880C,0,0,$3FFD,0,$A021,$8434,$353F,$1DE8
-	dcb.w	2,0
-	dc.w	$3FFE,0,$B921,$43FA,$36F5,$E02E,0,0,$3FFD,0,$A5F2,$FCAB,$BBC5,$06DA,0
-	dc.w	0,$3FFE,0,$B70F,$BB5A,$19BE,$3659,0,0,$3FFD,0,$ABB3,$B8BA,$2AD3,$62A5
-	dcb.w	2,0
-	dc.w	$3FFE,0,$B509,$E68A,$9B94,$821F,0,0,$3FFD,0,$B164,$1795,$CE3C,$A97B,0
-	dc.w	0,$3FFE,0,$B30F,$6352,$8917,$C80B,0,0,$3FFD,0,$B704,$7551,$5D0F,$1C61
-	dcb.w	2,0
-	dc.w	$3FFE,0,$B11F,$D3B8,$0B11,$FD3C,0,0,$3FFD,0,$BC95,$2AFE,$EA3D,$13E1,0
-	dc.w	0,$3FFE,0,$AF3A,$DDC6,$80AF,$3ADE,0,0,$3FFD,0,$C216,$8ED0,$F458,$BA4A
-	dcb.w	2,0
-	dc.w	$3FFE,0,$AD60,$2B58,$0AD6,$02B6,0,0,$3FFD,0,$C788,$F439,$B316,$3BF1,0
-	dc.w	0,$3FFE,0,$AB8F,$69E2,$8359,$CD11,0,0,$3FFD,0,$CCEC,$AC08,$BF04,$565D
-	dcb.w	2,0
-	dc.w	$3FFE,0,$A9C8,$4A47,$A07F,$5638,0,0,$3FFD,0,$D242,$0487,$2DD8,$5160,0
-	dc.w	0,$3FFE,0,$A80A,$80A8,$0A80,$A80B,0,0,$3FFD,0,$D789,$4992,$3BC3,$588A
-	dcb.w	2,0
-	dc.w	$3FFE,0,$A655,$C439,$2D7B,$73A8,0,0,$3FFD,0,$DCC2,$C4B4,$9887,$DACC,0
-	dc.w	0,$3FFE,0,$A4A9,$CF1D,$9683,$3751,0,0,$3FFD,0,$E1EE,$BD3E,$6D6A,$6B9E
-	dcb.w	2,0
-	dc.w	$3FFE,0,$A306,$5E3F,$AE7C,$D0E0,0,0,$3FFD,0,$E70D,$785C,$2F9F,$5BDC,0
-	dc.w	0,$3FFE,0,$A16B,$312E,$A8FC,$377D,0,0,$3FFD,0,$EC1F,$392C,$5179,$F283
-	dcb.w	2,0
-	dc.w	$3FFE,0,$9FD8,$09FD,$809F,$D80A,0,0,$3FFD,0,$F124,$40D3,$E361,$30E6,0
-	dc.w	0,$3FFE,0,$9E4C,$AD23,$DD5F,$3A20,0,0,$3FFD,0,$F61C,$CE92,$3466,$00BB
-	dcb.w	2,0
-	dc.w	$3FFE,0,$9CC8,$E160,$C3FB,$19B9,0,0,$3FFD,0,$FB09,$1FD3,$8145,$630A,0
-	dc.w	0,$3FFE,0,$9B4C,$6F9E,$F03A,$3CAA,0,0,$3FFD,0,$FFE9,$7042,$BFA4,$C2AD
-	dcb.w	2,0
-	dc.w	$3FFE,0,$99D7,$22DA,$BDE5,$8F06,0,0,$3FFE,0,$825E,$FCED,$4936,$9330,0
-	dc.w	0,$3FFE,0,$9868,$C809,$868C,$8098,0,0,$3FFE,0,$84C3,$7A7A,$B9A9,$05C9
-	dcb.w	2,0
-	dc.w	$3FFE,0,$9701,$2E02,$5C04,$B809,0,0,$3FFE,0,$8722,$4C2E,$8E64,$5FB7,0
-	dc.w	0,$3FFE,0,$95A0,$2568,$095A,$0257,0,0,$3FFE,0,$897B,$8CAC,$9F7D,$E298
-	dcb.w	2,0
-	dc.w	$3FFE,0,$9445,$8094,$4580,$9446,0,0,$3FFE,0,$8BCF,$55DE,$C4CD,$05FE,0
-	dc.w	0,$3FFE,0,$92F1,$1384,$0497,$889C,0,0,$3FFE,0,$8E1D,$C0FB,$89E1,$25E5
-	dcb.w	2,0
-	dc.w	$3FFE,0,$91A2,$B3C4,$D5E6,$F809,0,0,$3FFE,0,$9066,$E68C,$955B,$6C9B,0
-	dc.w	0,$3FFE,0,$905A,$3863,$3E06,$C43B,0,0,$3FFE,0,$92AA,$DE74,$C7BE,$59E0
-	dcb.w	2,0
-	dc.w	$3FFE,0,$8F17,$79D9,$FDC3,$A219,0,0,$3FFE,0,$94E9,$BFF6,$1584,$5643,0
-	dc.w	0,$3FFE,0,$8DDA,$5202,$3769,$4809,0,0,$3FFE,0,$9723,$A1B7,$2013,$4203
-	dcb.w	2,0
-	dc.w	$3FFE,0,$8CA2,$9C04,$6514,$E023,0,0,$3FFE,0,$9958,$99C8,$90EB,$8990,0
-	dc.w	0,$3FFE,0,$8B70,$344A,$139B,$C75A,0,0,$3FFE,0,$9B88,$BDAA,$3A3D,$AE2F
-	dcb.w	2,0
-	dc.w	$3FFE,0,$8A42,$F870,$5669,$DB46,0,0,$3FFE,0,$9DB4,$224F,$FFE1,$157C,0
-	dc.w	0,$3FFE,0,$891A,$C73A,$E981,$9B50,0,0,$3FFE,0,$9FDA,$DC26,$8B7A,$12DA
-	dcb.w	2,0
-	dc.w	$3FFE,0,$87F7,$8087,$F780,$87F8,0,0,$3FFE,0,$A1FC,$FF17,$CE73,$3BD4,0
-	dc.w	0,$3FFE,0,$86D9,$0544,$7A34,$ACC6,0,0,$3FFE,0,$A41A,$9E8F,$5446,$FB9F
-	dcb.w	2,0
-	dc.w	$3FFE,0,$85BF,$3761,$2CEE,$3C9B,0,0,$3FFE,0,$A633,$CD7E,$6771,$CD8B,0
-	dc.w	0,$3FFE,0,$84A9,$F9C8,$084A,$9F9D,0,0,$3FFE,0,$A848,$9E60,$0B43,$5A5E
-	dcb.w	2,0
-	dc.w	$3FFE,0,$8399,$3052,$3FBE,$3368,0,0,$3FFE,0,$AA59,$233C,$CCA4,$BD49,0
-	dc.w	0,$3FFE,0,$828C,$BFBE,$B9A0,$20A3,0,0,$3FFE,0,$AC65,$6DAE,$6BCC,$4985
-	dcb.w	2,0
-	dc.w	$3FFE,0,$8184,$8DA8,$FAF0,$D277,0,0,$3FFE,0,$AE6D,$8EE3,$60BB,$2468,0
-	dc.w	0,$3FFE,0,$8080,$8080,$8080,$8081,0,0,$3FFE,0,$B071,$97A2,$3C46,$C654
-	dcb.w	2,0
-	dc.w	$F210,$4800,$2D7C,0,0,$FF54,$2210,$3228,4,$2D50,$FF84,$2D68,4,$FF88
-	dc.w	$2D68,8,$FF8C,$0C81,0,0,$6D00,$0182,$0C81,$3FFE,$F07D,$6D0A,$0C81
-	dc.w	$3FFF,$8841,$6F00,$00E2,$E081,$E081,$0481,0,$3FFF,$D2AE,$FF54,$41FA
-	dc.w	$F7B2,$F201,$4080,$2D7C,$3FFF,0,$FF84,$2D6E,$FF88,$FF94,$02AE,$FE00,0
-	dc.w	$FF94,$00AE,$0100,0,$FF94,$222E,$FF94,$0281,$7E00,0,$E081,$E081,$E881
-	dc.w	$D1C1,$F22E,$4800,$FF84,$2D7C,$3FFF,0,$FF90,$42AE,$FF98,$F22E,$4828
-	dc.w	$FF90,$F227,$E00C,$F210,$4823,$F23A,$48A3,$F6C8,$F200,$0100,$F200
-	dc.w	$0923,$F22E,$6880,$FF84,$F200,$0980,$F200,$0880,$F23A,$54A3,$F6CC
-	dc.w	$F23A,$5523,$F6CE,$F23A,$54A2,$F6D0,$F23A,$5522,$F6D2,$F200,$0CA3
-	dc.w	$F200,$0D23,$F23A,$54A2,$F6CC,$F23A,$5522,$F6CE,$F200,$0CA3,$D1FC,0
-	dc.w	$0010,$F200,$0D23,$F200,$00A3,$F200,$0822,$F210,$48A2,$F21F,$D030
-	dc.w	$F200,$0422,$F200,$9000,$F22E,$4822,$FF84,$60FF,0,$142A,$F23C,$5838,1
-	dc.w	$F2C1,0,$1678,$F200,$0080,$F23A,$44A8,$F64E,$F23A,$4422,$F648,$F200
-	dc.w	$04A2,$F200,$00A0,$F227,$E00C,$F200,$0400,$F200,$0023,$F22E,$6880
-	dc.w	$FF84,$F200,$0080,$F200,$04A3,$F23A,$5580,$F660,$F23A,$5500,$F662
-	dc.w	$F200,$05A3,$F200,$0523,$F23A,$55A2,$F65C,$F23A,$5522,$F65E,$F200
-	dc.w	$0CA3,$F200,$0123,$F23A,$54A2,$F658,$F22E,$4823,$FF84,$F200,$08A2
-	dc.w	$F21F,$D030,$F200,$0423,$F200,$9000,$F22E,$4822,$FF84,$60FF,0,$139C
-	dc.w	$60FF,0,$1210,$2D7C,$FFFF,$FF9C,$FF54,$48E7,$3F00,$2610,$2828,4,$2A28
-	dc.w	8,$4282,$4A84,$6634,$2805,$4285,$7420,$4286,$EDC4,$6000,$EDAC,$D486
-	dc.w	$2D43,$FF84,$2D44,$FF88,$2D45,$FF8C,$4482,$2D42,$FF54,$F22E,$4800
-	dc.w	$FF84,$4CDF,$00FC,$41EE,$FF84,$6000,$FE0C,$4286,$EDC4,$6000,$2406
-	dc.w	$EDAC,$2E05,$EDAD,$4486,$0686,0,$0020,$ECAF,$8887,$2D43,$FF84,$2D44
-	dc.w	$FF88,$2D45,$FF8C,$4482,$2D42,$FF54,$F22E,$4800,$FF84,$4CDF,$00FC
-	dc.w	$41EE,$FF84,$6000,$FDCE,$F210,$4800,$F200,$0018,$F23A,$4838,$F5A4
-	dc.w	$F292,$0014,$F200,$9000,$123C,3,$F210,$4800,$60FF,0,$12D6,$F210,$4800
-	dc.w	$2D7C,0,0,$FF54,$F200,$0080,$F23A,$4422,$F508,$F22E,$6800,$FF84,$3D6E
-	dc.w	$FF88,$FF86,$222E,$FF84,$0C81,0,0,$6F00,$00DA,$0C81,$3FFE,$8000,$6D00
-	dc.w	$FDA2,$0C81,$3FFF,$C000,$6E00,$FD98,$0C81,$3FFE,$F07D,$6D00,$001A
-	dc.w	$0C81,$3FFF,$8841,$6E00,$0010,$F200,$04A2,$F23A,$4422,$F4BC,$6000
-	dc.w	$FE76,$2D6E,$FF88,$FF94,$02AE,$FE00,0,$FF94,$00AE,$0100,0,$FF94,$0C81
-	dc.w	$3FFF,$8000,$6C44,$F23A,$4400,$F4FC,$2D7C,$3FFF,0,$FF90,$42AE,$FF98
-	dc.w	$F22E,$4828,$FF90,$222E,$FF94,$0281,$7E00,0,$E081,$E081,$E881,$F200
-	dc.w	$04A2,$F227,$E00C,$F200,$0422,$41FA,$F4E2,$D1C1,$F23A,$4480,$F466
-	dc.w	$6000,$FD76,$F23A,$4400,$F450,$2D7C,$3FFF,0,$FF90,$42AE,$FF98,$F22E
-	dc.w	$4828,$FF90,$222E,$FF94,$0281,$7E00,0,$E081,$E081,$E881,$F200,$0422
-	dc.w	$F227,$E00C,$41FA,$F4A2,$D1C1,$F23A,$4480,$F41E,$6000,$FD36,$0C81,0,0
-	dc.w	$6D10,$F23A,$4400,$F414,$F200,$9000,$60FF,0,$1014,$F23A,$4400,$F3FC
-	dc.w	$F200,$9000,$60FF,0,$102E,$60FF,0,$1042,$2210,$3228,4,$0281,$7FFF
-	dc.w	$FFFF,$0C81,$3FFF,$8000,$6C56,$F210,$4818,$F200,$0080,$F200,$049A
-	dc.w	$F200,$0022,$F23C,$44A2,$3F80,0,$F200,$0420,$2210,$0281,$8000,0,$0081
-	dc.w	$3F00,0,$2F01,$2F00,$4280,$F227,$E001,$41D7,$61FF,$FFFF,$FE5A,$DFFC,0
-	dc.w	12,$201F,$F200,$9000,$123C,0,$F21F,$4423,$60FF,0,$1136,$F210,$4818
-	dc.w	$F23C,$4438,$3F80,0,$F2D2,0,$0FAC,$60FF,0,$0F7C,$60FF,0,$0FBA,$3FFD,0
-	dc.w	$DE5B,$D8A9,$3728,$7195,0,0,$3FFF,0,$B8AA,$3B29,$5C17,$F0BC,0,0,$F23C
-	dc.w	$5800,1,$F210,$4838,$F2C1,0,$1350,$2210,$6D00,$0090,$2F00,$4280,$61FF
-	dc.w	$FFFF,$FBA2,$F21F,$9000,$F23A,$4823,$FFB8,$60FF,0,$10D6,$2210,$6D00
-	dc.w	$0070,$2F00,$4280,$61FF,$FFFF,$FD34,$F21F,$9000,$F23A,$4823,$FF98
-	dc.w	$60FF,0,$10C6,$2210,$6D00,$0050,$2228,8,$662E,$2228,4,$0281,$7FFF
-	dc.w	$FFFF,$6622,$3210,$0281,0,$7FFF,$0481,0,$3FFF,$67FF,0,$12E4,$F200
-	dc.w	$9000,$F201,$4000,$60FF,0,$107C,$2F00,$4280,$61FF,$FFFF,$FB2E,$F21F
-	dc.w	$9000,$F23A,$4823,$FF54,$60FF,0,$1062,$60FF,0,$0ED6,$2210,$6D00,$FFF6
-	dc.w	$2F00,$4280,$61FF,$FFFF,$FCBA,$F21F,$9000,$F23A,$4823,$FF2E,$60FF,0
-	dc.w	$104C,$406A,$934F,$0979,$A371,$3F73,$4413,$509F,$8000,$BFCD,0,$C021
-	dc.w	$9DC1,$DA99,$4FD2,0,0,$4000,0,$935D,$8DDD,$AAA8,$AC17,0,0,$3FFE,0
-	dc.w	$B172,$17F7,$D1CF,$79AC,0,0,$3F56,$C16D,$6F7B,$D0B2,$3F81,$1112,$302C
-	dc.w	$712C,$3FA5,$5555,$5555,$4CC1,$3FC5,$5555,$5555,$4A54,$3FE0,0,0,0,0,0
-	dcb.w	2,0
-	dc.w	$3FFF,0,$8000,0,0,0,$3F73,$8000,$3FFF,0,$8164,$D1F3,$BC03,$0773,$3FBE
-	dc.w	$F7CA,$3FFF,0,$82CD,$8698,$AC2B,$A1D7,$3FBD,$F8A9,$3FFF,0,$843A,$28C3
-	dc.w	$ACDE,$4046,$3FBC,$D7C9,$3FFF,0,$85AA,$C367,$CC48,$7B15,$BFBD,$E8DA
-	dc.w	$3FFF,0,$871F,$6196,$9E8D,$1010,$3FBD,$E85C,$3FFF,0,$8898,$0E80,$92DA
-	dc.w	$8527,$3FBE,$BBF1,$3FFF,0,$8A14,$D575,$496E,$FD9A,$3FBB,$80CA,$3FFF,0
-	dc.w	$8B95,$C1E3,$EA8B,$D6E7,$BFBA,$8373,$3FFF,0,$8D1A,$DF5B,$7E5B,$A9E6
-	dc.w	$BFBE,$9670,$3FFF,0,$8EA4,$398B,$45CD,$53C0,$3FBD,$B700,$3FFF,0,$9031
-	dc.w	$DC43,$1466,$B1DC,$3FBE,$EEB0,$3FFF,0,$91C3,$D373,$AB11,$C336,$3FBB
-	dc.w	$FD6D,$3FFF,0,$935A,$2B2F,$13E6,$E92C,$BFBD,$B319,$3FFF,0,$94F4,$EFA8
-	dc.w	$FEF7,$0961,$3FBD,$BA2B,$3FFF,0,$9694,$2D37,$2018,$5A00,$3FBE,$91D5
-	dc.w	$3FFF,0,$9837,$F051,$8DB8,$A96F,$3FBE,$8D5A,$3FFF,0,$99E0,$4593,$20B7
-	dc.w	$FA65,$BFBC,$DE7B,$3FFF,0,$9B8D,$39B9,$D54E,$5539,$BFBE,$BAAF,$3FFF,0
-	dc.w	$9D3E,$D9A7,$2CFF,$B751,$BFBD,$86DA,$3FFF,0,$9EF5,$3260,$91A1,$11AE
-	dc.w	$BFBE,$BEDD,$3FFF,0,$A0B0,$510F,$B971,$4FC2,$3FBC,$C96E,$3FFF,0,$A270
-	dc.w	$4303,$0C49,$6819,$BFBE,$C90B,$3FFF,0,$A435,$15AE,$09E6,$809E,$3FBB
-	dc.w	$D1DB,$3FFF,0,$A5FE,$D6A9,$B151,$38EA,$3FBC,$E5EB,$3FFF,0,$A7CD,$93B4
-	dc.w	$E965,$356A,$BFBE,$C274,$3FFF,0,$A9A1,$5AB4,$EA7C,$0EF8,$3FBE,$A83C
-	dc.w	$3FFF,0,$AB7A,$39B5,$A93E,$D337,$3FBE,$CB00,$3FFF,0,$AD58,$3EEA,$42A1
-	dc.w	$4AC6,$3FBE,$9301,$3FFF,0,$AF3B,$78AD,$690A,$4375,$BFBD,$8367,$3FFF,0
-	dc.w	$B123,$F581,$D2AC,$2590,$BFBE,$F05F,$3FFF,0,$B311,$C412,$A911,$2489
-	dc.w	$3FBD,$FB3C,$3FFF,0,$B504,$F333,$F9DE,$6484,$3FBE,$B2FB,$3FFF,0,$B6FD
-	dc.w	$91E3,$28D1,$7791,$3FBA,$E2CB,$3FFF,0,$B8FB,$AF47,$62FB,$9EE9,$3FBC
-	dc.w	$DC3C,$3FFF,0,$BAFF,$5AB2,$133E,$45FB,$3FBE,$E9AA,$3FFF,0,$BD08,$A39F
-	dc.w	$580C,$36BF,$BFBE,$AEFD,$3FFF,0,$BF17,$99B6,$7A73,$1083,$BFBC,$BF51
-	dc.w	$3FFF,0,$C12C,$4CCA,$6670,$9456,$3FBE,$F88A,$3FFF,0,$C346,$CCDA,$2497
-	dc.w	$6407,$3FBD,$83B2,$3FFF,0,$C567,$2A11,$5506,$DADD,$3FBD,$F8AB,$3FFF,0
-	dc.w	$C78D,$74C8,$ABB9,$B15D,$BFBD,$FB17,$3FFF,0,$C9B9,$BD86,$6E2F,$27A3
-	dc.w	$BFBE,$FE3C,$3FFF,0,$CBEC,$14FE,$F272,$7C5D,$BFBB,$B6F8,$3FFF,0,$CE24
-	dc.w	$8C15,$1F84,$80E4,$BFBC,$EE53,$3FFF,0,$D063,$33DA,$EF2B,$2595,$BFBD
-	dc.w	$A4AE,$3FFF,0,$D2A8,$1D91,$F12A,$E45A,$3FBC,$9124,$3FFF,0,$D4F3,$5AAB
-	dc.w	$CFED,$FA1F,$3FBE,$B243,$3FFF,0,$D744,$FCCA,$D69D,$6AF4,$3FBD,$E69A
-	dc.w	$3FFF,0,$D99D,$15C2,$78AF,$D7B6,$BFB8,$BC61,$3FFF,0,$DBFB,$B797,$DAF2
-	dc.w	$3755,$3FBD,$F610,$3FFF,0,$DE60,$F482,$5E0E,$9124,$BFBD,$8BE1,$3FFF,0
-	dc.w	$E0CC,$DEEC,$2A94,$E111,$3FBA,$CB12,$3FFF,0,$E33F,$8972,$BE8A,$5A51
-	dc.w	$3FBB,$9BFE,$3FFF,0,$E5B9,$06E7,$7C83,$48A8,$3FBC,$F2F4,$3FFF,0,$E839
-	dc.w	$6A50,$3C4B,$DC68,$3FBE,$F22F,$3FFF,0,$EAC0,$C6E7,$DD24,$392F,$BFBD
-	dc.w	$BF4A,$3FFF,0,$ED4F,$301E,$D994,$2B84,$3FBE,$C01A,$3FFF,0,$EFE4,$B99B
-	dc.w	$DCDA,$F5CB,$3FBE,$8CAC,$3FFF,0,$F281,$773C,$59FF,$B13A,$BFBC,$BB3F
-	dc.w	$3FFF,0,$F525,$7D15,$2486,$CC2C,$3FBE,$F73A,$3FFF,0,$F7D0,$DF73,$0AD1
-	dc.w	$3BB9,$BFB8,$B795,$3FFF,0,$FA83,$B2DB,$722A,$033A,$3FBE,$F84B,$3FFF,0
-	dc.w	$FD3E,$0C0C,$F486,$C175,$BFBE,$F581,$F210,$D080,$2210,$3228,4,$F22E
-	dc.w	$6800,$FF84,$0281,$7FFF,$FFFF,$0C81,$3FB9,$8000,$6C04,$6000,$0088
-	dc.w	$0C81,$400D,$80C0,$6F04,$6000,$007C,$F200,$0080,$F23C,$44A3,$4280,0
-	dc.w	$F22E,$6080,$FF54,$2F02,$43FA,$FBBC,$F22E,$4080,$FF54,$222E,$FF54
-	dc.w	$2401,$0281,0,$003F,$E981,$D3C1,$EC82,$2202,$E281,$9481,$0682,0,$3FFF
-	dc.w	$F227,$E00C,$F23C,$44A3,$3C80,0,$2D59,$FF84,$2D59,$FF88,$2D59,$FF8C
-	dc.w	$3D59,$FF90,$F200,$0428,$3D59,$FF94,$426E,$FF96,$42AE,$FF98,$D36E
-	dc.w	$FF84,$F23A,$4823,$FB22,$D36E,$FF90,$6000,$0100,$0C81,$3FFF,$8000
-	dc.w	$6E12,$F200,$9000,$F23C,$4422,$3F80,0,$60FF,0,$0B12,$222E,$FF84,$0C81
-	dcb.w	2,0
-	dc.w	$6D06,$60FF,0,$0AC8,$60FF,0,$0A1A,$F200,$9000,$F23C,$4400,$3F80,0
-	dc.w	$2210,$0081,$0080,1,$F201,$4422,$60FF,0,$0ADC,$F210,$D080,$2210,$3228
-	dc.w	4,$F22E,$6800,$FF84,$0281,$7FFF,$FFFF,$0C81,$3FB9,$8000,$6C04,$6000
-	dc.w	$FF90,$0C81,$400B,$9B07,$6F04,$6000,$FF84,$F200,$0080,$F23A,$54A3
-	dc.w	$FA62,$F22E,$6080,$FF54,$2F02,$43FA,$FAC6,$F22E,$4080,$FF54,$222E
-	dc.w	$FF54,$2401,$0281,0,$003F,$E981,$D3C1,$EC82,$2202,$E281,$9481,$0682,0
-	dc.w	$3FFF,$F227,$E00C,$F200,$0500,$F23A,$54A3,$FA2C,$2D59,$FF84,$F23A
-	dc.w	$4923,$FA2A,$2D59,$FF88,$2D59,$FF8C,$F200,$0428,$3D59,$FF90,$F200
-	dc.w	$0828,$3D59,$FF94,$426E,$FF96,$42AE,$FF98,$F23A,$4823,$FA14,$D36E
-	dc.w	$FF84,$D36E,$FF90,$F200,$0080,$F200,$04A3,$F23A,$5500,$FA1E,$F23A
-	dc.w	$5580,$FA20,$F200,$0523,$F200,$05A3,$F23A,$5522,$FA1A,$F23A,$55A2
-	dc.w	$FA1C,$F200,$0523,$F200,$05A3,$F23A,$5522,$FA16,$F200,$01A3,$F200
-	dc.w	$0523,$F200,$0C22,$F200,$0822,$F21F,$D030,$F22E,$4823,$FF84,$F22E
-	dc.w	$4822,$FF90,$F22E,$4822,$FF84,$F200,$9000,$3D42,$FF84,$241F,$2D7C
-	dc.w	$8000,0,$FF88,$42AE,$FF8C,$123C,0,$F22E,$4823,$FF84,$60FF,0,$0996
-	dc.w	$F200,$9000,$F23C,$4400,$3F80,0,$2210,$0081,$0080,1,$F201,$4422,$60FF
-	dc.w	0,$098E,$2F01,$E808,$2200,$0241,3,$0240,12,$4840,$3001,$221F,$4A01
-	dc.w	$671E,$0C01,10,$6F12,$0C01,14,$6F3C,$0C01,$002F,$6F06,$0C01,$003F
-	dc.w	$6F62,$60FF,0,$0BAA,$4A00,$660C,$41FB,$0170,0,$00D6,$6000,$0086,$0C00
-	dc.w	3,$670A,$41FB,$0170,0,$00D0,$6074,$41FB,$0170,0,$00D2,$606A,$0401,11
-	dc.w	$4A00,$6610,$41FB,$0170,0,$00CC,$0C01,2,$6F54,$605A,$0C00,3,$670A
-	dc.w	$41FB,$0170,0,$00F2,$60E8,$41FB,$0170,0,$0124,$60DE,$0401,$0030,$4A00
-	dc.w	$6616,$41FB,$0170,0,$014E,$0C01,1,$6F22,$0C01,7,$6F24,$601A,$0C00,3
-	dc.w	$670A,$41FB,$0170,0,$01F2,$60E2,$41FB,$0170,0,$02A8,$60D8,$00AE,0
-	dc.w	$0208,$FF64,$C2FC,12,$4840,$4A00,$6608,$F230,$D080,$1000,$4E75,$4840
-	dc.w	$3D70,$1000,$FF90,$2D70,$1004,$FF94,$2D70,$1008,$FF98,$2200,$4280
-	dc.w	$41EE,$FF90,$4268,2,$61FF,0,$62C6,$F210,$D080,$4E75,$51FC,$4000,0
-	dc.w	$C90F,$DAA2,$2168,$C235,$4000,0,$C90F,$DAA2,$2168,$C234,$4000,0,$C90F
-	dc.w	$DAA2,$2168,$C235,$3FFD,0,$9A20,$9A84,$FBCF,$F798,$4000,0,$ADF8,$5458
-	dc.w	$A2BB,$4A9A,$3FFF,0,$B8AA,$3B29,$5C17,$F0BC,$3FFD,0,$DE5B,$D8A9,$3728
-	dc.w	$7195,0,0,0,0,0,0,$3FFD,0,$9A20,$9A84,$FBCF,$F798,$4000,0,$ADF8,$5458
-	dc.w	$A2BB,$4A9A,$3FFF,0,$B8AA,$3B29,$5C17,$F0BB,$3FFD,0,$DE5B,$D8A9,$3728
-	dc.w	$7195,0,0,0,0,0,0,$3FFD,0,$9A20,$9A84,$FBCF,$F799,$4000,0,$ADF8,$5458
-	dc.w	$A2BB,$4A9B,$3FFF,0,$B8AA,$3B29,$5C17,$F0BC,$3FFD,0,$DE5B,$D8A9,$3728
-	dc.w	$7195,0,0,0,0,0,0,$3FFE,0,$B172,$17F7,$D1CF,$79AC,$4000,0,$935D,$8DDD
-	dc.w	$AAA8,$AC17,$3FFF,0,$8000,0,0,0,$4002,0,$A000,0,0,0,$4005,0,$C800,0,0
-	dc.w	0,$400C,0,$9C40,0,0,0,$4019,0,$BEBC,$2000,0,0,$4034,0,$8E1B,$C9BF
-	dc.w	$0400,0,$4069,0,$9DC5,$ADA8,$2B70,$B59E,$40D3,0,$C278,$1F49,$FFCF
-	dc.w	$A6D5,$41A8,0,$93BA,$47C9,$80E9,$8CE0,$4351,0,$AA7E,$EBFB,$9DF9,$DE8E
-	dc.w	$46A3,0,$E319,$A0AE,$A60E,$91C7,$4D48,0,$C976,$7586,$8175,$0C17,$5A92
-	dc.w	0,$9E8B,$3B5D,$C53D,$5DE5,$7525,0,$C460,$5202,$8A20,$979B,$3FFE,0
-	dc.w	$B172,$17F7,$D1CF,$79AB,$4000,0,$935D,$8DDD,$AAA8,$AC16,$3FFF,0,$8000
-	dcb.w	3,0
-	dc.w	$4002,0,$A000,0,0,0,$4005,0,$C800,0,0,0,$400C,0,$9C40,0,0,0,$4019,0
-	dc.w	$BEBC,$2000,0,0,$4034,0,$8E1B,$C9BF,$0400,0,$4069,0,$9DC5,$ADA8,$2B70
-	dc.w	$B59D,$40D3,0,$C278,$1F49,$FFCF,$A6D5,$41A8,0,$93BA,$47C9,$80E9,$8CDF
-	dc.w	$4351,0,$AA7E,$EBFB,$9DF9,$DE8D,$46A3,0,$E319,$A0AE,$A60E,$91C6,$4D48
-	dc.w	0,$C976,$7586,$8175,$0C17,$5A92,0,$9E8B,$3B5D,$C53D,$5DE4,$7525,0
-	dc.w	$C460,$5202,$8A20,$979A,$3FFE,0,$B172,$17F7,$D1CF,$79AC,$4000,0,$935D
-	dc.w	$8DDD,$AAA8,$AC17,$3FFF,0,$8000,0,0,0,$4002,0,$A000,0,0,0,$4005,0
-	dc.w	$C800,0,0,0,$400C,0,$9C40,0,0,0,$4019,0,$BEBC,$2000,0,0,$4034,0,$8E1B
-	dc.w	$C9BF,$0400,0,$4069,0,$9DC5,$ADA8,$2B70,$B59E,$40D3,0,$C278,$1F49
-	dc.w	$FFCF,$A6D6,$41A8,0,$93BA,$47C9,$80E9,$8CE0,$4351,0,$AA7E,$EBFB,$9DF9
-	dc.w	$DE8E,$46A3,0,$E319,$A0AE,$A60E,$91C7,$4D48,0,$C976,$7586,$8175,$0C18
-	dc.w	$5A92,0,$9E8B,$3B5D,$C53D,$5DE5,$7525,0,$C460,$5202,$8A20,$979B,$2F00
-	dc.w	$3229,0,$5BEE,$FF54,$0281,0,$7FFF,$3028,0,$0240,$7FFF,$0C40,$3FFF
-	dc.w	$6D00,$00C0,$0C40,$400C,$6E00,$00A4,$F228,$4803,0,$F200,$6000,$F23C
-	dc.w	$8800,0,0,$4A29,4,$6B5E,$2F00,$3D69,0,$FF84,$2D69,4,$FF88,$2D69,8
-	dc.w	$FF8C,$41EE,$FF84,$61FF,0,$60BA,$4480,$D09F,$F22E,$D080,$FF84,$0C40
-	dc.w	$C001,$6C36,$F21F,$9000,$223C,$8000,0,$0480,$FFFF,$C001,$4480,$0C00
-	dc.w	$0020,$6C0A,$E0A9,$42A7,$2F01,$42A7,$6028,$0400,$0020,$E0A9,$2F01
-	dcb.w	2,$42A7
-	dc.w	$601A,$F229,$D080,0,$F21F,$9000,$0640,$3FFF,$4840,$42A7,$2F3C,$8000,0
-	dc.w	$2F00,$F200,$B000,$123C,0,$F21F,$4823,$60FF,0,$04CE,$201F,$C149,$4A29
-	dc.w	0,$6BFF,0,$038C,$60FF,0,$03C4,$4A29,4,$6A16,$201F,$F200,$9000,$123C,3
-	dc.w	$F229,$4800,0,$60FF,0,$049E,$201F,$2049,$60FF,0,$02E2,1,0,$8000,0,0,0
-	dcb.w	2,0
-	dc.w	$422E,$FF65,$2F00,$422E,$FF5C,$600C,$422E,$FF65,$2F00,$1D7C,1,$FF5C
-	dc.w	$48E7,$3F00,$3628,0,$3D43,$FF58,$0283,0,$7FFF,$2828,4,$2A28,8,$4A83
-	dc.w	$663C,$263C,0,$3FFE,$4A84,$6616,$2805,$4285,$0483,0,$0020,$4286,$EDC4
-	dc.w	$6000,$EDAC,$9686,$6022,$4286,$EDC4,$6000,$9686,$EDAC,$2E05,$EDAD
-	dc.w	$4486,$0686,0,$0020,$ECAF,$8887,$6006,$0683,0,$3FFE,$3029,0,$3D40
-	dc.w	$FF5A,$322E,$FF58,$B181,$0281,0,$8000,$3D41,$FF5E,$0280,0,$7FFF,$2229
-	dc.w	4,$2429,8,$4A80,$663C,$203C,0,$3FFE,$4A81,$6616,$2202,$4282,$0480,0
-	dc.w	$0020,$4286,$EDC1,$6000,$EDA9,$9086,$6022,$4286,$EDC1,$6000,$9086
-	dc.w	$EDA9,$2E02,$EDAA,$4486,$0686,0,$0020,$ECAF,$8287,$6006,$0680,0,$3FFE
-	dc.w	$2D43,$FF54,$2F00,$9083,$4286,$4283,$227C,0,0,$4A80,$6C06,$201F,$6000
-	dc.w	$006A,$588F,$4A86,$6E0E,$B284,$6608,$B485,$6604,$6000,$0136,$6508
-	dc.w	$9485,$9384,$4286,$5283,$4A80,$670E,$D683,$D482,$E391,$55C6,$5289
-	dc.w	$5380,$60D4,$202E,$FF54,$4A81,$6616,$2202,$4282,$0480,0,$0020,$4286
-	dc.w	$EDC1,$6000,$EDA9,$9086,$601C,$4286,$EDC1,$6000,$6B14,$9086,$EDA9
-	dc.w	$2E02,$EDAA,$4486,$0686,0,$0020,$ECAF,$8287,$0C80,0,$41FE,$6C2A,$3D40
-	dc.w	$FF90,$2D41,$FF94,$2D42,$FF98,$2C2E,$FF54,$3D46,$FF84,$2D44,$FF88
-	dc.w	$2D45,$FF8C,$F22E,$4800,$FF90,$1D7C,1,$FF5D,$6036,$2D41,$FF94,$2D42
-	dc.w	$FF98,$0480,0,$3FFE,$3D40,$FF90,$2C2E,$FF54,$0486,0,$3FFE,$2D46,$FF54
-	dc.w	$F22E,$4800,$FF90,$3D46,$FF84,$2D44,$FF88,$2D45,$FF8C,$422E,$FF5D
-	dc.w	$4A2E,$FF5C,$6722,$2C2E,$FF54,$5386,$B086,$6D18,$6E0E,$B284,$6608
-	dc.w	$B485,$6604,$6000,$007A,$6508,$F22E,$4828,$FF84,$5283,$3C2E,$FF5A
-	dc.w	$6C04,$F200,$001A,$4286,$3C2E,$FF5E,$7E08,$EEAE,$0283,0,$007F,$8686
-	dc.w	$1D43,$FF65,$4CDF,$00FC,$201F,$F200,$9000,$4A2E,$FF5D,$6710,$123C,0
-	dc.w	$F23A,$4823,$FDC0,$60FF,0,$024C,$123C,3,$F200,0,$60FF,0,$023E,$5283
-	dc.w	$0C80,0,8,$6C04,$E1AB,$6002,$4283,$F23C,$4400,0,0,$422E,$FF5D,$6000
-	dc.w	$FF94,$2C03,$0286,0,1,$4A86,$6700,$FF86,$5283,$3C2E,$FF5A,$0A86,0
-	dc.w	$8000,$3D46,$FF5A,$6000,$FF72,$7FFF,0,$FFFF,$FFFF,$FFFF,$FFFF,$4A28,0
-	dc.w	$6B12,$F23C,$4400,$7F80,0,$00AE,$0200,$0410,$FF64,$4E75,$F23C,$4400
-	dc.w	$FF80,0,$00AE,$0A00,$0410,$FF64,$4E75,$00AE,$0100,$2080,$FF64,$F23A
-	dc.w	$D080,$FFBE,$4E75,$00AE,0,$0800,$FF64,$6008,$00AE,0,$0A28,$FF64,$2248
-	dc.w	$2200,$0201,$00C0,$660E,$4A28,0,$6A18,$08EE,3,$FF64,$6010,$2F09,$4A28
-	dc.w	0,$5BC1,$61FF,0,$0196,$225F,$F210,$D080,$102E,$FF62,$0200,10,$6602
-	dc.w	$4E75,$3D69,0,$FF84,$2D69,4,$FF88,$2D69,8,$FF8C,$41EE,$FF84,$61FF,0
-	dc.w	$5CD0,$0680,0,$6000,$026E,$8000,$FF84,$816E,$FF84,$F22E,$D040,$FF84
-	dc.w	$4E75,$00AE,0,$0A28,$FF64,$4A10,$5BC1,$61FF,0,$013E,$F210,$D080,$F23C
-	dc.w	$4480,0,0,$4E75,$00AE,0,$0A28,$FF64,$51C1,$61FF,0,$0120,$F210,$D080
-	dc.w	$F23C,$4480,0,0,$4E75,$00AE,0,$1048,$FF64,$1200,$0201,$00C0,$675C
-	dc.w	$4A28,4,$6B24,$3D68,0,$FF84,$2D68,4,$FF88,$2D68,8,$FF8C,$41EE,$FF84
-	dc.w	$48E7,$C080,$61FF,0,$5C44,$4CDF,$0103,$0C01,$0040,$660E,$4AA8,8,$6614
-	dc.w	$4A28,7,$660E,$601E,$2228,8,$0281,0,$07FF,$6712,$00AE,0,$0200,$FF64
-	dc.w	$6008,$00AE,0,$1248,$FF64,$4A28,0,$5BC1,$61FF,0,$5F26,$1D40,$FF64
-	dc.w	$F210,$D080,$F23C,$4480,0,0,$4E75,$00AE,0,$1248,$FF64,$51C1,$61FF,0
-	dc.w	$5F04,$1D40,$FF64,$F210,$D080,$F23C,$4480,0,0,$4E75,$F327,$4A2F,2
-	dc.w	$6B2E,$DFFC,0,12,$F294,14,$F281,$0014,$006E,$0208,$FF66,$4E75,$00AE
-	dc.w	$0800,$0208,$FF64,$4E75,$1D7C,4,$FF64,$006E,$0208,$FF66,$4E75,$006E
-	dc.w	$0208,$FF66,$61FF,0,$0BAE,$DFFC,0,12,$4E75,$F327,$4A2F,2,$6BEA,$DFFC
-	dc.w	0,12,$F200,$A800,$81AE,$FF64,$4E75,$00AE,0,$0A28,$FF64,$0241,$0010
-	dc.w	$E808,$0200,15,$8001,$2200,$E309,$1D7B,10,$FF64,$41FB,$1620,$4E75
-	dc.w	$0404,$0400,$0404,$0400,$0404,$0400,0,0,$0C0C,$080C,$0C0C,$080C,$0C0C
-	dc.w	$080C,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0
-	dc.w	$3F81,0,0,0,0,0,0,0,$3F81,0,0,0,0,0,0,0,$3F81,0,0,0,0,0,0,0,$3F81,0,0
-	dc.w	$0100,0,0,0,0,$3C01,0,0,0,0,0,0,0,$3C01,0,0,0,0,0,0,0,$3C01,0,0,0,0,0
-	dcb.w	2,0
-	dc.w	$3C01,0,0,0,0,$0800,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-	dcb.w	9,0
-	dc.w	$8000,0,0,0,0,0,0,0,$8000,0,0,0,0,0,0,0,$8000,0,0,0,0,1,0,0,$8000,0,0
-	dcb.w	5,0
-	dc.w	$BF81,0,0,0,0,0,0,0,$BF81,0,0,0,0,0,0,0,$BF81,0,0,$0100,0,0,0,0,$BF81
-	dcb.w	7,0
-	dc.w	$BC01,0,0,0,0,0,0,0,$BC01,0,0,0,0,0,0,0,$BC01,0,0,0,0,$0800,0,0,$BC01
-	dcb.w	7,0
-	dc.w	$4A28,0,$6B10,$F23C,$4400,0,0,$1D7C,4,$FF64,$4E75,$F23C,$4400,$8000,0
-	dc.w	$1D7C,12,$FF64,$4E75,$4A29,0,$6BEA,$60D8,$4A28,0,$6B10,$F23C,$4400
-	dc.w	$7F80,0,$1D7C,2,$FF64,$4E75,$F23C,$4400,$FF80,0,$1D7C,10,$FF64,$4E75
-	dc.w	$4A29,0,$6BEA,$60D8,$4A28,0,$6BA4,$60D0,$4A28,0,$6B00,$FBBC,$60C6
-	dc.w	$4A28,0,$6B16,$60BE,$4A28,0,$6B0E,$F23C,$4400,$3F80,0,$422E,$FF64
-	dc.w	$4E75,$F23C,$4400,$BF80,0,$1D7C,8,$FF64,$4E75,$3FFF,0,$C90F,$DAA2
-	dc.w	$2168,$C235,$BFFF,0,$C90F,$DAA2,$2168,$C235,$4A28,0,$6B0E,$F200,$9000
-	dc.w	$F23A,$4800,$FFDA,$6000,$FCF0,$F200,$9000,$F23A,$4800,$FFD8,$6000
-	dc.w	$FCEA,$F23C,$4480,$3F80,0,$4A28,0,$6A10,$F23C,$4400,$8000,0,$1D7C,12
-	dc.w	$FF64,$6040,$F23C,$4400,0,0,$1D7C,4,$FF64,$6030,$F23A,$4880,$FAEA
-	dc.w	$61FF,0,$0028,$6000,$FB16,$F228,$4880,0,$61FF,0,$0018,$6000,$030E
-	dc.w	$F228,$4880,0,$61FF,0,8,$6000,$02EE,$102E,$FF43,$0240,7,$303B,$0206
-	dc.w	$4EFB,2,$0010,$0018,$0020,$0026,$002C,$0032,$0038,$003E,$F22E,$F040
-	dc.w	$FFDC,$4E75,$F22E,$F040,$FFE8,$4E75,$F200,$0500,$4E75,$F200,$0580
-	dc.w	$4E75,$F200,$0600,$4E75,$F200,$0680,$4E75,$F200,$0700,$4E75,$F200
-	dc.w	$0780,$4E75,$122E,$FF4F,$67FF,$FFFF,$F7DC,$0C01,1,$6700,$0096,$0C01,2
-	dc.w	$67FF,$FFFF,$FA88,$0C01,4,$67FF,$FFFF,$F7C0,$0C01,5,$67FF,0,$0240
-	dc.w	$60FF,0,$024A,$122E,$FF4F,$67FF,$FFFF,$FA64,$0C01,1,$67FF,$FFFF,$FA5A
-	dc.w	$0C01,2,$67FF,$FFFF,$FA50,$0C01,4,$67FF,$FFFF,$FA46,$0C01,3,$67FF,0
-	dc.w	$0218,$60FF,0,$0202,$122E,$FF4F,$67FF,0,$004E,$0C01,1,$67FF,0,$0028
-	dc.w	$0C01,2,$67FF,$FFFF,$FA18,$0C01,4,$67FF,0,$0030,$0C01,3,$67FF,0,$01E0
-	dc.w	$60FF,0,$01CA,$1228,0,$1029,0,$B101,$0201,$0080,$1D41,$FF65,$4A00
-	dc.w	$6A00,$FDC4,$6000,$FDD0,$422E,$FF65,$2F00,$1228,0,$1029,0,$B101,$0201
-	dc.w	$0080,$1D41,$FF65,$0C2E,4,$FF4F,$660C,$41E9,0,$201F,$60FF,$FFFF,$F9C6
-	dc.w	$F21F,$9000,$F229,$4800,0,$4A29,0,$6B02,$4E75,$1D7C,8,$FF64,$4E75
-	dc.w	$122E,$FF4F,$67FF,$FFFF,$F6E0,$0C01,1,$6700,$FF8E,$0C01,2,$67FF,$FFFF
-	dc.w	$F980,$0C01,4,$67FF,$FFFF,$F6C4,$0C01,3,$67FF,0,$0148,$60FF,0,$0132
-	dc.w	$122E,$FF4F,$67FF,$FFFF,$F95C,$0C01,1,$67FF,$FFFF,$F952,$0C01,2,$67FF
-	dc.w	$FFFF,$F948,$0C01,4,$67FF,$FFFF,$F93E,$0C01,3,$67FF,0,$0110,$60FF,0
-	dc.w	$00FA,$122E,$FF4F,$6700,$FF46,$0C01,1,$6700,$FF22,$0C01,2,$67FF,$FFFF
-	dc.w	$F914,$0C01,4,$67FF,$FFFF,$FF2C,$0C01,3,$67FF,0,$00DC,$60FF,0,$00C6
-	dc.w	$122E,$FF4F,$67FF,$FFFF,$F51E,$0C01,1,$67FF,$FFFF,$FCE6,$0C01,2,$67FF
-	dc.w	$FFFF,$FD0A,$0C01,4,$67FF,$FFFF,$F500,$0C01,3,$67FF,0,$00A4,$60FF,0
-	dc.w	$008E,$122E,$FF4F,$67FF,$FFFF,$F4E6,$0C01,1,$67FF,$FFFF,$FCAE,$0C01,2
-	dc.w	$67FF,$FFFF,$FCD2,$0C01,4,$67FF,$FFFF,$F4C8,$0C01,3,$67FF,0,$006C
-	dc.w	$60FF,0,$0056,$122E,$FF4F,$67FF,$FFFF,$F880,$0C01,3,$67FF,0,$0052
-	dc.w	$0C01,5,$67FF,0,$0038,$60FF,$FFFF,$F866,$122E,$FF4F,$0C01,3,$6734
-	dc.w	$0C01,5,$671E,$6058,$122E,$FF4F,$0C01,3,$6708,$0C01,5,$670C,$6036
-	dc.w	$00AE,$0100,$4080,$FF64,$6010,$F229,$4800,0,$F200,$A800,$81AE,$FF64
-	dc.w	$4E75,$F229,$4800,0,$4A29,0,$6B08,$1D7C,1,$FF64,$4E75,$1D7C,9,$FF64
-	dc.w	$4E75,$F228,$4800,0,$F200,$A800,$81AE,$FF64,$4E75,$F228,$4800,0,$4A28
-	dc.w	0,$6BDC,$1D7C,1,$FF64,$4E75,$1D7C,9,$FF64,$4E75,$122E,$FF4E,$67FF
-	dc.w	$FFFF,$D936,$0C01,1,$67FF,$FFFF,$FBA6,$0C01,2,$67FF,$FFFF,$FBCA,$0C01
-	dc.w	4,$67FF,$FFFF,$D9F6,$0C01,3,$67FF,$FFFF,$FFB6,$60FF,$FFFF,$FFA0,$122E
-	dc.w	$FF4E,$67FF,$FFFF,$E620,$0C01,1,$67FF,$FFFF,$FB6E,$0C01,2,$67FF,$FFFF
-	dc.w	$FBC8,$0C01,4,$67FF,$FFFF,$E756,$0C01,3,$67FF,$FFFF,$FF7E,$60FF,$FFFF
-	dc.w	$FF68,$122E,$FF4E,$67FF,$FFFF,$D4D2,$0C01,1,$67FF,$FFFF,$FB36,$0C01,2
-	dc.w	$67FF,$FFFF,$FB9A,$0C01,4,$67FF,$FFFF,$D76A,$0C01,3,$67FF,$FFFF,$FF46
-	dc.w	$60FF,$FFFF,$FF30,$122E,$FF4E,$67FF,$FFFF,$D972,$0C01,1,$67FF,$FFFF
-	dc.w	$FAFE,$0C01,2,$67FF,$FFFF,$FB6A,$0C01,4,$67FF,$FFFF,$DABC,$0C01,3
-	dc.w	$67FF,$FFFF,$FF0E,$60FF,$FFFF,$FEF8,$122E,$FF4E,$67FF,$FFFF,$CA6A
-	dc.w	$0C01,1,$67FF,$FFFF,$FAC6,$0C01,2,$67FF,$FFFF,$FB6E,$0C01,4,$67FF
-	dc.w	$FFFF,$CC8A,$0C01,3,$67FF,$FFFF,$FED6,$60FF,$FFFF,$FEC0,$122E,$FF4E
-	dc.w	$67FF,$FFFF,$CC76,$0C01,1,$67FF,$FFFF,$FA8E,$0C01,2,$67FF,$FFFF,$F6AA
-	dc.w	$0C01,4,$67FF,$FFFF,$CD06,$0C01,3,$67FF,$FFFF,$FE9E,$60FF,$FFFF,$FE88
-	dc.w	$122E,$FF4E,$67FF,$FFFF,$E662,$0C01,1,$67FF,$FFFF,$FA56,$0C01,2,$67FF
-	dc.w	$FFFF,$F672,$0C01,4,$67FF,$FFFF,$E6C6,$0C01,3,$67FF,$FFFF,$FE66,$60FF
-	dc.w	$FFFF,$FE50,$122E,$FF4E,$67FF,$FFFF,$B372,$0C01,1,$67FF,$FFFF,$FA1E
-	dc.w	$0C01,2,$67FF,$FFFF,$F63A,$0C01,4,$67FF,$FFFF,$B538,$0C01,3,$67FF
-	dc.w	$FFFF,$FE2E,$60FF,$FFFF,$FE18,$122E,$FF4E,$67FF,$FFFF,$BDFC,$0C01,1
-	dc.w	$67FF,$FFFF,$F9E6,$0C01,2,$67FF,$FFFF,$F602,$0C01,4,$67FF,$FFFF,$BF42
-	dc.w	$0C01,3,$67FF,$FFFF,$FDF6,$60FF,$FFFF,$FDE0,$122E,$FF4E,$67FF,$FFFF
-	dc.w	$D17A,$0C01,1,$67FF,$FFFF,$FA2A,$0C01,2,$67FF,$FFFF,$FA00,$0C01,4
-	dc.w	$67FF,$FFFF,$D308,$0C01,3,$67FF,$FFFF,$FDBE,$60FF,$FFFF,$FDA8,$122E
-	dc.w	$FF4E,$67FF,$FFFF,$EB64,$0C01,1,$67FF,$FFFF,$F9F2,$0C01,2,$67FF,$FFFF
-	dc.w	$F9C8,$0C01,4,$67FF,$FFFF,$EC20,$0C01,3,$67FF,$FFFF,$FD86,$60FF,$FFFF
-	dc.w	$FD70,$122E,$FF4E,$67FF,$FFFF,$EC24,$0C01,1,$67FF,$FFFF,$F9BA,$0C01,2
-	dc.w	$67FF,$FFFF,$F990,$0C01,4,$67FF,$FFFF,$ED36,$0C01,3,$67FF,$FFFF,$FD4E
-	dc.w	$60FF,$FFFF,$FD38,$122E,$FF4E,$67FF,$FFFF,$E178,$0C01,1,$67FF,$FFFF
-	dc.w	$F51A,$0C01,2,$67FF,$FFFF,$F960,$0C01,4,$67FF,$FFFF,$E30C,$0C01,3
-	dc.w	$67FF,$FFFF,$FD16,$60FF,$FFFF,$FD00,$122E,$FF4E,$67FF,$FFFF,$E582
-	dc.w	$0C01,1,$67FF,$FFFF,$F4E2,$0C01,2,$67FF,$FFFF,$F928,$0C01,4,$67FF
-	dc.w	$FFFF,$E594,$0C01,3,$67FF,$FFFF,$FCDE,$60FF,$FFFF,$FCC8,$122E,$FF4E
-	dc.w	$67FF,$FFFF,$E59A,$0C01,1,$67FF,$FFFF,$F4AA,$0C01,2,$67FF,$FFFF,$F8F0
-	dc.w	$0C01,4,$67FF,$FFFF,$E5D6,$0C01,3,$67FF,$FFFF,$FCA6,$60FF,$FFFF,$FC90
-	dc.w	$122E,$FF4E,$67FF,$FFFF,$D530,$0C01,1,$67FF,$FFFF,$F8DA,$0C01,2,$67FF
-	dc.w	$FFFF,$F888,$0C01,4,$67FF,$FFFF,$D5B6,$0C01,3,$67FF,$FFFF,$FC6E,$60FF
-	dc.w	$FFFF,$FC58,$122E,$FF4E,$67FF,$FFFF,$CAC2,$0C01,1,$67FF,$FFFF,$F8DE
-	dc.w	$0C01,2,$67FF,$FFFF,$F442,$0C01,4,$67FF,$FFFF,$CB34,$0C01,3,$67FF
-	dc.w	$FFFF,$FC36,$60FF,$FFFF,$FC20,$122E,$FF4E,$67FF,$FFFF,$B14C,$0C01,1
-	dc.w	$67FF,$FFFF,$F86A,$0C01,2,$67FF,$FFFF,$F40A,$0C01,4,$67FF,$FFFF,$B30E
-	dc.w	$0C01,3,$67FF,$FFFF,$FBFE,$60FF,$FFFF,$FBE8,$122E,$FF4E,$67FF,$FFFF
-	dc.w	$D40E,$0C01,1,$67FF,$FFFF,$F7B6,$0C01,2,$67FF,$FFFF,$F3D2,$0C01,4
-	dc.w	$67FF,$FFFF,$D40C,$0C01,3,$67FF,$FFFF,$FBC6,$60FF,$FFFF,$FBB0,$122E
-	dc.w	$FF4E,$67FF,$FFFF,$D40A,$0C01,1,$67FF,$FFFF,$F77E,$0C01,2,$67FF,$FFFF
-	dc.w	$F39A,$0C01,4,$67FF,$FFFF,$D41A,$0C01,3,$67FF,$FFFF,$FB8E,$60FF,$FFFF
-	dc.w	$FB78,$122E,$FF4E,$67FF,$FFFF,$B292,$0C01,1,$67FF,$FFFF,$F81A,$0C01,2
-	dc.w	$67FF,$FFFF,$F83E,$0C01,4,$67FF,$FFFF,$B50A,$0C01,3,$67FF,$FFFF,$F83A
-	dc.w	$60FF,$FFFF,$F844,$122E,$FF4E,$67FF,$FFFF,$F89E,$0C01,1,$67FF,$FFFF
-	dc.w	$F8CA,$0C01,2,$67FF,$FFFF,$F8F8,$0C01,4,$67FF,$FFFF,$F880,$0C01,3
-	dc.w	$67FF,$FFFF,$FAB4,$60FF,$FFFF,$FAC0,$122E,$FF4E,$67FF,$FFFF,$F96E
-	dc.w	$0C01,1,$67FF,$FFFF,$F99A,$0C01,2,$67FF,$FFFF,$F9C8,$0C01,4,$67FF
-	dc.w	$FFFF,$F950,$0C01,3,$67FF,$FFFF,$FA7C,$60FF,$FFFF,$FA88,$122E,$FF4E
-	dc.w	$67FF,$FFFF,$F9D8,$0C01,1,$67FF,$FFFF,$FA06,$0C01,2,$67FF,$FFFF,$FA34
-	dc.w	$0C01,4,$67FF,$FFFF,$F9BA,$0C01,3,$67FF,$FFFF,$FA44,$60FF,$FFFF,$FA50
-	dc.w	$0C2F,7,3,$673E,$1D7C,0,$FF4E,$1D7C,0,$FF4F,$F22E,$F080,$FF78,$41EF,4
-	dc.w	$43EE,$FF78,$0C01,3,$6716,$0C01,2,$6708,$61FF,0,$0200,$4E75,$61FF,0
-	dc.w	$1B9E,$4E75,$61FF,0,$05E4,$4E75,$1D7C,4,$FF4E,$60C0,$4AFC,$006D,0
-	dc.w	$05D2,0,$0FC8,$FFFF,$FA6E,0,$106C,0,$2314,0,0,$FFFF,$FAA6,0,0,$FFFF
-	dc.w	$FADE,$FFFF,$FB16,$FFFF,$FB4E,0,0,$FFFF,$FB86,$FFFF,$FBBE,$FFFF,$FBF6
-	dc.w	$FFFF,$FC2E,$FFFF,$FC66,$FFFF,$FC9E,$FFFF,$FCD6,0,0,$FFFF,$FD0E,$FFFF
-	dc.w	$FD46,$FFFF,$FD7E,0,0,0,$1112,$FFFF,$FDB6,0,$0CA8,0,0,$FFFF,$FDEE
-	dc.w	$FFFF,$FE26,$FFFF,$FE5E,$FFFF,$FE96,0,$089E,$FFFF,$FF06,0,$1B84,0
-	dc.w	$01DE,0,$1854,$FFFF,$FF3E,$FFFF,$FF76,0,$1512,0,$1F4C,0,0,0,0,0,0,0,0
-	dcb.w	6,0
-	dc.w	$FFFF,$FECE,$FFFF,$FECE,$FFFF,$FECE,$FFFF,$FECE,$FFFF,$FECE,$FFFF
-	dc.w	$FECE,$FFFF,$FECE,$FFFF,$FECE,0,$13B0,0,0,0,$0F56,0,0,0,0,0,0,0,0,0,0
-	dc.w	0,$05C0,0,$2302,0,0,0,0,0,$05CA,0,$230C,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-	dcb.w	$00000016,0
-	dc.w	$1100,0,0,0,$0C96,0,0,0,$110A,0,0,0,$0CA0,0,0,0,$088C,0,0,0,$1B72,0
-	dc.w	$01CC,0,$0896,0,0,0,$1B7C,0,$01D6,0,$1F3A,0,0,0,0,0,0,0,$1F44,$FFFF
-	dc.w	$C001,$FFFF,$FF81,$FFFF,$FC01,0,$4000,0,$007F,0,$03FF,$0200,$0030,0
-	dc.w	$0040,$6008,$0200,$0030,0,$0080,$2D40,$FF5C,$4241,$122E,$FF4F,$E709
-	dc.w	$822E,$FF4E,$6600,$02E4,$3D69,0,$FF90,$2D69,4,$FF94,$2D69,8,$FF98
-	dc.w	$3D68,0,$FF84,$2D68,4,$FF88,$2D68,8,$FF8C,$61FF,0,$24CE,$2F00,$61FF,0
-	dc.w	$2572,$D197,$322E,$FF5E,$EC09,$201F,$B0BB,$1484,$6700,$011E,$6D00
-	dc.w	$0062,$B0BB,$1484,$6700,$021A,$6E00,$014A,$F22E,$D080,$FF90,$F22E
-	dc.w	$9000,$FF5C,$F23C,$8800,0,0,$F22E,$4823,$FF84,$F201,$A800,$F23C,$9000
-	dcb.w	2,0
-	dc.w	$83AE,$FF64,$F22E,$F080,$FF84,$2F02,$322E,$FF84,$2401,$0281,0,$7FFF
-	dc.w	$0242,$8000,$9280,$8242,$3D41,$FF84,$241F,$F22E,$D080,$FF84,$4E75
-	dc.w	$F22E,$D080,$FF90,$F22E,$9000,$FF5C,$F23C,$8800,0,0,$F22E,$4823,$FF84
-	dc.w	$F201,$A800,$F23C,$9000,0,0,$83AE,$FF64,$00AE,0,$1048,$FF64,$122E
-	dc.w	$FF62,$0201,$0013,$661C,$082E,3,$FF64,$56C1,$202E,$FF5C,$61FF,0,$4FCC
-	dc.w	$812E,$FF64,$F210,$D080,$4E75,$222E,$FF5C,$0201,$00C0,$6634,$F22E
-	dc.w	$F080,$FF84,$2F02,$322E,$FF84,$3401,$0281,0,$7FFF,$9280,$0481,0,$6000
-	dc.w	$0241,$7FFF,$0242,$8000,$8242,$3D41,$FF84,$241F,$F22E,$D040,$FF84
-	dc.w	$60A6,$F22E,$D080,$FF90,$222E,$FF5C,$0201,$0030,$F201,$9000,$F22E
-	dc.w	$4823,$FF84,$F23C,$9000,0,0,$60AA,$F22E,$D080,$FF90,$F22E,$9000,$FF5C
-	dc.w	$F23C,$8800,0,0,$F22E,$4823,$FF84,$F201,$A800,$F23C,$9000,0,0,$83AE
-	dc.w	$FF64,$F200,$0098,$F23C,$58B8,2,$F293,$FF3C,$6000,$FEE4,$08EE,3,$FF66
-	dc.w	$F22E,$D080,$FF90,$F23C,$9000,0,$0010,$F23C,$8800,0,0,$F22E,$4823
-	dc.w	$FF84,$F201,$A800,$F23C,$9000,0,0,$83AE,$FF64,$122E,$FF62,$0201,11
-	dc.w	$6620,$F22E,$F080,$FF84,$41EE,$FF84,$222E,$FF5C,$61FF,0,$4DD8,$812E
-	dc.w	$FF64,$F22E,$D080,$FF84,$4E75,$F22E,$D040,$FF90,$222E,$FF5C,$0201
-	dc.w	$00C0,$6652,$F22E,$9000,$FF5C,$F23C,$8800,0,0,$F22E,$48A3,$FF84,$F23C
-	dc.w	$9000,0,0,$F22E,$F040,$FF84,$2F02,$322E,$FF84,$2401,$0281,0,$7FFF
-	dc.w	$0242,$8000,$9280,$0681,0,$6000,$0241,$7FFF,$8242,$3D41,$FF84,$241F
-	dc.w	$F22E,$D040,$FF84,$6000,$FF80,$222E,$FF5C,$0201,$0030,$F201,$9000
-	dc.w	$60A6,$F22E,$D080,$FF90,$F22E,$9000,$FF5C,$F23C,$8800,0,0,$F22E,$4823
-	dc.w	$FF84,$F201,$A800,$F23C,$9000,0,0,$83AE,$FF64,$F200,$0098,$F23C,$58B8
-	dc.w	2,$F292,$FDE0,$F294,$FEFA,$F22E,$D040,$FF90,$222E,$FF5C,$0201,$00C0,1
-	dc.w	$0010,$F201,$9000,$F23C,$8800,0,0,$F22E,$48A3,$FF84,$F23C,$9000,0,0
-	dc.w	$F200,$0498,$F23C,$58B8,2,$F293,$FDA2,$6000,$FEBC,$323B,$120A,$4EFB
-	dc.w	$1006,$4AFC,$0030,$FD12,$0072,$00CC,$006C,$FD12,$0066,0,0,$0072,$0072
-	dc.w	$0060,$006C,$0072,$0066,0,0,$009E,$0060,$009E,$006C,$009E,$0066,0,0
-	dcb.w	5,$006C
-	dc.w	$0066,0,0,$FD12,$0072,$00CC,$006C,$FD12,$0066,0,0,$0066,$0066,$0066
-	dcb.w	3,$0066
-	dcb.w	2,0
-	dc.w	$60FF,0,$230E,$60FF,0,$2284,$60FF,0,$227E,$1028,0,$1229,0,$B101,$6A10
-	dc.w	$F23C,$4400,$8000,0,$1D7C,12,$FF64,$4E75,$F23C,$4400,0,0,$1D7C,4
-	dc.w	$FF64,$4E75,$F229,$D080,0,$1028,0,$1229,0,$B101,$6A10,$F200,$0018
-	dc.w	$F200,$001A,$1D7C,10,$FF64,$4E75,$F200,$0018,$1D7C,2,$FF64,$4E75
-	dc.w	$F228,$D080,0,$1028,0,$1229,0,$B101,$6AE2,$60D0,$0200,$0030,0,$0040
-	dc.w	$6008,$0200,$0030,0,$0080,$2D40,$FF5C,$122E,$FF4E,$6600,$0262,$0200
-	dc.w	$00C0,$6600,$007C,$4A28,0,$6A06,$08EE,3,$FF64,$F228,$D080,0,$4E75
-	dc.w	$0200,$00C0,$6600,$0060,$08EE,3,$FF66,$4A28,0,$6A06,$08EE,3,$FF64
-	dc.w	$F228,$D080,0,$082E,3,$FF62,$6602,$4E75,$3D68,0,$FF84,$2D68,4,$FF88
-	dc.w	$2D68,8,$FF8C,$41EE,$FF84,$61FF,0,$4950,$4440,$0640,$6000,$322E,$FF84
-	dc.w	$0241,$8000,$0240,$7FFF,$8041,$3D40,$FF84,$F22E,$D040,$FF84,$4E75
-	dc.w	$0C00,$0040,$667E,$3D68,0,$FF84,$2D68,4,$FF88,$2D68,8,$FF8C,$61FF,0
-	dc.w	$206C,$0C80,0,$007F,$6C00,$0092,$0C80,$FFFF,$FF81,$6700,$0178,$6D00
-	dc.w	$00F4,$F23C,$8800,0,0,$F22E,$9000,$FF5C,$F22E,$4800,$FF84,$F201,$A800
-	dc.w	$F23C,$9000,0,0,$83AE,$FF64,$2F02,$F22E,$F080,$FF84,$322E,$FF84,$3401
-	dc.w	$0281,0,$7FFF,$9280,$0242,$8000,$8441,$3D42,$FF84,$241F,$F22E,$D080
-	dc.w	$FF84,$4E75,$3D68,0,$FF84,$2D68,4,$FF88,$2D68,8,$FF8C,$61FF,0,$1FEE
-	dc.w	$0C80,0,$03FF,$6C00,$0014,$0C80,$FFFF,$FC01,$6700,$00FA,$6D00,$0076
-	dc.w	$6000,$FF80,$08EE,3,$FF66,$4A2E,$FF84,$6A06,$08EE,3,$FF64,$122E,$FF62
-	dc.w	$0201,11,$661A,$41EE,$FF84,$222E,$FF5C,$61FF,0,$4A74,$812E,$FF64
-	dc.w	$F22E,$D080,$FF84,$4E75,$2D6E,$FF88,$FF94,$2D6E,$FF8C,$FF98,$322E
-	dc.w	$FF84,$2F02,$3401,$0281,0,$7FFF,$9280,$0242,$8000,$0681,0,$6000,$0241
-	dc.w	$7FFF,$8441,$3D42,$FF90,$F22E,$D040,$FF90,$241F,$60AC,$F23C,$8800,0,0
-	dc.w	$F22E,$9000,$FF5C,$F22E,$4800,$FF84,$F23C,$9000,0,0,$F201,$A800,$83AE
-	dc.w	$FF64,$00AE,0,$1048,$FF64,$122E,$FF62,$0201,$0013,$661C,$082E,3,$FF64
-	dc.w	$56C1,$202E,$FF5C,$61FF,0,$4AE4,$812E,$FF64,$F210,$D080,$4E75,$2F02
-	dc.w	$322E,$FF84,$2401,$0281,0,$7FFF,$0242,$8000,$9280,$0481,0,$6000,$0241
-	dc.w	$7FFF,$8242,$3D41,$FF84,$241F,$F22E,$D040,$FF84,$60B6,$F23C,$8800,0,0
-	dc.w	$F22E,$9000,$FF5C,$F22E,$4800,$FF84,$F201,$A800,$F23C,$9000,0,0,$83AE
-	dc.w	$FF64,$F200,$0098,$F23C,$58B8,2,$F293,$FF74,$6000,$FE7E,$0C01,4,$6700
-	dc.w	$FDB6,$0C01,5,$67FF,0,$1F98,$0C01,3,$67FF,0,$1FA2,$F228,$4800,0,$F200
-	dc.w	$A800,$E198,$1D40,$FF64,$4E75,$51FC,$51FC,$51FC,$51FC,0,$3FFF,0,$007E
-	dc.w	0,$03FE,$FFFF,$C001,$FFFF,$FF81,$FFFF,$FC01,$0200,$0030,0,$0040,$6008
-	dc.w	$0200,$0030,0,$0080,$2D40,$FF5C,$4241,$122E,$FF4F,$E709,$822E,$FF4E
-	dc.w	$6600,$02D6,$3D69,0,$FF90,$2D69,4,$FF94,$2D69,8,$FF98,$3D68,0,$FF84
-	dc.w	$2D68,4,$FF88,$2D68,8,$FF8C,$61FF,0,$1E0E,$2F00,$61FF,0,$1EB2,$4497
-	dc.w	$D197,$322E,$FF5E,$EC09,$201F,$B0BB,$148E,$6F00,$0074,$B0BB,$1520
-	dc.w	$FF7A,$6700,$020C,$6E00,$013C,$F22E,$D080,$FF90,$F22E,$9000,$FF5C
-	dc.w	$F23C,$8800,0,0,$F22E,$4820,$FF84,$F201,$A800,$F23C,$9000,0,0,$83AE
-	dc.w	$FF64,$F22E,$F080,$FF84,$2F02,$322E,$FF84,$2401,$0281,0,$7FFF,$0242
-	dc.w	$8000,$9280,$8242,$3D41,$FF84,$241F,$F22E,$D080,$FF84,$4E75,0,$7FFF,0
-	dc.w	$407F,0,$43FF,$201F,$60C6,$2F00,$F22E,$D080,$FF90,$F22E,$9000,$FF5C
-	dc.w	$F23C,$8800,0,0,$F22E,$4820,$FF84,$F200,$A800,$F23C,$9000,0,0,$81AE
-	dc.w	$FF64,$F227,$E001,$3017,$DFFC,0,12,$0280,0,$7FFF,$9097,$B0BB,$14AE
-	dc.w	$6DB6,$201F,$00AE,0,$1048,$FF64,$122E,$FF62,$0201,$0013,$661C,$082E,3
-	dc.w	$FF64,$56C1,$202E,$FF5C,$61FF,0,$48DE,$812E,$FF64,$F210,$D080,$4E75
-	dc.w	$222E,$FF5C,$0201,$00C0,$6634,$F22E,$F080,$FF84,$2F02,$322E,$FF84
-	dc.w	$3401,$0281,0,$7FFF,$9280,$0481,0,$6000,$0241,$7FFF,$0242,$8000,$8242
-	dc.w	$3D41,$FF84,$241F,$F22E,$D040,$FF84,$60A6,$F22E,$D080,$FF90,$222E
-	dc.w	$FF5C,$0201,$0030,$F201,$9000,$F22E,$4820,$FF84,$F23C,$9000,0,0,$60AA
-	dc.w	$08EE,3,$FF66,$F22E,$D080,$FF90,$F23C,$9000,0,$0010,$F23C,$8800,0,0
-	dc.w	$F22E,$4820,$FF84,$F201,$A800,$F23C,$9000,0,0,$83AE,$FF64,$122E,$FF62
-	dc.w	$0201,11,$6620,$F22E,$F080,$FF84,$41EE,$FF84,$222E,$FF5C,$61FF,0
-	dc.w	$4726,$812E,$FF64,$F22E,$D080,$FF84,$4E75,$F22E,$D040,$FF90,$222E
-	dc.w	$FF5C,$0201,$00C0,$6652,$F22E,$9000,$FF5C,$F23C,$8800,0,0,$F22E,$48A0
-	dc.w	$FF84,$F23C,$9000,0,0,$F22E,$F040,$FF84,$2F02,$322E,$FF84,$2401,$0281
-	dc.w	0,$7FFF,$0242,$8000,$9280,$0681,0,$6000,$0241,$7FFF,$8242,$3D41,$FF84
-	dc.w	$241F,$F22E,$D040,$FF84,$6000,$FF80,$222E,$FF5C,$0201,$0030,$F201
-	dc.w	$9000,$60A6,$F22E,$D080,$FF90,$F22E,$9000,$FF5C,$F23C,$8800,0,0,$F22E
-	dc.w	$4820,$FF84,$F201,$A800,$F23C,$9000,0,0,$83AE,$FF64,$F200,$0098,$F23C
-	dc.w	$58B8,1,$F292,$FDEE,$F294,$FEFA,$F22E,$D040,$FF90,$222E,$FF5C,$0201
-	dc.w	$00C0,1,$0010,$F201,$9000,$F23C,$8800,0,0,$F22E,$48A0,$FF84,$F23C
-	dc.w	$9000,0,0,$F200,$0498,$F23C,$58B8,1,$F293,$FDB0,$6000,$FEBC,$323B
-	dc.w	$120A,$4EFB,$1006,$4AFC,$0030,$FD20,$009E,$0072,$0060,$FD20,$0066,0,0
-	dc.w	$0072,$006C,$0072,$0060,$0072,$0066,0,0,$00D0,$00D0,$006C,$0060,$00D0
-	dc.w	$0066,0,0,$0060,$0060,$0060,$0060,$0060,$0066,0,0,$FD20,$009E,$0072
-	dc.w	$0060,$FD20,$0066,0,0,$0066,$0066,$0066,$0066,$0066,$0066,0,0,$60FF,0
-	dc.w	$1BD8,$60FF,0,$1BD2,$60FF,0,$1C50,$1028,0,$1229,0,$B101,$6A10,$F23C
-	dc.w	$4400,$8000,0,$1D7C,12,$FF64,$4E75,$F23C,$4400,0,0,$1D7C,4,$FF64
-	dc.w	$4E75,$006E,$0410,$FF66,$1028,0,$1229,0,$B101,$6A10,$F23C,$4400,$FF80
-	dc.w	0,$1D7C,10,$FF64,$4E75,$F23C,$4400,$7F80,0,$1D7C,2,$FF64,$4E75,$1029
-	dc.w	0,$1228,0,$B101,$6A16,$F229,$D080,0,$F200,$0018,$F200,$001A,$1D7C,10
-	dc.w	$FF64,$4E75,$F229,$D080,0,$F200,$0018,$1D7C,2,$FF64,$4E75,$0200,$0030
-	dc.w	0,$0040,$6008,$0200,$0030,0,$0080,$2D40,$FF5C,$122E,$FF4E,$6600,$0276
-	dc.w	$0200,$00C0,$6600,$0090,$2D68,4,$FF88,$2D68,8,$FF8C,$3028,0,$0A40
-	dc.w	$8000,$6A06,$1D7C,8,$FF64,$3D40,$FF84,$F22E,$D080,$FF84,$4E75,$0200
-	dc.w	$00C0,$6660,$08EE,3,$FF66,$2D68,4,$FF88,$2D68,8,$FF8C,$3028,0,$0A40
-	dc.w	$8000,$6A06,$1D7C,8,$FF64,$3D40,$FF84,$F22E,$D080,$FF84,$082E,3,$FF62
-	dc.w	$6602,$4E75,$41EE,$FF84,$61FF,0,$4266,$4440,$0640,$6000,$322E,$FF84
-	dc.w	$0241,$8000,$0240,$7FFF,$8041,$3D40,$FF84,$F22E,$D040,$FF84,$4E75
-	dc.w	$0C00,$0040,$667E,$3D68,0,$FF84,$2D68,4,$FF88,$2D68,8,$FF8C,$61FF,0
-	dc.w	$1982,$0C80,0,$007F,$6C00,$0090,$0C80,$FFFF,$FF81,$6700,$0178,$6D00
-	dc.w	$00F4,$F23C,$8800,0,0,$F22E,$9000,$FF5C,$F22E,$481A,$FF84,$F201,$A800
-	dc.w	$F23C,$9000,0,0,$83AE,$FF64,$2F02,$F22E,$F080,$FF84,$322E,$FF84,$3401
-	dc.w	$0281,0,$7FFF,$9280,$0242,$8000,$8441,$3D42,$FF84,$241F,$F22E,$D080
-	dc.w	$FF84,$4E75,$3D68,0,$FF84,$2D68,4,$FF88,$2D68,8,$FF8C,$61FF,0,$1904
-	dc.w	$0C80,0,$03FF,$6C12,$0C80,$FFFF,$FC01,$6700,$00FC,$6D00,$0078,$6000
-	dc.w	$FF82,$08EE,3,$FF66,$0A2E,$0080,$FF84,$6A06,$08EE,3,$FF64,$122E,$FF62
-	dc.w	$0201,11,$661A,$41EE,$FF84,$222E,$FF5C,$61FF,0,$438A,$812E,$FF64
-	dc.w	$F22E,$D080,$FF84,$4E75,$2D6E,$FF88,$FF94,$2D6E,$FF8C,$FF98,$322E
-	dc.w	$FF84,$2F02,$2401,$0281,0,$7FFF,$0242,$8000,$9280,$0681,0,$6000,$0241
-	dc.w	$7FFF,$8242,$3D41,$FF90,$F22E,$D040,$FF90,$241F,$60AC,$F23C,$8800,0,0
-	dc.w	$F22E,$9000,$FF5C,$F22E,$481A,$FF84,$F23C,$9000,0,0,$F201,$A800,$83AE
-	dc.w	$FF64,$00AE,0,$1048,$FF64,$122E,$FF62,$0201,$0013,$661C,$082E,3,$FF64
-	dc.w	$56C1,$202E,$FF5C,$61FF,0,$43FA,$812E,$FF64,$F210,$D080,$4E75,$2F02
-	dc.w	$322E,$FF84,$2401,$0281,0,$7FFF,$0242,$8000,$9280,$0481,0,$6000,$0241
-	dc.w	$7FFF,$8242,$3D41,$FF84,$F22E,$D040,$FF84,$241F,$60B6,$F23C,$8800,0,0
-	dc.w	$F22E,$9000,$FF5C,$F22E,$481A,$FF84,$F201,$A800,$F23C,$9000,0,0,$83AE
-	dc.w	$FF64,$F200,$0098,$F23C,$58B8,2,$F293,$FF74,$6000,$FE7E,$0C01,4,$6700
-	dc.w	$FDB6,$0C01,5,$67FF,0,$18AE,$0C01,3,$67FF,0,$18B8,$F228,$481A,0,$F200
-	dc.w	$A800,$E198,$1D40,$FF64,$4E75,$122E,$FF4E,$6610,$4A28,0,$6B02,$4E75
-	dc.w	$1D7C,8,$FF64,$4E75,$0C01,1,$6740,$0C01,2,$6724,$0C01,5,$67FF,0,$1866
-	dc.w	$0C01,3,$67FF,0,$1870,$4A28,0,$6B02,$4E75,$1D7C,8,$FF64,$4E75,$4A28,0
-	dc.w	$6B08,$1D7C,2,$FF64,$4E75,$1D7C,10,$FF64,$4E75,$4A28,0,$6B08,$1D7C,4
-	dc.w	$FF64,$4E75,$1D7C,12,$FF64,$4E75,$122E,$FF4E,$6628,$0200,$0030,$F200
-	dc.w	$9000,$F23C,$8800,0,0,$F228,$4801,0,$F23C,$9000,0,0,$F200,$A800,$81AE
-	dc.w	$FF64,$4E75,$0C01,1,$672E,$0C01,2,$674E,$0C01,4,$6710,$0C01,5,$67FF,0
-	dc.w	$17D6,$60FF,0,$17E4,$3D68,0,$FF84,$1D7C,$0080,$FF88,$41EE,$FF84,$60A4
-	dc.w	$4A28,0,$6B10,$F23C,$4400,0,0,$1D7C,4,$FF64,$4E75,$F23C,$4400,$8000,0
-	dc.w	$1D7C,12,$FF64,$4E75,$F228,$D080,0,$4A28,0,$6B08,$1D7C,2,$FF64,$4E75
-	dc.w	$1D7C,10,$FF64,$4E75,$122E,$FF4E,$6618,$F23C,$8800,0,0,$F228,$4803,0
-	dc.w	$F200,$A800,$81AE,$FF64,$4E75,$0C01,1,$672E,$0C01,2,$674E,$0C01,4
-	dc.w	$6710,$0C01,5,$67FF,0,$1742,$60FF,0,$1750,$3D68,0,$FF84,$1D7C,$0080
-	dc.w	$FF88,$41EE,$FF84,$60B4,$4A28,0,$6B10,$F23C,$4400,0,0,$1D7C,4,$FF64
-	dc.w	$4E75,$F23C,$4400,$8000,0,$1D7C,12,$FF64,$4E75,$F228,$D080,0,$4A28,0
-	dc.w	$6B08,$1D7C,2,$FF64,$4E75,$1D7C,10,$FF64,$4E75,$0200,$0030,0,$0040
-	dc.w	$6008,$0200,$0030,0,$0080,$2D40,$FF5C,$122E,$FF4E,$6600,$025C,$0200
-	dc.w	$00C0,$667E,$2D68,4,$FF88,$2D68,8,$FF8C,$3228,0,$0881,15,$3D41,$FF84
-	dc.w	$F22E,$D080,$FF84,$4E75,$0200,$00C0,$6658,$08EE,3,$FF66,$2D68,4,$FF88
-	dc.w	$2D68,8,$FF8C,$3028,0,$0880,15,$3D40,$FF84,$F22E,$D080,$FF84,$082E,3
-	dc.w	$FF62,$6602,$4E75,$41EE,$FF84,$61FF,0,$3E0E,$4440,$0640,$6000,$322E
-	dc.w	$FF84,$0241,$8000,$0240,$7FFF,$8041,$3D40,$FF84,$F22E,$D040,$FF84
-	dc.w	$4E75,$0C00,$0040,$667E,$3D68,0,$FF84,$2D68,4,$FF88,$2D68,8,$FF8C
-	dc.w	$61FF,0,$152A,$0C80,0,$007F,$6C00,$0090,$0C80,$FFFF,$FF81,$6700,$0170
-	dc.w	$6D00,$00EC,$F23C,$8800,0,0,$F22E,$9000,$FF5C,$F22E,$4818,$FF84,$F201
-	dc.w	$A800,$F23C,$9000,0,0,$83AE,$FF64,$2F02,$F22E,$F080,$FF84,$322E,$FF84
-	dc.w	$2401,$0281,0,$7FFF,$9280,$0242,$8000,$8441,$3D42,$FF84,$241F,$F22E
-	dc.w	$D080,$FF84,$4E75,$3D68,0,$FF84,$2D68,4,$FF88,$2D68,8,$FF8C,$61FF,0
-	dc.w	$14AC,$0C80,0,$03FF,$6C12,$0C80,$FFFF,$FC01,$6700,$00F4,$6D00,$0070
-	dc.w	$6000,$FF82,$08EE,3,$FF66,$08AE,7,$FF84,$122E,$FF62,$0201,11,$661A
-	dc.w	$41EE,$FF84,$222E,$FF5C,$61FF,0,$3F3A,$812E,$FF64,$F22E,$D080,$FF84
-	dc.w	$4E75,$2D6E,$FF88,$FF94,$2D6E,$FF8C,$FF98,$322E,$FF84,$2F02,$2401
-	dc.w	$0281,0,$7FFF,$0242,$8000,$9280,$0681,0,$6000,$0241,$7FFF,$8242,$3D41
-	dc.w	$FF90,$F22E,$D040,$FF90,$241F,$60AC,$F23C,$8800,0,0,$F22E,$9000,$FF5C
-	dc.w	$F22E,$4818,$FF84,$F23C,$9000,0,0,$F201,$A800,$83AE,$FF64,$00AE,0
-	dc.w	$1048,$FF64,$122E,$FF62,$0201,$0013,$661C,$082E,3,$FF64,$56C1,$202E
-	dc.w	$FF5C,$61FF,0,$3FAA,$812E,$FF64,$F210,$D080,$4E75,$2F02,$322E,$FF84
-	dc.w	$2401,$0281,0,$7FFF,$0242,$8000,$9280,$0481,0,$6000,$0241,$7FFF,$8242
-	dc.w	$3D41,$FF84,$F22E,$D040,$FF84,$241F,$60B6,$F23C,$8800,0,0,$F22E,$9000
-	dc.w	$FF5C,$F22E,$4818,$FF84,$F201,$A800,$F23C,$9000,0,0,$83AE,$FF64,$F200
-	dc.w	$0098,$F23C,$58B8,2,$F293,$FF74,$6000,$FE86,$0C01,4,$6700,$FDC6,$0C01
-	dc.w	5,$67FF,0,$145E,$0C01,3,$67FF,0,$1468,$F228,$4818,0,$0C01,2,$6708
-	dc.w	$1D7C,4,$FF64,$4E75,$1D7C,2,$FF64,$4E75,$4241,$122E,$FF4F,$E709,$822E
-	dc.w	$FF4E,$6618,$F229,$D080,0,$F228,$4838,0,$F200,$A800,$E198,$1D40,$FF64
-	dc.w	$4E75,$323B,$120A,$4EFB,$1006,$4AFC,$0030,$FFDC,$FFDC,$FFDC,$0060
-	dc.w	$00F8,$006E,0,0,$FFDC,$FFDC,$FFDC,$0060,$007C,$006E,0,0,$FFDC,$FFDC
-	dc.w	$FFDC,$0060,$007C,$006E,0,0,$0060,$0060,$0060,$0060,$0060,$006E,0,0
-	dc.w	$0114,$009C,$009C,$0060,$00BC,$006E,0,0,$006E,$006E,$006E,$006E,$006E
-	dc.w	$006E,0,0,$61FF,0,$1388,$022E,$00F7,$FF64,$4E75,$61FF,0,$137A,$022E
-	dc.w	$00F7,$FF64,$4E75,$3D68,0,$FF84,$2028,4,$08C0,$001F,$2D40,$FF88,$2D68
-	dc.w	8,$FF8C,$41EE,$FF84,$6000,$FF42,$2D69,0,$FF84,$2029,4,$08C0,$001F
-	dc.w	$2D40,$FF88,$2D69,8,$FF8C,$43EE,$FF84,$6000,$FF22,$3D69,0,$FF90,$3D68
-	dc.w	0,$FF84,$2029,4,$08C0,$001F,$2D40,$FF94,$2028,4,$08C0,$001F,$2D40
-	dc.w	$FF88,$2D69,8,$FF98,$2D68,8,$FF8C,$43EE,$FF90,$41EE,$FF84,$6000,$FEE6
-	dc.w	$1028,0,$1229,0,$B101,$6B00,$FF78,$4A00,$6B02,$4E75,$1D7C,8,$FF64
-	dc.w	$4E75,$1028,0,$1229,0,$B101,$6B00,$FF7C,$4A00,$6A02,$4E75,$1D7C,8
-	dc.w	$FF64,$4E75,$2D40,$FF5C,$4241,$122E,$FF4F,$E709,$822E,$FF4E,$6600
-	dc.w	$02A0,$3D69,0,$FF90,$2D69,4,$FF94,$2D69,8,$FF98,$3D68,0,$FF84,$2D68,4
-	dc.w	$FF88,$2D68,8,$FF8C,$61FF,0,$119A,$2F00,$61FF,0,$123E,$D09F,$0C80
-	dc.w	$FFFF,$C001,$6700,$00F8,$6D00,$0064,$0C80,0,$4000,$6700,$01DA,$6E00
-	dc.w	$0122,$F22E,$D080,$FF90,$F22E,$9000,$FF5C,$F23C,$8800,0,0,$F22E,$4827
-	dc.w	$FF84,$F201,$A800,$F23C,$9000,0,0,$83AE,$FF64,$F22E,$F080,$FF84,$2F02
-	dc.w	$322E,$FF84,$2401,$0281,0,$7FFF,$0242,$8000,$9280,$8242,$3D41,$FF84
-	dc.w	$241F,$F22E,$D080,$FF84,$4E75,$F22E,$D080,$FF90,$F22E,$9000,$FF5C
-	dc.w	$F23C,$8800,0,0,$F22E,$4827,$FF84,$F201,$A800,$F23C,$9000,0,0,$83AE
-	dc.w	$FF64,$00AE,0,$1048,$FF64,$122E,$FF62,$0201,$0013,$6620,$082E,3,$FF64
-	dc.w	$56C1,$202E,$FF5C,$0200,$0030,$61FF,0,$3C98,$812E,$FF64,$F210,$D080
-	dc.w	$4E75,$F22E,$F080,$FF84,$2F02,$322E,$FF84,$2401,$0281,0,$7FFF,$9280
-	dc.w	$0481,0,$6000,$0241,$7FFF,$0242,$8000,$8242,$3D41,$FF84,$241F,$F22E
-	dc.w	$D040,$FF84,$60AC,$F22E,$D080,$FF90,$F22E,$9000,$FF5C,$F23C,$8800,0,0
-	dc.w	$F22E,$4827,$FF84,$F201,$A800,$F23C,$9000,0,0,$83AE,$FF64,$F200,$0098
-	dc.w	$F23C,$58B8,2,$F293,$FF64,$6000,$FF0C,$08EE,3,$FF66,$F22E,$D080,$FF90
-	dc.w	$F23C,$9000,0,$0010,$F23C,$8800,0,0,$F22E,$4827,$FF84,$F201,$A800
-	dc.w	$F23C,$9000,0,0,$83AE,$FF64,$122E,$FF62,$0201,11,$6620,$F22E,$F080
-	dc.w	$FF84,$41EE,$FF84,$222E,$FF5C,$61FF,0,$3B56,$812E,$FF64,$F22E,$D080
-	dc.w	$FF84,$4E75,$F22E,$D040,$FF90,$F22E,$9000,$FF5C,$F23C,$8800,0,0,$F22E
-	dc.w	$48A7,$FF84,$F23C,$9000,0,0,$F22E,$F040,$FF84,$2F02,$322E,$FF84,$2401
-	dc.w	$0281,0,$7FFF,$0242,$8000,$9280,$0681,0,$6000,$0241,$7FFF,$8242,$3D41
-	dc.w	$FF84,$241F,$F22E,$D040,$FF84,$6000,$FF8A,$F22E,$D080,$FF90,$F22E
-	dc.w	$9000,$FF5C,$F23C,$8800,0,0,$F22E,$4827,$FF84,$F201,$A800,$F23C,$9000
-	dcb.w	2,0
-	dc.w	$83AE,$FF64,$F200,$0098,$F23C,$58B8,2,$F292,$FE20,$F294,$FF12,$F22E
-	dc.w	$D040,$FF90,$222E,$FF5C,$0201,$00C0,1,$0010,$F201,$9000,$F23C,$8800,0
-	dc.w	0,$F22E,$48A7,$FF84,$F23C,$9000,0,0,$F200,$0498,$F23C,$58B8,2,$F293
-	dc.w	$FDE2,$6000,$FED4,$323B,$120A,$4EFB,$1006,$4AFC,$0030,$FD56,$0072
-	dc.w	$0078,$006C,$FD56,$0066,0,0,$0072,$0072,$0060,$006C,$0072,$0066,0,0
-	dc.w	$007E,$0060,$007E,$006C,$007E,$0066,0,0,$006C,$006C,$006C,$006C,$006C
-	dc.w	$0066,0,0,$FD56,$0072,$0078,$006C,$FD56,$0066,0,0,$0066,$0066,$0066
-	dcb.w	3,$0066
-	dcb.w	2,0
-	dc.w	$60FF,0,$101E,$60FF,0,$0F94,$60FF,0,$0F8E,$60FF,$FFFF,$ED0E,$60FF
-	dc.w	$FFFF,$ED62,$60FF,$FFFF,$ED2E,$2D40,$FF5C,$4241,$122E,$FF4F,$E709
-	dc.w	$822E,$FF4E,$6600,$027C,$3D69,0,$FF90,$2D69,4,$FF94,$2D69,8,$FF98
-	dc.w	$3D68,0,$FF84,$2D68,4,$FF88,$2D68,8,$FF8C,$61FF,0,$0E58,$2F00,$61FF,0
-	dc.w	$0EFC,$4497,$D197,$322E,$FF5E,$EC09,$201F,$0C80,$FFFF,$C001,$6F00
-	dc.w	$0064,$0C80,0,$3FFF,$6700,$01B6,$6E00,$0100,$F22E,$D080,$FF90,$F22E
-	dc.w	$9000,$FF5C,$F23C,$8800,0,0,$F22E,$4824,$FF84,$F201,$A800,$F23C,$9000
-	dcb.w	2,0
-	dc.w	$83AE,$FF64,$F22E,$F080,$FF84,$2F02,$322E,$FF84,$2401,$0281,0,$7FFF
-	dc.w	$0242,$8000,$9280,$8242,$3D41,$FF84,$241F,$F22E,$D080,$FF84,$4E75
-	dc.w	$F22E,$D080,$FF90,$F22E,$9000,$FF5C,$F23C,$8800,0,0,$F22E,$4824,$FF84
-	dc.w	$F201,$A800,$F23C,$9000,0,0,$83AE,$FF64,$F227,$E001,$3217,$DFFC,0,12
-	dc.w	$0281,0,$7FFF,$9280,$0C81,0,$7FFF,$6D90,$006E,$1048,$FF66,$122E,$FF62
-	dc.w	$0201,$0013,$6620,$082E,3,$FF64,$56C1,$202E,$FF5C,$0200,$0030,$61FF,0
-	dc.w	$3936,$812E,$FF64,$F210,$D080,$4E75,$F22E,$F080,$FF84,$2F02,$322E
-	dc.w	$FF84,$2401,$0281,0,$7FFF,$0242,$8000,$9280,$0481,0,$6000,$0241,$7FFF
-	dc.w	$8242,$3D41,$FF84,$241F,$F22E,$D040,$FF84,$60AC,$08EE,3,$FF66,$F22E
-	dc.w	$D080,$FF90,$F23C,$9000,0,$0010,$F23C,$8800,0,0,$F22E,$4824,$FF84
-	dc.w	$F201,$A800,$F23C,$9000,0,0,$83AE,$FF64,$122E,$FF62,$0201,11,$6620
-	dc.w	$F22E,$F080,$FF84,$41EE,$FF84,$222E,$FF5C,$61FF,0,$3830,$812E,$FF64
-	dc.w	$F22E,$D080,$FF84,$4E75,$F22E,$D040,$FF90,$F22E,$9000,$FF5C,$F23C
-	dc.w	$8800,0,0,$F22E,$48A4,$FF84,$F23C,$9000,0,0,$F22E,$F040,$FF84,$2F02
-	dc.w	$322E,$FF84,$2401,$0281,0,$7FFF,$0242,$8000,$9280,$0681,0,$6000,$0241
-	dc.w	$7FFF,$8242,$3D41,$FF84,$241F,$F22E,$D040,$FF84,$608A,$F22E,$D080
-	dc.w	$FF90,$F22E,$9000,$FF5C,$F23C,$8800,0,0,$F22E,$4824,$FF84,$F201,$A800
-	dc.w	$F23C,$9000,0,0,$83AE,$FF64,$F200,$0098,$F23C,$58B8,1,$F292,$FE44
-	dc.w	$F294,$FF14,$F22E,$D040,$FF90,$4281,1,$0010,$F201,$9000,$F23C,$8800,0
-	dc.w	0,$F22E,$48A4,$FF84,$F23C,$9000,0,0,$F200,$0498,$F23C,$58B8,1,$F293
-	dc.w	$FE0C,$6000,$FEDC,$323B,$120A,$4EFB,$1006,$4AFC,$0030,$FD7A,$0072
-	dc.w	$0078,$0060,$FD7A,$0066,0,0,$0078,$006C,$0078,$0060,$0078,$0066,0,0
-	dcb.w	2,$007E
-	dc.w	$006C,$0060,$007E,$0066,0,0,$0060,$0060,$0060,$0060,$0060,$0066,0,0
-	dc.w	$FD7A,$0072,$0078,$0060,$FD7A,$0066,0,0,$0066,$0066,$0066,$0066,$0066
-	dc.w	$0066,0,0,$60FF,0,$0C7C,$60FF,0,$0C76,$60FF,0,$0CF4,$60FF,$FFFF,$F0CE
-	dc.w	$60FF,$FFFF,$F09C,$60FF,$FFFF,$F0F4,$0200,$0030,0,$0040,$6008,$0200
-	dc.w	$0030,0,$0080,$2D40,$FF5C,$4241,$122E,$FF4F,$E709,$822E,$FF4E,$6600
-	dc.w	$024C,$61FF,0,$0A5C,$F22E,$D080,$FF90,$F23C,$8800,0,0,$F22E,$9000
-	dc.w	$FF5C,$F22E,$4822,$FF84,$F23C,$9000,0,0,$F201,$A800,$83AE,$FF64,$F281
-	dc.w	$003C,$2F02,$F227,$E001,$322E,$FF5E,$EC09,$3417,$0282,0,$7FFF,$9480
-	dc.w	$B4BB,$1424,$6C38,$B4BB,$142A,$6D00,$00B8,$6700,$0184,$3217,$0241
-	dc.w	$8000,$8242,$3E81,$F21F,$D080,$241F,$4E75,$4E75,0,$7FFF,0,$407F,0
-	dc.w	$43FF,0,0,0,$3F81,0,$3C01,$00AE,0,$1048,$FF64,$122E,$FF62,$0201,$0013
-	dc.w	$6624,$DFFC,0,12,$082E,3,$FF64,$56C1,$202E,$FF5C,$61FF,0,$366A,$812E
-	dc.w	$FF64,$F210,$D080,$241F,$4E75,$122E,$FF5C,$0201,$00C0,$661A,$3217
-	dc.w	$0241,$8000,$0482,0,$6000,$0242,$7FFF,$8242,$3E81,$F21F,$D040,$60BE
-	dc.w	$F22E,$D080,$FF90,$222E,$FF5C,$0201,$0030,$F201,$9000,$F22E,$4822
-	dc.w	$FF84,$F23C,$9000,0,0,$DFFC,0,12,$F227,$E001,$60BA,$08EE,3,$FF66
-	dc.w	$DFFC,0,12,$F22E,$D080,$FF90,$F23C,$9000,0,$0010,$F23C,$8800,0,0
-	dc.w	$F22E,$4822,$FF84,$F23C,$9000,0,0,$F201,$A800,$83AE,$FF64,$122E,$FF62
-	dc.w	$0201,11,$6622,$F22E,$F080,$FF84,$41EE,$FF84,$222E,$FF5C,$61FF,0
-	dc.w	$34BA,$812E,$FF64,$F22E,$D080,$FF84,$241F,$4E75,$F22E,$D040,$FF90
-	dc.w	$222E,$FF5C,$0201,$00C0,$664E,$F22E,$9000,$FF5C,$F23C,$8800,0,0,$F22E
-	dc.w	$48A2,$FF84,$F23C,$9000,0,0,$F22E,$F040,$FF84,$322E,$FF84,$2401,$0281
-	dc.w	0,$7FFF,$0242,$8000,$9280,$0681,0,$6000,$0241,$7FFF,$8242,$3D41,$FF84
-	dc.w	$F22E,$D040,$FF84,$6000,$FF82,$222E,$FF5C,$0201,$0030,$F201,$9000
-	dc.w	$60AA,$222E,$FF5C,$0201,$00C0,$6700,$FE74,$222F,4,$0C81,$8000,0,$6600
-	dc.w	$FE66,$4AAF,8,$6600,$FE5E,$082E,1,$FF66,$6700,$FE54,$F22E,$D040,$FF90
-	dc.w	$222E,$FF5C,$0201,$00C0,1,$0010,$F201,$9000,$F23C,$8800,0,0,$F22E
-	dc.w	$48A2,$FF84,$F23C,$9000,0,0,$F200,$0018,$F200,$0498,$F200,$0438,$F292
-	dc.w	$FECA,$6000,$FE14,$323B,$120A,$4EFB,$1006,$4AFC,$0030,$FDAA,$00E4
-	dc.w	$011C,$0060,$FDAA,$0066,0,0,$00BC,$006C,$011C,$0060,$00BC,$0066,0,0
-	dcb.w	2,$0130
-	dc.w	$010C,$0060,$0130,$0066,0,0,$0060,$0060,$0060,$0060,$0060,$0066,0,0
-	dc.w	$FDAA,$00E4,$011C,$0060,$FDAA,$0066,0,0,$0066,$0066,$0066,$0066,$0066
-	dc.w	$0066,0,0,$60FF,0,$097C,$60FF,0,$0976,$1028,0,$1229,0,$B101,$6B00
-	dc.w	$0016,$4A00,$6B2E,$F23C,$4400,0,0,$1D7C,4,$FF64,$4E75,$122E,$FF5F
-	dc.w	$0201,$0030,$0C01,$0020,$6710,$F23C,$4400,0,0,$1D7C,4,$FF64,$4E75
-	dc.w	$F23C,$4400,$8000,0,$1D7C,12,$FF64,$4E75,$3D68,0,$FF84,$2D68,4,$FF88
-	dc.w	$2D68,8,$FF8C,$61FF,0,$0828,$426E,$FF90,$42AE,$FF94,$42AE,$FF98,$6000
-	dc.w	$FCCE,$3D69,0,$FF90,$2D69,4,$FF94,$2D69,8,$FF98,$61FF,0,$08AC,$426E
-	dc.w	$FF84,$42AE,$FF88,$42AE,$FF8C,$6000,$FCA6,$1028,0,$1229,0,$B300,$6BFF
-	dc.w	0,$094A,$F228,$D080,0,$4A28,0,$6A1C,$1D7C,10,$FF64,$4E75,$F229,$D080
-	dc.w	0,$4A29,0,$6A08,$1D7C,10,$FF64,$4E75,$1D7C,2,$FF64,$4E75,$0200,$0030
-	dc.w	0,$0040,$6008,$0200,$0030,0,$0080,$2D40,$FF5C,$4241,$122E,$FF4F,$E709
-	dc.w	$822E,$FF4E,$6600,$024C,$61FF,0,$0694,$F22E,$D080,$FF90,$F23C,$8800,0
-	dc.w	0,$F22E,$9000,$FF5C,$F22E,$4828,$FF84,$F23C,$9000,0,0,$F201,$A800
-	dc.w	$83AE,$FF64,$F281,$003C,$2F02,$F227,$E001,$322E,$FF5E,$EC09,$3417
-	dc.w	$0282,0,$7FFF,$9480,$B4BB,$1424,$6C38,$B4BB,$142A,$6D00,$00B8,$6700
-	dc.w	$0184,$3217,$0241,$8000,$8242,$3E81,$F21F,$D080,$241F,$4E75,$4E75,0
-	dc.w	$7FFF,0,$407F,0,$43FF,0,0,0,$3F81,0,$3C01,$00AE,0,$1048,$FF64,$122E
-	dc.w	$FF62,$0201,$0013,$6624,$DFFC,0,12,$082E,3,$FF64,$56C1,$202E,$FF5C
-	dc.w	$61FF,0,$32A2,$812E,$FF64,$F210,$D080,$241F,$4E75,$122E,$FF5C,$0201
-	dc.w	$00C0,$661A,$3217,$0241,$8000,$0482,0,$6000,$0242,$7FFF,$8242,$3E81
-	dc.w	$F21F,$D040,$60BE,$F22E,$D080,$FF90,$222E,$FF5C,$0201,$0030,$F201
-	dc.w	$9000,$F22E,$4828,$FF84,$F23C,$9000,0,0,$DFFC,0,12,$F227,$E001,$60BA
-	dc.w	$08EE,3,$FF66,$DFFC,0,12,$F22E,$D080,$FF90,$F23C,$9000,0,$0010,$F23C
-	dc.w	$8800,0,0,$F22E,$4828,$FF84,$F23C,$9000,0,0,$F201,$A800,$83AE,$FF64
-	dc.w	$122E,$FF62,$0201,11,$6622,$F22E,$F080,$FF84,$41EE,$FF84,$222E,$FF5C
-	dc.w	$61FF,0,$30F2,$812E,$FF64,$F22E,$D080,$FF84,$241F,$4E75,$F22E,$D040
-	dc.w	$FF90,$222E,$FF5C,$0201,$00C0,$664E,$F22E,$9000,$FF5C,$F23C,$8800,0,0
-	dc.w	$F22E,$48A8,$FF84,$F23C,$9000,0,0,$F22E,$F040,$FF84,$322E,$FF84,$2401
-	dc.w	$0281,0,$7FFF,$0242,$8000,$9280,$0681,0,$6000,$0241,$7FFF,$8242,$3D41
-	dc.w	$FF84,$F22E,$D040,$FF84,$6000,$FF82,$222E,$FF5C,$0201,$0030,$F201
-	dc.w	$9000,$60AA,$222E,$FF5C,$0201,$00C0,$6700,$FE74,$222F,4,$0C81,$8000,0
-	dc.w	$6600,$FE66,$4AAF,8,$6600,$FE5E,$082E,1,$FF66,$6700,$FE54,$F22E,$D040
-	dc.w	$FF90,$222E,$FF5C,$0201,$00C0,1,$0010,$F201,$9000,$F23C,$8800,0,0
-	dc.w	$F22E,$48A8,$FF84,$F23C,$9000,0,0,$F200,$0018,$F200,$0498,$F200,$0438
-	dc.w	$F292,$FECA,$6000,$FE14,$323B,$120A,$4EFB,$1006,$4AFC,$0030,$FDAA
-	dc.w	$00E2,$011A,$0060,$FDAA,$0066,0,0,$00BA,$006C,$011A,$0060,$00BA,$0066
-	dcb.w	2,0
-	dcb.w	2,$0130
-	dc.w	$010A,$0060,$0130,$0066,0,0,$0060,$0060,$0060,$0060,$0060,$0066,0,0
-	dc.w	$FDAA,$00E2,$011A,$0060,$FDAA,$0066,0,0,$0066,$0066,$0066,$0066,$0066
-	dc.w	$0066,0,0,$60FF,0,$05B4,$60FF,0,$05AE,$1028,0,$1229,0,$B300,$6A14
-	dc.w	$4A00,$6B2E,$F23C,$4400,0,0,$1D7C,4,$FF64,$4E75,$122E,$FF5F,$0201
-	dc.w	$0030,$0C01,$0020,$6710,$F23C,$4400,0,0,$1D7C,4,$FF64,$4E75,$F23C
-	dc.w	$4400,$8000,0,$1D7C,12,$FF64,$4E75,$3D68,0,$FF84,$2D68,4,$FF88,$2D68
-	dc.w	8,$FF8C,$61FF,0,$0462,$426E,$FF90,$42AE,$FF94,$42AE,$FF98,$6000,$FCD0
-	dc.w	$3D69,0,$FF90,$2D69,4,$FF94,$2D69,8,$FF98,$61FF,0,$04E6,$426E,$FF84
-	dc.w	$42AE,$FF88,$42AE,$FF8C,$6000,$FCA8,$1028,0,$1229,0,$B300,$6AFF,0
-	dc.w	$0584,$F228,$D080,0,$F200,$001A,$F293,$001E,$1D7C,10,$FF64,$4E75
-	dc.w	$F229,$D080,0,$4A29,0,$6A08,$1D7C,10,$FF64,$4E75,$1D7C,2,$FF64,$4E75
-	dc.w	$0200,$0030,0,$0040,$6008,$0200,$0030,0,$0080,$2D40,$FF5C,$4241,$122E
-	dc.w	$FF4E,$6600,$0274,$4A28,0,$6BFF,0,$0528,$0200,$00C0,$6648,$F22E,$9000
-	dc.w	$FF5C,$F23C,$8800,0,0,$F210,$4804,$F201,$A800,$83AE,$FF64,$4E75,$4A28
-	dc.w	0,$6BFF,0,$04FC,$0200,$00C0,$661C,$3D68,0,$FF84,$2D68,4,$FF88,$2D68,8
-	dc.w	$FF8C,$61FF,0,$03AE,$6000,$003E,$0C00,$0040,$6600,$0084,$3D68,0,$FF84
-	dc.w	$2D68,4,$FF88,$2D68,8,$FF8C,$61FF,0,$038A,$0C80,0,$007E,$6700,$0098
-	dc.w	$6E00,$009E,$0C80,$FFFF,$FF80,$6700,$01A4,$6D00,$0120,$F23C,$8800,0,0
-	dc.w	$F22E,$9000,$FF5C,$F22E,$4804,$FF84,$F201,$A800,$F23C,$9000,0,0,$83AE
-	dc.w	$FF64,$2F02,$F22E,$F080,$FF84,$322E,$FF84,$2401,$0281,0,$7FFF,$9280
-	dc.w	$0242,$8000,$8441,$3D42,$FF84,$241F,$F22E,$D080,$FF84,$4E75,$3D68,0
-	dc.w	$FF84,$2D68,4,$FF88,$2D68,8,$FF8C,$61FF,0,$0308,$0C80,0,$03FE,$6700
-	dc.w	$0016,$6E1C,$0C80,$FFFF,$FC00,$6700,$0124,$6D00,$00A0,$6000,$FF7E
-	dc.w	$082E,0,$FF85,$6600,$FF74,$08EE,3,$FF66,$F23C,$9000,0,$0010,$F23C
-	dc.w	$8800,0,0,$F22E,$4804,$FF84,$F201,$A800,$F23C,$9000,0,0,$83AE,$FF64
-	dc.w	$122E,$FF62,$0201,11,$6620,$F22E,$F080,$FF84,$41EE,$FF84,$222E,$FF5C
-	dc.w	$61FF,0,$2D28,$812E,$FF64,$F22E,$D080,$FF84,$4E75,$2D6E,$FF88,$FF94
-	dc.w	$2D6E,$FF8C,$FF98,$322E,$FF84,$2F02,$2401,$0281,0,$7FFF,$0242,$8000
-	dc.w	$9280,$0681,0,$6000,$0241,$7FFF,$8242,$3D41,$FF90,$F22E,$D040,$FF90
-	dc.w	$241F,$60A6,$F23C,$8800,0,0,$F22E,$9000,$FF5C,$F22E,$4804,$FF84,$F23C
-	dc.w	$9000,0,0,$F201,$A800,$83AE,$FF64,$00AE,0,$1048,$FF64,$122E,$FF62
-	dc.w	$0201,$0013,$661C,$082E,3,$FF64,$56C1,$202E,$FF5C,$61FF,0,$2D98,$812E
-	dc.w	$FF64,$F210,$D080,$4E75,$2F02,$322E,$FF84,$2401,$0281,0,$7FFF,$0242
-	dc.w	$8000,$9280,$0481,0,$6000,$0241,$7FFF,$8242,$3D41,$FF84,$F22E,$D040
-	dc.w	$FF84,$241F,$60B6,$082E,0,$FF85,$6600,$FF78,$F23C,$8800,0,0,$F22E
-	dc.w	$9000,$FF5C,$F22E,$4804,$FF84,$F201,$A800,$F23C,$9000,0,0,$83AE,$FF64
-	dc.w	$F200,$0080,$F23C,$58B8,1,$F293,$FF6A,$6000,$FE48,$0C01,4,$6700,$FDB4
-	dc.w	$0C01,1,$6716,$0C01,2,$6736,$0C01,5,$67FF,0,$0236,$60FF,0,$0244,$4A28
-	dc.w	0,$6B10,$F23C,$4400,0,0,$1D7C,4,$FF64,$4E75,$F23C,$4400,$8000,0,$1D7C
-	dc.w	12,$FF64,$4E75,$4A28,0,$6BFF,0,$026C,$F228,$D080,0,$1D7C,2,$FF64
-	dc.w	$4E75,$2D68,4,$FF88,$2D69,4,$FF94,$2D68,8,$FF8C,$2D69,8,$FF98,$3028,0
-	dc.w	$3229,0,$3D40,$FF84,$3D41,$FF90,$0240,$7FFF,$0241,$7FFF,$3D40,$FF54
-	dc.w	$3D41,$FF56,$B041,$6CFF,0,$005C,$61FF,0,$015A,$2F00,$0C2E,4,$FF4E
-	dc.w	$6610,$41EE,$FF84,$61FF,0,$2940,$4440,$3D40,$FF54,$302E,$FF56,$0440
-	dc.w	$0042,$B06E,$FF54,$6C1A,$302E,$FF54,$D06F,2,$322E,$FF84,$0241,$8000
-	dc.w	$8041,$3D40,$FF84,$201F,$4E75,$026E,$8000,$FF84,$08EE,0,$FF85,$201F
-	dc.w	$4E75,$61FF,0,$0056,$2F00,$0C2E,4,$FF4F,$6610,$41EE,$FF90,$61FF,0
-	dc.w	$28E8,$4440,$3D40,$FF56,$302E,$FF54,$0440,$0042,$B06E,$FF56,$6C1A
-	dc.w	$302E,$FF56,$D06F,2,$322E,$FF90,$0241,$8000,$8041,$3D40,$FF90,$201F
-	dc.w	$4E75,$026E,$8000,$FF90,$08EE,0,$FF91,$201F,$4E75,$322E,$FF84,$3001
-	dc.w	$0281,0,$7FFF,$0240,$8000,$0040,$3FFF,$3D40,$FF84,$0C2E,4,$FF4E,$670A
-	dc.w	$203C,0,$3FFF,$9081,$4E75,$41EE,$FF84,$61FF,0,$2876,$4480,$2200,$60E6
-	dc.w	$0C2E,4,$FF4E,$673A,$322E,$FF84,$0281,0,$7FFF,$026E,$8000,$FF84,$0801
-	dc.w	0,$6712,$006E,$3FFF,$FF84,$203C,0,$3FFF,$9081,$E280,$4E75,$006E,$3FFE
-	dc.w	$FF84,$203C,0,$3FFE,$9081,$E280,$4E75,$41EE,$FF84,$61FF,0,$2824,$0800
-	dc.w	0,$6710,$006E,$3FFF,$FF84,$0680,0,$3FFF,$E280,$4E75,$006E,$3FFE,$FF84
-	dc.w	$0680,0,$3FFE,$E280,$4E75,$322E,$FF90,$3001,$0281,0,$7FFF,$0240,$8000
-	dc.w	$0040,$3FFF,$3D40,$FF90,$0C2E,4,$FF4F,$670A,$203C,0,$3FFF,$9081,$4E75
-	dc.w	$41EE,$FF90,$61FF,0,$27CA,$4480,$2200,$60E6,$0C2E,5,$FF4F,$6732,$0C2E
-	dc.w	3,$FF4F,$673E,$0C2E,3,$FF4E,$6714,$08EE,6,$FF70,$00AE,$0100,$4080
-	dc.w	$FF64,$41EE,$FF6C,$6042,$00AE,$0100,0,$FF64,$41EE,$FF6C,$6034,$00AE
-	dc.w	$0100,$4080,$FF64,$08EE,6,$FF7C,$41EE,$FF78,$6020,$41EE,$FF78,$0C2E,5
-	dc.w	$FF4E,$66FF,0,12,$00AE,0,$4080,$FF64,$00AE,$0100,0,$FF64,$0828,7,0
-	dc.w	$6708,$00AE,$0800,0,$FF64,$F210,$D080,$4E75,$00AE,$0100,$2080,$FF64
-	dc.w	$F23B,$D080,$0170,0,8,$4E75,$7FFF,0,$FFFF,$FFFF,$FFFF,$FFFF,$2D40
-	dc.w	$FF54,$302E,$FF42,$4281,$122E,$FF64,$E099,$F201,$8800,$323B,$0206
-	dc.w	$4EFB,$1002,$0234,$0040,$02F8,$030C,$0320,$0334,$0348,$035C,$0366
-	dc.w	$0352,$033E,$032A,$0316,$0302,$004A,$0238,$023A,$0276,$0054,$009E
-	dc.w	$0102,$014C,$01B2,$01FC,$0218,$01D8,$018C,$0128,$00DE,$007A,$02B6
-	dc.w	$025A,$F281,6,$6000,$032A,$4E75,$F28E,6,$6000,$0320,$4E75,$F292,$0022
-	dc.w	$082E,0,$FF64,$6700,$0310,$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600
-	dc.w	$032C,$6000,$02FA,$4E75,$F29D,6,$6000,$02F0,$082E,0,$FF64,$6712,$00AE
-	dc.w	0,$8080,$FF64,$082E,7,$FF62,$6600,$0304,$4E75,$F293,$0022,$082E,0
-	dc.w	$FF64,$6700,$02C6,$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600,$02E2,$6000
-	dc.w	$02B0,$082E,0,$FF64,$6712,$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600
-	dc.w	$02C4,$4E75,$F29C,6,$6000,$028C,$082E,0,$FF64,$6712,$00AE,0,$8080
-	dc.w	$FF64,$082E,7,$FF62,$6600,$02A0,$4E75,$F294,$0022,$082E,0,$FF64,$6700
-	dc.w	$0262,$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600,$027E,$6000,$024C,$4E75
-	dc.w	$F29B,6,$6000,$0242,$082E,0,$FF64,$6712,$00AE,0,$8080,$FF64,$082E,7
-	dc.w	$FF62,$6600,$0256,$4E75,$F295,$0022,$082E,0,$FF64,$6700,$0218,$00AE,0
-	dc.w	$8080,$FF64,$082E,7,$FF62,$6600,$0234,$6000,$0202,$082E,0,$FF64,$6712
-	dc.w	$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600,$0216,$4E75,$F29A,6,$6000
-	dc.w	$01DE,$082E,0,$FF64,$6700,$0014,$00AE,0,$8080,$FF64,$082E,7,$FF62
-	dc.w	$6600,$01F0,$4E75,$F296,$0022,$082E,0,$FF64,$6700,$01B2,$00AE,0,$8080
-	dc.w	$FF64,$082E,7,$FF62,$6600,$01CE,$6000,$019C,$4E75,$F299,6,$6000,$0192
-	dc.w	$082E,0,$FF64,$6712,$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600,$01A6
-	dc.w	$4E75,$F297,$0018,$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600,$018E,$6000
-	dc.w	$015C,$4E75,$F298,6,$6000,$0152,$00AE,0,$8080,$FF64,$082E,7,$FF62
-	dc.w	$6600,$016E,$4E75,$6000,$013A,$4E75,$082E,0,$FF64,$6700,$012E,$00AE,0
-	dc.w	$8080,$FF64,$082E,7,$FF62,$6600,$014A,$6000,$0118,$082E,0,$FF64,$6712
-	dc.w	$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600,$012C,$4E75,$F291,$0022,$082E
-	dc.w	0,$FF64,$6700,$00EE,$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600,$010A
-	dc.w	$6000,$00D8,$082E,0,$FF64,$6712,$00AE,0,$8080,$FF64,$082E,7,$FF62
-	dc.w	$6600,$00EC,$4E75,$F29E,$0022,$082E,0,$FF64,$6700,$00AE,$00AE,0,$8080
-	dc.w	$FF64,$082E,7,$FF62,$6600,$00CA,$6000,$0098,$082E,0,$FF64,$6700,$0014
-	dc.w	$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600,$00AA,$4E75,$F282,6,$6000
-	dc.w	$0072,$4E75,$F28D,6,$6000,$0068,$4E75,$F283,6,$6000,$005E,$4E75,$F28C
-	dc.w	6,$6000,$0054,$4E75,$F284,6,$6000,$004A,$4E75,$F28B,6,$6000,$0040
-	dc.w	$4E75,$F285,6,$6000,$0036,$4E75,$F28A,6,$6000,$002C,$4E75,$F286,6
-	dc.w	$6000,$0022,$4E75,$F289,6,$6000,$0018,$4E75,$F287,6,$6000,14,$4E75
-	dc.w	$F288,6,$6000,4,$4E75,$122E,$FF41,$0241,7,$61FF,0,$1D66,$5340,$61FF,0
-	dc.w	$1DD0,$0C40,$FFFF,$6602,$4E75,$202E,$FF54,$D0AE,$FF68,$5880,$2D40,6
-	dc.w	$4E75,$1D7C,2,$FF4A,$4E75,$302E,$FF42,$4281,$122E,$FF64,$E099,$F201
-	dc.w	$8800,$323B,$0206,$4EFB,$1002,$021E,$0040,$02E4,$02F0,$02FC,$0308
-	dc.w	$0314,$0320,$0326,$031A,$030E,$0302,$02F6,$02EA,$0046,$0220,$0224
-	dc.w	$0260,$004C,$0092,$00F8,$013E,$01A4,$01EA,$0202,$01C4,$017E,$0118
-	dc.w	$00D2,$006C,$02A2,$0240,$F281,$02EA,$4E75,$F28E,$02E4,$4E75,$F292
-	dc.w	$02DE,$082E,0,$FF64,$6712,$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600
-	dc.w	$02CC,$4E75,$F29D,4,$4E75,$082E,0,$FF64,$6700,$02B2,$00AE,0,$8080
-	dc.w	$FF64,$082E,7,$FF62,$6600,$02A8,$6000,$029C,$F293,$001E,$082E,0,$FF64
-	dc.w	$6712,$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600,$0286,$4E75,$082E,0
-	dc.w	$FF64,$6700,$0272,$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600,$0268,$6000
-	dc.w	$025C,$F29C,4,$4E75,$082E,0,$FF64,$6700,$024C,$00AE,0,$8080,$FF64
-	dc.w	$082E,7,$FF62,$6600,$0242,$6000,$0236,$F294,$0232,$082E,0,$FF64,$6712
-	dc.w	$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600,$0220,$4E75,$F29B,4,$4E75
-	dc.w	$082E,0,$FF64,$6700,$0206,$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600
-	dc.w	$01FC,$6000,$01F0,$F295,$001E,$082E,0,$FF64,$6712,$00AE,0,$8080,$FF64
-	dc.w	$082E,7,$FF62,$6600,$01DA,$4E75,$082E,0,$FF64,$6700,$01C6,$00AE,0
-	dc.w	$8080,$FF64,$082E,7,$FF62,$6600,$01BC,$6000,$01B0,$F29A,4,$4E75,$082E
-	dc.w	0,$FF64,$6700,$01A0,$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600,$0196
-	dc.w	$6000,$018A,$F296,$0186,$082E,0,$FF64,$6712,$00AE,0,$8080,$FF64,$082E
-	dc.w	7,$FF62,$6600,$0174,$4E75,$F299,4,$4E75,$082E,0,$FF64,$6700,$015A
-	dc.w	$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600,$0150,$6000,$0144,$F297,$0140
-	dc.w	$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600,$0136,$4E75,$F298,4,$4E75
-	dc.w	$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600,$011C,$6000,$0110,$4E75,$6000
-	dc.w	$010A,$082E,0,$FF64,$6712,$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600
-	dc.w	$00F8,$4E75,$082E,0,$FF64,$6700,$00E4,$00AE,0,$8080,$FF64,$082E,7
-	dc.w	$FF62,$6600,$00DA,$6000,$00CE,$F291,$0020,$082E,0,$FF64,$6700,$0014
-	dc.w	$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600,$00B6,$4E75,$082E,0,$FF64
-	dc.w	$6700,$00A2,$00AE,0,$8080,$FF64,$082E,7,$FF62,$6600,$0098,$6000,$008C
-	dc.w	$F29E,$0020,$082E,0,$FF64,$6700,$0014,$00AE,0,$8080,$FF64,$082E,7
-	dc.w	$FF62,$6600,$0074,$4E75,$082E,0,$FF64,$6700,$0060,$00AE,0,$8080,$FF64
-	dc.w	$082E,7,$FF62,$6600,$0056,$6000,$004A,$F282,$0046,$4E75,$F28D,$0040
-	dc.w	$4E75,$F283,$003A,$4E75,$F28C,$0034,$4E75,$F284,$002E,$4E75,$F28B
-	dc.w	$0028,$4E75,$F285,$0022,$4E75,$F28A,$001C,$4E75,$F286,$0016,$4E75
-	dc.w	$F289,$0010,$4E75,$F287,10,$4E75,$F288,4,$4E75,$1D7C,1,$FF4A,$4E75
-	dc.w	$1D7C,2,$FF4A,$4E75,$302E,$FF42,$4281,$122E,$FF64,$E099,$F201,$8800
-	dc.w	$323B,$0206,$4EFB,$1002,$0208,$0040,$02AC,$02CC,$02EC,$030C,$032C
-	dc.w	$034C,$035C,$033C,$031C,$02FC,$02DC,$02BC,$0050,$020E,$0214,$0244
-	dc.w	$0060,$00A4,$00FA,$013E,$0194,$01D8,$01F0,$01B6,$0172,$011C,$00D8
-	dc.w	$0082,$0278,$022C,$F281,8,$4200,$6000,$032E,$50C0,$6000,$0328,$F28E,8
-	dc.w	$4200,$6000,$031E,$50C0,$6000,$0318,$F292,$001A,$4200,$082E,0,$FF64
-	dc.w	$6700,$0308,$00AE,0,$8080,$FF64,$6000,$02F2,$50C0,$6000,$02F6,$F29D,8
-	dc.w	$4200,$6000,$02EC,$50C0,$082E,0,$FF64,$6700,$02E0,$00AE,0,$8080,$FF64
-	dc.w	$6000,$02CA,$F293,$001A,$4200,$082E,0,$FF64,$6700,$02C4,$00AE,0,$8080
-	dc.w	$FF64,$6000,$02AE,$50C0,$082E,0,$FF64,$6700,$02AC,$00AE,0,$8080,$FF64
-	dc.w	$6000,$0296,$F29C,8,$4200,$6000,$0296,$50C0,$082E,0,$FF64,$6700,$028A
-	dc.w	$00AE,0,$8080,$FF64,$6000,$0274,$F294,$001A,$4200,$082E,0,$FF64,$6700
-	dc.w	$026E,$00AE,0,$8080,$FF64,$6000,$0258,$50C0,$6000,$025C,$F29B,8,$4200
-	dc.w	$6000,$0252,$50C0,$082E,0,$FF64,$6700,$0246,$00AE,0,$8080,$FF64,$6000
-	dc.w	$0230,$F295,$001A,$4200,$082E,0,$FF64,$6700,$022A,$00AE,0,$8080,$FF64
-	dc.w	$6000,$0214,$50C0,$082E,0,$FF64,$6700,$0212,$00AE,0,$8080,$FF64,$6000
-	dc.w	$01FC,$F29A,8,$4200,$6000,$01FC,$50C0,$082E,0,$FF64,$6700,$01F0,$00AE
-	dc.w	0,$8080,$FF64,$6000,$01DA,$F296,$001A,$4200,$082E,0,$FF64,$6700,$01D4
-	dc.w	$00AE,0,$8080,$FF64,$6000,$01BE,$50C0,$6000,$01C2,$F299,8,$4200,$6000
-	dc.w	$01B8,$50C0,$082E,0,$FF64,$6700,$01AC,$00AE,0,$8080,$FF64,$6000,$0196
-	dc.w	$F297,$0010,$4200,$00AE,0,$8080,$FF64,$6000,$0184,$50C0,$6000,$0188
-	dc.w	$F298,8,$4200,$6000,$017E,$50C0,$00AE,0,$8080,$FF64,$6000,$0166,$4200
-	dc.w	$6000,$016A,$50C0,$6000,$0164,$4200,$082E,0,$FF64,$6700,$0158,$00AE,0
-	dc.w	$8080,$FF64,$6000,$0142,$50C0,$082E,0,$FF64,$6700,$0140,$00AE,0,$8080
-	dc.w	$FF64,$6000,$012A,$F291,$001A,$4200,$082E,0,$FF64,$6700,$0124,$00AE,0
-	dc.w	$8080,$FF64,$6000,$010E,$50C0,$082E,0,$FF64,$6700,$010C,$00AE,0,$8080
-	dc.w	$FF64,$6000,$00F6,$F29E,$001A,$4200,$082E,0,$FF64,$6700,$00F0,$00AE,0
-	dc.w	$8080,$FF64,$6000,$00DA,$50C0,$082E,0,$FF64,$6700,$00D8,$00AE,0,$8080
-	dc.w	$FF64,$6000,$00C2,$F282,8,$4200,$6000,$00C2,$50C0,$6000,$00BC,$F28D,8
-	dc.w	$4200,$6000,$00B2,$50C0,$6000,$00AC,$F283,8,$4200,$6000,$00A2,$50C0
-	dc.w	$6000,$009C,$F28C,8,$4200,$6000,$0092,$50C0,$6000,$008C,$F284,8,$4200
-	dc.w	$6000,$0082,$50C0,$6000,$007C,$F28B,8,$4200,$6000,$0072,$50C0,$6000
-	dc.w	$006C,$F285,8,$4200,$6000,$0062,$50C0,$6000,$005C,$F28A,8,$4200,$6000
-	dc.w	$0052,$50C0,$6000,$004C,$F286,8,$4200,$6000,$0042,$50C0,$6000,$003C
-	dc.w	$F289,8,$4200,$6000,$0032,$50C0,$6000,$002C,$F287,8,$4200,$6000,$0022
-	dc.w	$50C0,$6000,$001C,$F288,8,$4200,$6000,$0012,$50C0,$6000,12,$082E,7
-	dc.w	$FF62,$6600,$0088,$2040,$122E,$FF41,$2001,$0201,$0038,$6610,$2200
-	dc.w	$0241,7,$2008,$61FF,0,$172A,$4E75,$0C01,$0018,$671A,$0C01,$0020,$6738
-	dc.w	$2008,$206E,12,$61FF,$FFFF,$5A7C,$4A81,$6600,$0054,$4E75,$2008,$206E
-	dc.w	12,$61FF,$FFFF,$5A68,$4A81,$6600,$0040,$122E,$FF41,$0241,7,$7001
-	dc.w	$61FF,0,$1722,$4E75,$2008,$206E,12,$61FF,$FFFF,$5A44,$4A81,$6600
-	dc.w	$001C,$122E,$FF41,$0241,7,$7001,$61FF,0,$174E,$4E75,$1D7C,2,$FF4A
-	dc.w	$4E75,$3D7C,$00A1,10,$60FF,0,$2B86,$122E,$FF43,$0241,$0070,$E809
-	dc.w	$61FF,0,$15B2,$0280,0,$00FF,$2F00,$103B,$0920,$0148,$2F00,$61FF,0
-	dc.w	$0340,$201F,$221F,$6700,$0134,$082E,5,$FF42,$6700,$00B8,$082E,4,$FF42
-	dc.w	$6600,$001A,$123B,$1120,$021E,$082E,5,4,$670A,$0C2E,8,$FF4A,$6602
-	dc.w	$4E75,$2248,$9FC0,$41D7,$4A01,$6A0C,$20EE,$FFDC,$20EE,$FFE0,$20EE
-	dc.w	$FFE4,$E309,$6A0C,$20EE,$FFE8,$20EE,$FFEC,$20EE,$FFF0,$E309,$6A0A
-	dc.w	$F210,$F020,$D1FC,0,12,$E309,$6A0A,$F210,$F010,$D1FC,0,12,$E309,$6A0A
-	dc.w	$F210,$F008,$D1FC,0,12,$E309,$6A0A,$F210,$F004,$D1FC,0,12,$E309,$6A0A
-	dc.w	$F210,$F002,$D1FC,0,12,$E309,$6A0A,$F210,$F001,$D1FC,0,12,$2D49,$FF54
-	dc.w	$41D7,$2F00,$61FF,$FFFF,$58B2,$201F,$DFC0,$4A81,$6600,$071E,$4E75
-	dc.w	$2D48,$FF54,$9FC0,$43D7,$2F01,$2F00,$61FF,$FFFF,$587E,$201F,$4A81
-	dc.w	$6600,$070E,$221F,$41D7,$4A01,$6A0C,$2D58,$FFDC,$2D58,$FFE0,$2D58
-	dc.w	$FFE4,$E309,$6A0C,$2D58,$FFE8,$2D58,$FFEC,$2D58,$FFF0,$E309,$6A04
-	dc.w	$F218,$D020,$E309,$6A04,$F218,$D010,$E309,$6A04,$F218,$D008,$E309
-	dc.w	$6A04,$F218,$D004,$E309,$6A04,$F218,$D002,$E309,$6A04,$F218,$D001
-	dc.w	$DFC0,$4E75,$4E75,12,$0C18,$0C18,$1824,$0C18,$1824,$1824,$2430,$0C18
-	dcb.w	2,$1824
-	dc.w	$2430,$1824,$2430,$2430,$303C,$0C18,$1824,$1824,$2430,$1824,$2430
-	dc.w	$2430,$303C,$1824,$2430,$2430,$303C,$2430,$303C,$303C,$3C48,$0C18
-	dcb.w	2,$1824
-	dc.w	$2430,$1824,$2430,$2430,$303C,$1824,$2430,$2430,$303C,$2430,$303C
-	dc.w	$303C,$3C48,$1824,$2430,$2430,$303C,$2430,$303C,$303C,$3C48,$2430
-	dcb.w	2,$303C
-	dc.w	$3C48,$303C,$3C48,$3C48,$4854,$0C18,$1824,$1824,$2430,$1824,$2430
-	dc.w	$2430,$303C,$1824,$2430,$2430,$303C,$2430,$303C,$303C,$3C48,$1824
-	dcb.w	2,$2430
-	dc.w	$303C,$2430,$303C,$303C,$3C48,$2430,$303C,$303C,$3C48,$303C,$3C48
-	dc.w	$3C48,$4854,$1824,$2430,$2430,$303C,$2430,$303C,$303C,$3C48,$2430
-	dcb.w	2,$303C
-	dc.w	$3C48,$303C,$3C48,$3C48,$4854,$2430,$303C,$303C,$3C48,$303C,$3C48
-	dc.w	$3C48,$4854,$303C,$3C48,$3C48,$4854,$3C48,$4854,$4854,$5460,$0080
-	dc.w	$40C0,$20A0,$60E0,$1090,$50D0,$30B0,$70F0,$0888,$48C8,$28A8,$68E8
-	dc.w	$1898,$58D8,$38B8,$78F8,$0484,$44C4,$24A4,$64E4,$1494,$54D4,$34B4
-	dc.w	$74F4,$0C8C,$4CCC,$2CAC,$6CEC,$1C9C,$5CDC,$3CBC,$7CFC,$0282,$42C2
-	dc.w	$22A2,$62E2,$1292,$52D2,$32B2,$72F2,$0A8A,$4ACA,$2AAA,$6AEA,$1A9A
-	dc.w	$5ADA,$3ABA,$7AFA,$0686,$46C6,$26A6,$66E6,$1696,$56D6,$36B6,$76F6
-	dc.w	$0E8E,$4ECE,$2EAE,$6EEE,$1E9E,$5EDE,$3EBE,$7EFE,$0181,$41C1,$21A1
-	dc.w	$61E1,$1191,$51D1,$31B1,$71F1,$0989,$49C9,$29A9,$69E9,$1999,$59D9
-	dc.w	$39B9,$79F9,$0585,$45C5,$25A5,$65E5,$1595,$55D5,$35B5,$75F5,$0D8D
-	dc.w	$4DCD,$2DAD,$6DED,$1D9D,$5DDD,$3DBD,$7DFD,$0383,$43C3,$23A3,$63E3
-	dc.w	$1393,$53D3,$33B3,$73F3,$0B8B,$4BCB,$2BAB,$6BEB,$1B9B,$5BDB,$3BBB
-	dc.w	$7BFB,$0787,$47C7,$27A7,$67E7,$1797,$57D7,$37B7,$77F7,$0F8F,$4FCF
-	dc.w	$2FAF,$6FEF,$1F9F,$5FDF,$3FBF,$7FFF,$2040,$302E,$FF40,$3200,$0240
-	dc.w	$003F,$0281,0,7,$303B,$020A,$4EFB,6,$4AFC,$0040,0,0,0,0,0,0,0,0,0,0,0
-	dcb.w	5,0
-	dc.w	$0080,$0086,$008C,$0090,$0094,$0098,$009C,$00A0,$00A6,$00B6,$00C6
-	dc.w	$00D2,$00DE,$00EA,$00F6,$0102,$0118,$0126,$0134,$013E,$0148,$0152
-	dc.w	$015C,$0166,$017A,$0198,$01B6,$01D2,$01EE,$020A,$0226,$0242,$0260
-	dcb.w	7,$0260
-	dc.w	$02C0,$02DA,$02F4,$0314,0,0,0,0,$206E,$FFA4,$4E75,$206E,$FFA8,$4E75
-	dc.w	$204A,$4E75,$204B,$4E75,$204C,$4E75,$204D,$4E75,$2056,$4E75,$206E
-	dc.w	$FFD8,$4E75,$202E,$FFA4,$2200,$D288,$2D41,$FFA4,$2040,$4E75,$202E
-	dc.w	$FFA8,$2200,$D288,$2D41,$FFA8,$2040,$4E75,$200A,$2200,$D288,$2441
-	dc.w	$2040,$4E75,$200B,$2200,$D288,$2641,$2040,$4E75,$200C,$2200,$D288
-	dc.w	$2841,$2040,$4E75,$200D,$2200,$D288,$2A41,$2040,$4E75,$2016,$2200
-	dc.w	$D288,$2C81,$2040,$4E75,$1D7C,4,$FF4A,$202E,$FFD8,$2200,$D288,$2D41
-	dc.w	$FFD8,$2040,$4E75,$202E,$FFA4,$9088,$2D40,$FFA4,$2040,$4E75,$202E
-	dc.w	$FFA8,$9088,$2D40,$FFA8,$2040,$4E75,$200A,$9088,$2440,$2040,$4E75
-	dc.w	$200B,$9088,$2640,$2040,$4E75,$200C,$9088,$2840,$2040,$4E75,$200D
-	dc.w	$9088,$2A40,$2040,$4E75,$2016,$9088,$2C80,$2040,$4E75,$1D7C,8,$FF4A
-	dc.w	$202E,$FFD8,$9088,$2D40,$FFD8,$2040,$4E75,$206E,$FF44,$54AE,$FF44
-	dc.w	$61FF,$FFFF,$54A2,$4A81,$66FF,$FFFF,$6820,$3040,$D1EE,$FFA4,$4E75
-	dc.w	$206E,$FF44,$54AE,$FF44,$61FF,$FFFF,$5484,$4A81,$66FF,$FFFF,$6802
-	dc.w	$3040,$D1EE,$FFA8,$4E75,$206E,$FF44,$54AE,$FF44,$61FF,$FFFF,$5466
-	dc.w	$4A81,$66FF,$FFFF,$67E4,$3040,$D1CA,$4E75,$206E,$FF44,$54AE,$FF44
-	dc.w	$61FF,$FFFF,$544A,$4A81,$66FF,$FFFF,$67C8,$3040,$D1CB,$4E75,$206E
-	dc.w	$FF44,$54AE,$FF44,$61FF,$FFFF,$542E,$4A81,$66FF,$FFFF,$67AC,$3040
-	dc.w	$D1CC,$4E75,$206E,$FF44,$54AE,$FF44,$61FF,$FFFF,$5412,$4A81,$66FF
-	dc.w	$FFFF,$6790,$3040,$D1CD,$4E75,$206E,$FF44,$54AE,$FF44,$61FF,$FFFF
-	dc.w	$53F6,$4A81,$66FF,$FFFF,$6774,$3040,$D1D6,$4E75,$206E,$FF44,$54AE
-	dc.w	$FF44,$61FF,$FFFF,$53DA,$4A81,$66FF,$FFFF,$6758,$3040,$D1EE,$FFD8
-	dc.w	$4E75,$5081,$61FF,0,$0FDA,$2F00,$206E,$FF44,$54AE,$FF44,$61FF,$FFFF
-	dc.w	$53B2,$4A81,$66FF,$FFFF,$6730,$205F,$0800,8,$6600,$00E6,$2D40,$FF54
-	dc.w	$2200,$E959,$0241,15,$61FF,0,$0FA6,$2F02,$242E,$FF54,$0802,11,$6602
-	dc.w	$48C0,$2202,$EF59,$0281,0,3,$E3A8,$49C2,$D082,$D1C0,$241F,$4E75,$206E
-	dc.w	$FF44,$54AE,$FF44,$61FF,$FFFF,$535C,$4A81,$66FF,$FFFF,$66DA,$3040
-	dc.w	$4E75,$206E,$FF44,$58AE,$FF44,$61FF,$FFFF,$5358,$4A81,$66FF,$FFFF
-	dc.w	$66C0,$2040,$4E75,$206E,$FF44,$54AE,$FF44,$61FF,$FFFF,$5328,$4A81
-	dc.w	$66FF,$FFFF,$66A6,$3040,$D1EE,$FF44,$5588,$4E75,$206E,$FF44,$54AE
-	dc.w	$FF44,$61FF,$FFFF,$5308,$4A81,$66FF,$FFFF,$6686,$206E,$FF44,$5588
-	dc.w	$0800,8,$6600,$0038,$2D40,$FF54,$2200,$E959,$0241,15,$61FF,0,$0EF8
-	dc.w	$2F02,$242E,$FF54,$0802,11,$6602,$48C0,$2202,$EF59,$0281,0,3,$E3A8
-	dc.w	$49C2,$D082,$D1C0,$241F,$4E75,$0800,6,$670C,$48E7,$3C00,$2A00,$2608
-	dc.w	$4282,$6028,$2D40,$FF54,$E9C0,$1404,$61FF,0,$0EB4,$48E7,$3C00,$2400
-	dc.w	$2A2E,$FF54,$2608,$0805,11,$6602,$48C2,$E9C5,$0542,$E1AA,$0805,7
-	dc.w	$6702,$4283,$E9C5,$0682,$0C00,2,$6D34,$6718,$206E,$FF44,$58AE,$FF44
-	dc.w	$61FF,$FFFF,$5276,$4A81,$66FF,0,$00B0,$6018,$206E,$FF44,$54AE,$FF44
-	dc.w	$61FF,$FFFF,$5248,$4A81,$66FF,0,$0098,$48C0,$D680,$E9C5,$0782,$6700
-	dc.w	$006E,$0C00,2,$6D34,$6718,$206E,$FF44,$58AE,$FF44,$61FF,$FFFF,$5234
-	dc.w	$4A81,$66FF,0,$006E,$601C,$206E,$FF44,$54AE,$FF44,$61FF,$FFFF,$5206
-	dc.w	$4A81,$66FF,0,$0056,$48C0,$6002,$4280,$2800,$0805,2,$6714,$2043,$61FF
-	dc.w	$FFFF,$5240,$4A81,$6600,$0028,$D082,$D084,$6018,$D682,$2043,$61FF
-	dc.w	$FFFF,$522A,$4A81,$6600,$0012,$D084,$6004,$D682,$2003,$2040,$4CDF
-	dc.w	$003C,$4E75,$2043,$4CDF,$003C,$303C,$0101,$60FF,$FFFF,$6582,$4CDF
-	dc.w	$003C,$60FF,$FFFF,$6528,$61FF,0,$23C6,$303C,$00E1,$600A,$61FF,0,$23BA
-	dc.w	$303C,$0161,$206E,$FF54,$60FF,$FFFF,$6558,$102E,$FF42,$0C00,$009C
-	dc.w	$6700,$00B2,$0C00,$0098,$6700,$0074,$0C00,$0094,$6736,$206E,$FF44
-	dc.w	$58AE,$FF44,$61FF,$FFFF,$5170,$4A81,$66FF,$FFFF,$64D8,$2D40,$FF64
-	dc.w	$206E,$FF44,$58AE,$FF44,$61FF,$FFFF,$5156,$4A81,$66FF,$FFFF,$64BE
-	dc.w	$2D40,$FF68,$4E75,$206E,$FF44,$58AE,$FF44,$61FF,$FFFF,$513A,$4A81
-	dc.w	$66FF,$FFFF,$64A2,$2D40,$FF60,$206E,$FF44,$58AE,$FF44,$61FF,$FFFF
-	dc.w	$5120,$4A81,$66FF,$FFFF,$6488,$2D40,$FF68,$4E75,$206E,$FF44,$58AE
-	dc.w	$FF44,$61FF,$FFFF,$5104,$4A81,$66FF,$FFFF,$646C,$2D40,$FF60,$206E
-	dc.w	$FF44,$58AE,$FF44,$61FF,$FFFF,$50EA,$4A81,$66FF,$FFFF,$6452,$2D40
-	dc.w	$FF64,$4E75,$206E,$FF44,$58AE,$FF44,$61FF,$FFFF,$50CE,$4A81,$66FF
-	dc.w	$FFFF,$6436,$2D40,$FF60,$206E,$FF44,$58AE,$FF44,$61FF,$FFFF,$50B4
-	dc.w	$4A81,$66FF,$FFFF,$641C,$2D40,$FF64,$206E,$FF44,$58AE,$FF44,$61FF
-	dc.w	$FFFF,$509A,$4A81,$66FF,$FFFF,$6402,$2D40,$FF68,$4E75,$2040,$102E
-	dc.w	$FF41,$2200,$0240,$0038,$0281,0,7,$0C00,$0018,$6724,$0C00,$0020,$672C
-	dc.w	$8041,$0C00,$003C,$6706,$206E,12,$4E75,$1D7C,$0080,$FF4A,$41F6,$0162
-	dc.w	$FF68,4,$4E75,$2008,$61FF,0,$0D70,$206E,12,$4E75,$2008,$61FF,0,$0DB2
-	dc.w	$206E,12,$0C00,12,$6702,$4E75,$5188,$2D48,12,$4E75,$102E,$FF41,$2200
-	dc.w	$0240,$0038,$0281,0,7,$0C00,$0018,$670E,$0C00,$0020,$6700,$0076,$206E
-	dc.w	12,$4E75,$323B,$120E,$206E,12,$4EFB,$1006,$4AFC,8,$0010,$001A,$0024
-	dc.w	$002C,$0034,$003C,$0044,$004E,$06AE,0,12,$FFA4,$4E75,$06AE,0,12,$FFA8
-	dc.w	$4E75,$D5FC,0,12,$4E75,$D7FC,0,12,$4E75,$D9FC,0,12,$4E75,$DBFC,0,12
-	dc.w	$4E75,$06AE,0,12,$FFD4,$4E75,$1D7C,4,$FF4A,$06AE,0,12,$FFD8,$4E75
-	dc.w	$323B,$1214,$206E,12,$5188,$51AE,12,$4EFB,$1006,$4AFC,8,$0010,$0016
-	dc.w	$001C,$0020,$0024,$0028,$002C,$0032,$2D48,$FFA4,$4E75,$2D48,$FFA8
-	dc.w	$4E75,$2448,$4E75,$2648,$4E75,$2848,$4E75,$2A48,$4E75,$2D48,$FFD4
-	dc.w	$4E75,$2D48,$FFD8,$1D7C,8,$FF4A,$4E75,$082E,6,$FF42,$6664,$102E,$FF43
-	dc.w	$0800,5,$672C,$0800,4,$670A,$0240,$007F,$0C40,$0038,$661C,$E9EE,$0183
-	dc.w	$FF42,$61FF,0,$0D6A,$61FF,0,$1206,$0C00,6,$6722,$1D40,$FF4F,$E9EE
-	dc.w	$00C3,$FF42,$61FF,0,$0CBE,$61FF,0,$11EA,$0C00,6,$670E,$1D40,$FF4E
-	dc.w	$4E75,$61FF,0,$1148,$60D6,$61FF,0,$1140,$60EA,$302E,$FF42,$0800,5
-	dc.w	$672C,$0800,4,$670A,$0240,$007F,$0C40,$0038,$661C,$E9EE,$0183,$FF42
-	dc.w	$61FF,0,$0D06,$61FF,0,$11A2,$0C00,6,$6726,$1D40,$FF4F,$E9EE,$00C3
-	dc.w	$FF42,$E9EE,$1283,$FF40,$6600,$00BE,$422E,$FF4E,$E9EE,$1343,$FF40
-	dc.w	$303B,$0212,$4EFB,14,$61FF,0,$10E0,$60D2,$4AFC,8,$0010,$006A,0,0
-	dc.w	$002E,0,$004C,0,$61FF,0,$0A5C,$F200,$4000,$F22E,$F080,$FF6C,$F281,4
-	dc.w	$4E75,$1D7C,1,$FF4E,$4E75,$61FF,0,$0A3E,$F200,$5000,$F22E,$F080,$FF6C
-	dc.w	$F281,4,$4E75,$1D7C,1,$FF4E,$4E75,$61FF,0,$0A20,$F200,$5800,$F22E
-	dc.w	$F080,$FF6C,$F281,4,$4E75,$1D7C,1,$FF4E,$4E75,$61FF,0,$0A02,$2D40
-	dc.w	$FF54,$41EE,$FF54,$61FF,0,$11DE,$1D40,$FF4E,$0C00,5,$6700,$01A4,$0C00
-	dc.w	4,$6700,$015E,$F210,$4400,$F22E,$F080,$FF6C,$4E75,$422E,$FF4E,$303B
-	dc.w	$020A,$4EFB,6,$4AFC,8,$0010,$00E2,$0272,$02B0,$0056,$01A0,$009C,0
-	dc.w	$7004,$61FF,$FFFF,$FD22,$0C2E,$0080,$FF4A,$6726,$61FF,$FFFF,$4DDE
-	dc.w	$4A81,$66FF,0,$1EEC,$F200,$4000,$F22E,$F080,$FF6C,$F281,4,$4E75,$1D7C
-	dc.w	1,$FF4E,$4E75,$61FF,$FFFF,$4D76,$4A81,$66FF,$FFFF,$6E8A,$60D8,$7002
-	dc.w	$61FF,$FFFF,$FCDC,$0C2E,$0080,$FF4A,$6726,$61FF,$FFFF,$4D82,$4A81
-	dc.w	$66FF,0,$1E98,$F200,$5000,$F22E,$F080,$FF6C,$F281,4,$4E75,$1D7C,1
-	dc.w	$FF4E,$4E75,$61FF,$FFFF,$4D1A,$4A81,$66FF,$FFFF,$6E44,$60D8,$7001
-	dc.w	$61FF,$FFFF,$FC96,$0C2E,$0080,$FF4A,$6726,$61FF,$FFFF,$4D26,$4A81
-	dc.w	$66FF,0,$1E42,$F200,$5800,$F22E,$F080,$FF6C,$F281,4,$4E75,$1D7C,1
-	dc.w	$FF4E,$4E75,$61FF,$FFFF,$4CD4,$4A81,$66FF,$FFFF,$6DFE,$60D8,$7004
-	dc.w	$61FF,$FFFF,$FC50,$0C2E,$0080,$FF4A,$673E,$61FF,$FFFF,$4D0C,$2D40
-	dc.w	$FF54,$4A81,$66FF,0,$1E16,$41EE,$FF54,$61FF,0,$10A0,$1D40,$FF4E,$0C00
-	dc.w	4,$6700,$0028,$0C00,5,$6700,$005E,$F22E,$4400,$FF54,$F22E,$F080,$FF6C
-	dc.w	$4E75,$61FF,$FFFF,$4C8C,$4A81,$66FF,$FFFF,$6DA0,$60C4,$426E,$FF6C
-	dc.w	$E9D0,$0257,$E188,$2D40,$FF70,$42AE,$FF74,$426E,$FF6C,$0810,7,$6706
-	dc.w	$08EE,7,$FF6C,$41EE,$FF6C,$61FF,0,$0E78,$323C,$3F81,$9240,$836E,$FF6C
-	dc.w	$1D7C,0,$FF4E,$4E75,$3D7C,$7FFF,$FF6C,$E9D0,$0257,$E188,$2D40,$FF70
-	dc.w	$42AE,$FF74,$0810,7,$6706,$08EE,7,$FF6C,$4E75,$7008,$61FF,$FFFF,$FB92
-	dc.w	$0C2E,$0080,$FF4A,$6740,$43EE,$FF54,$7008,$61FF,$FFFF,$4BC4,$4A81
-	dc.w	$66FF,0,$1D64,$41EE,$FF54,$61FF,0,$0F70,$1D40,$FF4E,$0C00,4,$6700
-	dc.w	$002E,$0C00,5,$6700,$0068,$F22E,$5400,$FF54,$F22E,$F080,$FF6C,$4E75
-	dc.w	$43EE,$FF54,$7008,$61FF,$FFFF,$4B6E,$4A81,$66FF,$FFFF,$6CDA,$60BE
-	dc.w	$426E,$FF6C,$E9D0,$031F,$2D40,$FF70,$E9E8,$02D5,4,$720B,$E3A8,$2D40
-	dc.w	$FF74,$0810,7,$6706,$08EE,7,$FF6C,$41EE,$FF6C,$61FF,0,$0DAE,$323C
-	dc.w	$3C01,$9240,$836E,$FF6C,$1D7C,0,$FF4E,$4E75,$3D7C,$7FFF,$FF6C,$E9D0
-	dc.w	$031F,$2D40,$FF70,$E9E8,$02D5,4,$720B,$E3A8,$2D40,$FF74,$0810,7,$6706
-	dc.w	$08EE,7,$FF6C,$4E75,$700C,$61FF,$FFFF,$FAC0,$43EE,$FF6C,$700C,$61FF
-	dc.w	$FFFF,$4AFA,$4A81,$66FF,0,$1CA8,$41EE,$FF6C,$61FF,0,$0E24,$0C00,6
-	dc.w	$6706,$1D40,$FF4E,$4E75,$61FF,0,$0D82,$1D40,$FF4E,$4E75,$61FF,0,$1254
-	dc.w	$41EE,$FF6C,$61FF,0,$0DFC,$0C00,6,$6706,$1D40,$FF4E,$4E75,$61FF,0
-	dc.w	$0D5A,$1D40,$FF4E,$4E75,$E9EE,$10C3,$FF42,$327B,$120A,$4EFB,$9806
-	dc.w	$4AFC,8,$00E0,$01E0,$0148,$0620,$0078,$041A,$0010,$0620,$4A2E,$FF4E
-	dc.w	$664C,$F228,$D080,0,$F200,$9000,$F200,$7800,$F23C,$9000,0,0,$F201
-	dc.w	$A800,$836E,$FF66,$122E,$FF41,$0201,$0038,$6714,$206E,12,$61FF,$FFFF
-	dc.w	$4AE8,$4A81,$66FF,0,$1C0A,$4E75,$122E,$FF41,$0241,7,$61FF,0,$0764
-	dc.w	$4E75,$2228,0,$0281,$8000,0,$0081,$0080,0,$F201,$4400,$60A4,$4A2E
-	dc.w	$FF4E,$664C,$F228,$D080,0,$F200,$9000,$F200,$7000,$F23C,$9000,0,0
-	dc.w	$F201,$A800,$836E,$FF66,$122E,$FF41,$0201,$0038,$6714,$206E,12,$61FF
-	dc.w	$FFFF,$4A96,$4A81,$66FF,0,$1BB0,$4E75,$122E,$FF41,$0241,7,$61FF,0
-	dc.w	$06C0,$4E75,$2228,0,$0281,$8000,0,$0081,$0080,0,$F201,$4400,$60A4
-	dc.w	$4A2E,$FF4E,$664C,$F228,$D080,0,$F200,$9000,$F200,$6000,$F23C,$9000,0
-	dc.w	0,$F201,$A800,$836E,$FF66,$122E,$FF41,$0201,$0038,$6714,$206E,12
-	dc.w	$61FF,$FFFF,$4A44,$4A81,$66FF,0,$1B56,$4E75,$122E,$FF41,$0241,7,$61FF
-	dc.w	0,$061C,$4E75,$2228,0,$0281,$8000,0,$0081,$0080,0,$F201,$4400,$60A4
-	dc.w	$3D68,0,$FF84,$426E,$FF86,$2D68,4,$FF88,$2D68,8,$FF8C,$F228,$D080,0
-	dc.w	$61FF,$FFFF,$F94C,$2248,$41EE,$FF84,$700C,$0C2E,8,$FF4A,$6726,$61FF
-	dc.w	$FFFF,$492C,$4A81,$6600,$0052,$4A2E,$FF4E,$6602,$4E75,$08EE,3,$FF66
-	dc.w	$102E,$FF62,$0200,10,$6616,$4E75,$61FF,$FFFF,$5788,$4A81,$6600,$002C
-	dc.w	$4A2E,$FF4E,$66DC,$4E75,$41EE,$FF84,$61FF,0,$0B3C,$4440,$0240,$7FFF
-	dc.w	$026E,$8000,$FF84,$816E,$FF84,$F22E,$D040,$FF84,$4E75,$2CAE,$FFD4
-	dc.w	$60FF,0,$1AB2,$0200,$0030,0,$0040,$2D40,$FF5C,$3028,0,$0240,$7FFF
-	dc.w	$0C40,$407E,$6E00,$00E6,$6700,$0152,$0C40,$3F81,$6D00,$0058,$F228
-	dc.w	$D080,0,$F22E,$9000,$FF5C,$F23C,$8800,0,0,$F200,$6400,$F23C,$9000,0,0
-	dc.w	$F201,$A800,$836E,$FF66,$122E,$FF41,$0201,$0038,$6714,$206E,12,$61FF
-	dc.w	$FFFF,$4918,$4A81,$66FF,0,$1A2A,$4E75,$122E,$FF41,$0241,7,$61FF,0
-	dc.w	$04F0,$4E75,$08EE,3,$FF66,$3D68,0,$FF84,$2D68,4,$FF88,$2D68,8,$FF8C
-	dc.w	$2F08,$4280,$0C2E,4,$FF4E,$660A,$41EE,$FF84,$61FF,0,$0A6E,$41EE,$FF84
-	dc.w	$222E,$FF5C,$61FF,0,$0C86,$41EE,$FF84,$61FF,0,$034C,$122E,$FF41,$0201
-	dc.w	$0038,$6714,$206E,12,$61FF,$FFFF,$48A4,$4A81,$66FF,0,$19B6,$600E
-	dc.w	$122E,$FF41,$0241,7,$61FF,0,$047C,$122E,$FF62,$0201,10,$6600,$00B8
-	dc.w	$588F,$4E75,$4A28,7,$660E,$4AA8,8,$6608,$006E,$1048,$FF66,$6006,$006E
-	dc.w	$1248,$FF66,$2F08,$4A28,0,$5BC1,$202E,$FF5C,$61FF,0,$0D12,$F210,$D080
-	dc.w	$F200,$6400,$122E,$FF41,$0201,$0038,$6714,$206E,12,$61FF,$FFFF,$4834
-	dc.w	$4A81,$66FF,0,$1946,$600E,$122E,$FF41,$0241,7,$61FF,0,$040C,$122E
-	dc.w	$FF62,$0201,10,$6600,$007C,$588F,$4E75,$3228,0,$0241,$8000,$0041
-	dc.w	$3FFF,$3D41,$FF84,$2D68,4,$FF88,$2D68,8,$FF8C,$F22E,$9000,$FF5C,$F22E
-	dc.w	$4800,$FF84,$F23C,$9000,0,0,$F200,$0018,$F23C,$5838,2,$F294,$FE7C
-	dc.w	$6000,$FF50,$205F,$3D68,0,$FF84,$2D68,4,$FF88,$2D68,8,$FF8C,$0C2E,4
-	dc.w	$FF4E,$662C,$41EE,$FF84,$61FF,0,$0942,$4480,$0240,$7FFF,$EFEE,$004F
-	dc.w	$FF84,$6014,$205F,$3D68,0,$FF84,$2D68,4,$FF88,$2D68,8,$FF8C,$08AE,7
-	dc.w	$FF84,$56EE,$FF86,$41EE,$FF84,$122E,$FF5F,$E809,$0241,12,$4841,$122E
-	dc.w	$FF5F,$E809,$0241,3,$4280,$61FF,0,$0782,$4A2E,$FF86,$6706,$08EE,7
-	dc.w	$FF84,$F22E,$D040,$FF84,$4E75,$0200,$0030,0,$0080,$2D40,$FF5C,$3028,0
-	dc.w	$0240,$7FFF,$0C40,$43FE,$6E00,$00C8,$6700,$0120,$0C40,$3C01,$6D00
-	dc.w	$0046,$F228,$D080,0,$F22E,$9000,$FF5C,$F23C,$8800,0,0,$F22E,$7400
-	dc.w	$FF54,$F23C,$9000,0,0,$F200,$A800,$816E,$FF66,$226E,12,$41EE,$FF54
-	dc.w	$7008,$61FF,$FFFF,$4630,$4A81,$66FF,0,$1800,$4E75,$08EE,3,$FF66,$3D68
-	dc.w	0,$FF84,$2D68,4,$FF88,$2D68,8,$FF8C,$2F08,$4280,$0C2E,4,$FF4E,$660A
-	dc.w	$41EE,$FF84,$61FF,0,$0846,$41EE,$FF84,$222E,$FF5C,$61FF,0,$0A5E,$41EE
-	dc.w	$FF84,$61FF,0,$00D2,$2D40,$FF54,$2D41,$FF58,$226E,12,$41EE,$FF54
-	dc.w	$7008,$61FF,$FFFF,$45C8,$4A81,$66FF,0,$1798,$122E,$FF62,$0201,10
-	dc.w	$6600,$FE9C,$588F,$4E75,$3028,10,$0240,$07FF,$6608,$006E,$1048,$FF66
-	dc.w	$6006,$006E,$1248,$FF66,$2F08,$4A28,0,$5BC1,$202E,$FF5C,$61FF,0,$0AF8
-	dc.w	$F210,$D080,$F22E,$7400,$FF54,$226E,12,$41EE,$FF54,$7008,$61FF,$FFFF
-	dc.w	$456C,$4A81,$66FF,0,$173C,$122E,$FF62,$0201,10,$6600,$FE74,$588F
-	dc.w	$4E75,$3228,0,$0241,$8000,$0041,$3FFF,$3D41,$FF84,$2D68,4,$FF88,$2D68
-	dc.w	8,$FF8C,$F22E,$9000,$FF5C,$F22E,$4800,$FF84,$F23C,$9000,0,0,$F200
-	dc.w	$0018,$F23C,$5838,2,$F294,$FEAE,$6000,$FF64,$4280,$3028,0,$0440,$3FFF
-	dc.w	$0640,$03FF,$4A28,4,$6B02,$5340,$4840,$E988,$4A28,0,$6A04,$08C0,$001F
-	dc.w	$2228,4,$E9C1,$1054,$8081,$2D40,$FF54,$2228,4,$7015,$E1A9,$2D41,$FF58
-	dc.w	$2228,8,$E9C1,$0015,$222E,$FF58,$8280,$202E,$FF54,$4E75,$4280,$3028,0
-	dc.w	$0440,$3FFF,$0640,$007F,$4A28,4,$6B02,$5340,$4840,$EF88,$4A28,0,$6A04
-	dc.w	$08C0,$001F,$2228,4,$0281,$7FFF,$FF00,$E089,$8081,$4E75,$61FF,$FFFF
-	dc.w	$F490,$2F08,$102E,$FF4E,$6600,$0082,$082E,4,$FF42,$6712,$122E,$FF43
-	dc.w	$E809,$0241,7,$61FF,0,$0092,$6004,$102E,$FF43,$EBC0,$0647,$2F00,$41EE
-	dc.w	$FF6C,$61FF,0,$0ED0,$02AE,$CFFF,$F00F,$FF84,$201F,$4A2E,$FF87,$6616
-	dc.w	$4AAE,$FF88,$6610,$4AAE,$FF8C,$660A,$4A80,$6606,$026E,$F000,$FF84
-	dc.w	$41EE,$FF84,$225F,$700C,$0C2E,8,$FF4A,$670E,$61FF,$FFFF,$4412,$4A81
-	dc.w	$6600,$FB38,$4E75,$61FF,$FFFF,$5286,$4A81,$6600,$FB2A,$4E75,$0C00,4
-	dc.w	$6700,$FF7A,$41EE,$FF6C,$426E,$FF6E,$0C00,5,$6702,$60C0,$006E,$4080
-	dc.w	$FF66,$08EE,6,$FF70,$60B2,$303B,$1206,$4EFB,2,$0020,$0026,$002C,$0030
-	dc.w	$0034,$0038,$003C,$0040,$0044,$004A,$0050,$0054,$0058,$005C,$0060
-	dc.w	$0064,$202E,$FF9C,$4E75,$202E,$FFA0,$4E75,$2002,$4E75,$2003,$4E75
-	dc.w	$2004,$4E75,$2005,$4E75,$2006,$4E75,$2007,$4E75,$202E,$FFA4,$4E75
-	dc.w	$202E,$FFA8,$4E75,$200A,$4E75,$200B,$4E75,$200C,$4E75,$200D,$4E75
-	dc.w	$2016,$4E75,$202E,$FFD8,$4E75,$323B,$1206,$4EFB,$1002,$0010,$0016
-	dc.w	$001C,$0020,$0024,$0028,$002C,$0030,$2D40,$FF9C,$4E75,$2D40,$FFA0
-	dc.w	$4E75,$2400,$4E75,$2600,$4E75,$2800,$4E75,$2A00,$4E75,$2C00,$4E75
-	dc.w	$2E00,$4E75,$323B,$1206,$4EFB,$1002,$0010,$0016,$001C,$0020,$0024
-	dc.w	$0028,$002C,$0030,$3D40,$FF9E,$4E75,$3D40,$FFA2,$4E75,$3400,$4E75
-	dc.w	$3600,$4E75,$3800,$4E75,$3A00,$4E75,$3C00,$4E75,$3E00,$4E75,$323B
-	dc.w	$1206,$4EFB,$1002,$0010,$0016,$001C,$0020,$0024,$0028,$002C,$0030
-	dc.w	$1D40,$FF9F,$4E75,$1D40,$FFA3,$4E75,$1400,$4E75,$1600,$4E75,$1800
-	dc.w	$4E75,$1A00,$4E75,$1C00,$4E75,$1E00,$4E75,$323B,$1206,$4EFB,$1002
-	dc.w	$0010,$0016,$001C,$0020,$0024,$0028,$002C,$0030,$D1AE,$FFA4,$4E75
-	dc.w	$D1AE,$FFA8,$4E75,$D5C0,$4E75,$D7C0,$4E75,$D9C0,$4E75,$DBC0,$4E75
-	dc.w	$D196,$4E75,$1D7C,4,$FF4A,$0C00,1,$6706,$D1AE,$FFD8,$4E75,$54AE,$FFD8
-	dc.w	$4E75,$323B,$1206,$4EFB,$1002,$0010,$0016,$001C,$0020,$0024,$0028
-	dc.w	$002C,$0030,$91AE,$FFA4,$4E75,$91AE,$FFA8,$4E75,$95C0,$4E75,$97C0
-	dc.w	$4E75,$99C0,$4E75,$9BC0,$4E75,$9196,$4E75,$1D7C,8,$FF4A,$0C00,1,$6706
-	dc.w	$91AE,$FFD8,$4E75,$55AE,$FFD8,$4E75,$303B,$0206,$4EFB,2,$0010,$0028
-	dc.w	$0040,$004C,$0058,$0064,$0070,$007C,$2D6E,$FFDC,$FF6C,$2D6E,$FFE0
-	dc.w	$FF70,$2D6E,$FFE4,$FF74,$41EE,$FF6C,$4E75,$2D6E,$FFE8,$FF6C,$2D6E
-	dc.w	$FFEC,$FF70,$2D6E,$FFF0,$FF74,$41EE,$FF6C,$4E75,$F22E,$F020,$FF6C
-	dc.w	$41EE,$FF6C,$4E75,$F22E,$F010,$FF6C,$41EE,$FF6C,$4E75,$F22E,$F008
-	dc.w	$FF6C,$41EE,$FF6C,$4E75,$F22E,$F004,$FF6C,$41EE,$FF6C,$4E75,$F22E
-	dc.w	$F002,$FF6C,$41EE,$FF6C,$4E75,$F22E,$F001,$FF6C,$41EE,$FF6C,$4E75
-	dc.w	$303B,$0206,$4EFB,2,$0010,$0028,$0040,$004C,$0058,$0064,$0070,$007C
-	dc.w	$2D6E,$FFDC,$FF78,$2D6E,$FFE0,$FF7C,$2D6E,$FFE4,$FF80,$41EE,$FF78
-	dc.w	$4E75,$2D6E,$FFE8,$FF78,$2D6E,$FFEC,$FF7C,$2D6E,$FFF0,$FF80,$41EE
-	dc.w	$FF78,$4E75,$F22E,$F020,$FF78,$41EE,$FF78,$4E75,$F22E,$F010,$FF78
-	dc.w	$41EE,$FF78,$4E75,$F22E,$F008,$FF78,$41EE,$FF78,$4E75,$F22E,$F004
-	dc.w	$FF78,$41EE,$FF78,$4E75,$F22E,$F002,$FF78,$41EE,$FF78,$4E75,$F22E
-	dc.w	$F001,$FF78,$41EE,$FF78,$4E75,$303B,$0206,$4EFB,2,$0010,$0018,$0020
-	dc.w	$002A,$0034,$003E,$0048,$0052,$F22E,$F080,$FFDC,$4E75,$F22E,$F080
-	dc.w	$FFE8,$4E75,$F227,$E001,$F21F,$D020,$4E75,$F227,$E001,$F21F,$D010
-	dc.w	$4E75,$F227,$E001,$F21F,$D008,$4E75,$F227,$E001,$F21F,$D004,$4E75
-	dc.w	$F227,$E001,$F21F,$D002,$4E75,$F227,$E001,$F21F,$D001,$4E75,0,$3F81
-	dc.w	$3C01,$E408,$323B,$02F6,$3001,$9068,0,$0C40,$0042,$6A16,$4280,$082E,1
-	dc.w	$FF66,$6704,$08C0,$001D,$61FF,0,$001A,$4E75,$203C,$2000,0,$3141,0
-	dc.w	$42A8,4,$42A8,8,$4E75,$2D68,8,$FF54,$2D40,$FF58,$2001,$9268,0,$6F10
-	dc.w	$0C41,$0020,$6D10,$0C41,$0040,$6D50,$6000,$009A,$202E,$FF58,$4E75
-	dc.w	$2F02,$3140,0,$7020,$9041,$0C41,$001D,$6D08,$142E,$FF58,$852E,$FF57
-	dc.w	$E9E8,$2020,4,$E9E8,$1800,4,$E9EE,$0800,$FF54,$2142,4,$2141,8,$E8C0
-	dc.w	$009E,$6704,$08C0,$001D,$0280,$E000,0,$241F,$4E75,$2F02,$3140,0,$0441
-	dc.w	$0020,$7020,$9041,$142E,$FF58,$852E,$FF57,$E9E8,$2020,4,$E9E8,$1800,4
-	dc.w	$E8C1,$009E,$660C,$E8EE,$081F,$FF54,$6604,$2001,$6006,$2001,$08C0
-	dc.w	$001D,$42A8,4,$2142,8,$0280,$E000,0,$241F,$4E75,$3140,0,$0C41,$0041
-	dc.w	$6D12,$6724,$42A8,4,$42A8,8,$203C,$2000,0,$4E75,$2028,4,$2200,$0280
-	dc.w	$C000,0,$0281,$3FFF,$FFFF,$6012,$2028,4,$0280,$8000,0,$E288,$0281
-	dc.w	$7FFF,$FFFF,$6616,$4AA8,8,$6610,$4A2E,$FF58,$660A,$42A8,4,$42A8,8
-	dc.w	$4E75,$08C0,$001D,$42A8,4,$42A8,8,$4E75,$61FF,0,$0110,$4A80,$6700
-	dc.w	$00FA,$006E,$0208,$FF66,$327B,$1206,$4EFB,$9802,$0040,$00EA,$0024,8
-	dc.w	$4A28,2,$6B00,$00DC,$70FF,$4841,$0C01,4,$6700,$003E,$6E00,$0094,$6000
-	dc.w	$0064,$4A28,2,$6A00,$00C0,$70FF,$4841,$0C01,4,$6700,$0022,$6E00,$0078
-	dc.w	$6000,$0048,$E380,$6400,$00A6,$4841,$0C01,4,$6700,10,$6E00,$0060
-	dc.w	$6000,$0030,$06A8,0,$0100,4,$640C,$E4E8,4,$E4E8,6,$5268,0,$4A80,$6606
-	dc.w	$0268,$FE00,6,$02A8,$FFFF,$FF00,4,$42A8,8,$4E75,$52A8,8,$641A,$52A8,4
-	dc.w	$6414,$E4E8,4,$E4E8,6,$E4E8,8,$E4E8,10,$5268,0,$4A80,$6606,$0228
-	dc.w	$00FE,11,$4E75,$06A8,0,$0800,8,$641A,$52A8,4,$6414,$E4E8,4,$E4E8,6
-	dc.w	$E4E8,8,$E4E8,10,$5268,0,$4A80,$6606,$0268,$F000,10,$02A8,$FFFF,$F800
-	dc.w	8,$4E75,$4841,$0C01,4,$6700,$FF86,$6EEA,$4E75,$4841,$4A01,$6604,$4841
-	dc.w	$4E75,$48E7,$3000,$0C01,4,$6622,$E9E8,$3602,4,$741E,$E5AB,$2428,4
-	dc.w	$0282,0,$003F,$6628,$4AA8,8,$6622,$4A80,$661E,$6020,$E9E8,$3542,8
-	dc.w	$741E,$E5AB,$2428,8,$0282,0,$01FF,$6606,$4A80,$6602,$6004,$08C3,$001D
-	dc.w	$2003,$4CDF,12,$4841,$4E75,$2F02,$2F03,$2028,4,$2228,8,$EDC0,$2000
-	dc.w	$671A,$E5A8,$E9C1,$3022,$8083,$E5A9,$2140,4,$2141,8,$2002,$261F,$241F
-	dc.w	$4E75,$EDC1,$2000,$E5A9,$0682,0,$0020,$2141,4,$42A8,8,$2002,$261F
-	dc.w	$241F,$4E75,$EDE8,0,4,$660E,$EDE8,0,8,$6700,$0074,$0640,$0020,$4281
-	dc.w	$3228,0,$0241,$7FFF,$B041,$6E1C,$9240,$3028,0,$0240,$8000,$8240,$3141
-	dc.w	0,$61FF,$FFFF,$FF82,$103C,0,$4E75,$0C01,$0020,$6E20,$E9E8,$0840,4
-	dc.w	$2140,4,$2028,8,$E3A8,$2140,8,$0268,$8000,0,$103C,4,$4E75,$0441,$0020
-	dc.w	$2028,8,$E3A8,$2140,4,$42A8,8,$0268,$8000,0,$103C,4,$4E75,$0268,$8000
-	dc.w	0,$103C,1,$4E75,$3028,0,$0240,$7FFF,$0C40,$7FFF,$6748,$0828,7,4,$6706
-	dc.w	$103C,0,$4E75,$4A40,$6618,$4AA8,4,$660C,$4AA8,8,$6606,$103C,1,$4E75
-	dc.w	$103C,4,$4E75,$4AA8,4,$6612,$4AA8,8,$660C,$0268,$8000,0,$103C,1,$4E75
-	dc.w	$103C,6,$4E75,$4AA8,8,$6612,$2028,4,$0280,$7FFF,$FFFF,$6606,$103C,2
-	dc.w	$4E75,$0828,6,4,$6706,$103C,3,$4E75,$103C,5,$4E75,$2028,0,$2200,$0280
-	dc.w	$7FF0,0,$670E,$0C80,$7FF0,0,$6728,$103C,0,$4E75,$0281,15,$FFFF,$66FF
-	dc.w	0,$0014,$4AA8,4,$66FF,0,10,$103C,1,$4E75,$103C,4,$4E75,$0281,15,$FFFF
-	dc.w	$66FF,0,$0014,$4AA8,4,$66FF,0,10,$103C,2,$4E75,$0801,$0013,$66FF,0,10
-	dc.w	$103C,5,$4E75,$103C,3,$4E75,$2028,0,$2200,$0280,$7F80,0,$670E,$0C80
-	dc.w	$7F80,0,$671E,$103C,0,$4E75,$0281,$007F,$FFFF,$66FF,0,10,$103C,1
-	dc.w	$4E75,$103C,4,$4E75,$0281,$007F,$FFFF,$66FF,0,10,$103C,2,$4E75,$0801
-	dc.w	$0016,$66FF,0,10,$103C,5,$4E75,$103C,3,$4E75,$2F01,$0828,7,0,$56E8,2
-	dc.w	$3228,0,$0241,$7FFF,$9240,$3141,0,$2F08,$202F,4,$0240,$00C0,$E848
-	dc.w	$61FF,$FFFF,$FAE2,$2057,$322F,6,$0241,$00C0,$E849,$4841,$322F,6,$0241
-	dc.w	$0030,$E849,$61FF,$FFFF,$FC22,$205F,$08A8,7,0,$4A28,2,$670A,$08E8,7,0
-	dc.w	$4228,2,$4280,$4AA8,4,$660A,$4AA8,8,$6604,$08C0,2,$082E,1,$FF66,$6706
-	dc.w	$08EE,5,$FF67,$588F,$4E75,$2F01,$0828,7,0,$56E8,2,$3228,0,$0241,$7FFF
-	dc.w	$9240,$3141,0,$2F08,$4280,$61FF,$FFFF,$FA64,$2057,$323C,4,$4841,$322F
-	dc.w	6,$0241,$0030,$E849,$61FF,$FFFF,$FBAA,$205F,$08A8,7,0,$4A28,2,$670A
-	dc.w	$08E8,7,0,$4228,2,$4280,$4AA8,4,$660A,$4AA8,8,$6604,$08C0,2,$082E,1
-	dc.w	$FF66,$6706,$08EE,5,$FF67,$588F,$4E75,$0241,$0010,$E808,$8200,$3001
-	dc.w	$E309,$600E,$0241,$0010,$8200,$4840,$8200,$3001,$E309,$103B,8,$41FB
-	dc.w	$1620,$4E75,$0200,2,$0200,2,$0200,2,0,0,$0A08,$0A08,$0A08,$0A08,$0A08
-	dc.w	$0A08,$7FFF,0,0,0,0,0,0,0,$7FFE,0,$FFFF,$FFFF,$FFFF,$FFFF,0,0,$7FFE,0
-	dcb.w	4,$FFFF
-	dcb.w	2,0
-	dc.w	$7FFF,0,0,0,0,0,0,0,$7FFF,0,0,0,0,0,0,0,$407E,0,$FFFF,$FF00,0,0,0,0
-	dc.w	$407E,0,$FFFF,$FF00,0,0,0,0,$7FFF,0,0,0,0,0,0,0,$7FFF,0,0,0,0,0,0,0
-	dc.w	$43FE,0,$FFFF,$FFFF,$FFFF,$F800,0,0,$43FE,0,$FFFF,$FFFF,$FFFF,$F800,0
-	dc.w	0,$7FFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-	dcb.w	8,0
-	dc.w	$FFFF,0,0,0,0,0,0,0,$FFFE,0,$FFFF,$FFFF,$FFFF,$FFFF,0,0,$FFFF,0,0,0,0
-	dcb.w	3,0
-	dc.w	$FFFE,0,$FFFF,$FFFF,$FFFF,$FFFF,0,0,$FFFF,0,0,0,0,0,0,0,$C07E,0,$FFFF
-	dc.w	$FF00,0,0,0,0,$FFFF,0,0,0,0,0,0,0,$C07E,0,$FFFF,$FF00,0,0,0,0,$FFFF,0
-	dcb.w	6,0
-	dc.w	$C3FE,0,$FFFF,$FFFF,$FFFF,$F800,0,0,$FFFF,0,0,0,0,0,0,0,$C3FE,0,$FFFF
-	dcb.w	2,$FFFF
-	dc.w	$F800,0,0,$700C,$61FF,$FFFF,$E82C,$43EE,$FF6C,$700C,$61FF,$FFFF,$3866
-	dc.w	$4A81,$66FF,0,$0A14,$E9EE,$004F,$FF6C,$0C40,$7FFF,$6602,$4E75,$102E
-	dc.w	$FF6F,$0200,15,$660E,$4AAE,$FF70,$6608,$4AAE,$FF74,$6602,$4E75,$41EE
-	dc.w	$FF6C,$61FF,0,$001C,$F22E,$F080,$FF6C,$4E75,0,0,$0203,$0203,$0203
-	dcb.w	2,$0302
-	dc.w	$0203,$2D68,0,$FF84,$2D68,4,$FF88,$2D68,8,$FF8C,$41EE,$FF84,$48E7
-	dc.w	$3C00,$F227,$E001,$7402,$7604,$2810,$4281,$4C3C,$1001,0,10,$E9C4
-	dc.w	$08C4,$D280,$5803,$51CA,$FFEE,$0804,$001E,$6702,$4481,$0481,0,$0010
-	dc.w	$6C0E,$4481,$0084,$4000,0,$0090,$4000,0,$2F01,$7201,$F23C,$4400,0,0
-	dc.w	$E9D0,$0704,$F200,$5822,$2830,$1C00,$7600,$7407,$F23C,$4423,$4120,0
-	dc.w	$E9C4,$08C4,$F200,$5822,$5803,$51CA,$FFEC,$5281,$0C81,0,2,$6FD8,$0810
-	dc.w	$001F,$6704,$F200,$001A,$2217,$0C81,0,$001B,$6F00,$00E4,$0810,$001E
-	dc.w	$6674,$4281,$2810,$E9C4,$0704,$6624,$5281,$7A01,$2830,$5C00,$6608
-	dc.w	$5081,$5285,$2830,$5C00,$4283,$7407,$E9C4,$08C4,$6608,$5883,$5281
-	dc.w	$51CA,$FFF4,$2001,$2217,$9280,$6C10,$4481,$2810,$0084,$4000,0,$0090
-	dc.w	$4000,0,$43FB,$0170,0,$0666,$4283,$F23C,$4480,$3F80,0,$7403,$E280
-	dc.w	$6406,$F231,$48A3,$3800,$0683,0,12,$4A80,$66EC,$F200,$0423,$6068
-	dc.w	$4281,$7A02,$2830,$5C00,$6608,$5385,$5081,$2830,$5C00,$761C,$7407
-	dc.w	$E9C4,$08C4,$6608,$5983,$5281,$51CA,$FFF4,$2001,$2217,$9280,$6E10
-	dc.w	$4481,$2810,$0284,$BFFF,$FFFF,$0290,$BFFF,$FFFF,$43FB,$0170,0,$05FC
-	dc.w	$4283,$F23C,$4480,$3F80,0,$7403,$E280,$6406,$F231,$48A3,$3800,$0683,0
-	dc.w	12,$4A80,$66EC,$F200,$0420,$262E,$FF60,$E9C3,$2682,$2810,$E582,$E9C4
-	dc.w	2,$D480,$43FA,$FE50,$1031,$2800,$4283,$EFC3,$0682,$F203,$9000,$E280
-	dc.w	$640A,$43FB,$0170,0,$0644,$6016,$E280,$640A,$43FB,$0170,0,$06D2,$6008
-	dc.w	$43FB,$0170,0,$0590,$2001,$6A08,$4480,$0090,$4000,0,$4283,$F23C,$4480
-	dc.w	$3F80,0,$E280,$6406,$F231,$48A3,$3800,$0683,0,12,$4A80,$66EC,$0810
-	dc.w	$001E,$6706,$F200,$0420,$6004,$F200,$0423,$F200,$A800,$0880,9,$6706
-	dc.w	$006E,$0108,$FF66,$588F,$F21F,$D040,$4CDF,$003C,$F23C,$9000,0,0,$F23C
-	dc.w	$8800,0,0,$4E75,$3FFD,0,$9A20,$9A84,$FBCF,$F798,0,0,$3FFD,0,$9A20
-	dc.w	$9A84,$FBCF,$F799,0,0,$3F80,0,0,0,0,0,0,0,$4000,0,0,0,0,0,0,0,$4120,0
-	dcb.w	6,0
-	dc.w	$459A,$2800,0,0,0,0,0,0,0,0,$0303,$0202,$0302,$0203,$0203,$0302,$48E7
-	dc.w	$3F20,$F227,$E007,$F23C,$9000,0,$0020,$2D50,$FF58,$2E00,$422E,$FF50
-	dc.w	$0C2E,4,$FF4E,$6600,$0030,$3010,$0240,$7FFF,$2228,4,$2428,8,$5340
-	dc.w	$E38A,$E391,$4A81,$6CF6,$4A40,$6E04,$50EE,$FF50,$0240,$7FFF,$3080
-	dc.w	$2141,4,$2142,8,$2D50,$FF90,$2D68,4,$FF94,$2D68,8,$FF98,$02AE,$7FFF
-	dc.w	$FFFF,$FF90,$4A2E,$FF50,$6708,$2C3C,$FFFF,$ECBB,$6038,$302E,$FF90
-	dc.w	$3D7C,$3FFF,$FF90,$F22E,$4800,$FF90,$0440,$3FFF,$F200,$5022,$F23A
-	dc.w	$4428,$FF1C,$F293,14,$F23A,$4823,$FF02,$F206,$6000,$600A,$F23A,$4823
-	dc.w	$FEE6,$F206,$6000,$F23C,$8800,0,0,$4245,$4A87,$6F04,$2807,$6006,$2806
-	dc.w	$9887,$5284,$4A84,$6F18,$0C84,0,$0011,$6F12,$7811,$4A87,$6F0C,$00AE,0
-	dc.w	$2080,$FF64,$6002,$7801,$4A87,$6E06,$BE86,$6D02,$2C07,$2006,$5280
-	dc.w	$9084,$4845,$4245,$4242,$4A80,$6C14,$5245,$0C80,$FFFF,$ECD4,$6E08
-	dc.w	$0680,0,$0018,$7418,$4480,$F23A,$4480,$FE98,$E9EE,$1682,$FF60,$E349
-	dc.w	$D245,$E349,$4AAE,$FF58,$6C02,$5281,$45FA,$FEC0,$1632,$1800,$E98B
-	dc.w	$F203,$9000,$E88B,$4A03,$660A,$43FB,$0170,0,$0370,$6016,$E20B,$640A
-	dc.w	$43FB,$0170,0,$03FE,$6008,$43FB,$0170,0,$0490,$4283,$E288,$6406,$F231
-	dc.w	$48A3,$3800,$0683,0,12,$4A80,$66EC,$F23C,$8800,0,0,$F23C,$9000,0
-	dc.w	$0010,$F210,$4800,$F200,$0018,$4A45,$6608,$F200,$0420,$6000,$008E
-	dc.w	$4A2E,$FF50,$6700,$0072,$F227,$E002,$3617,$0243,$7FFF,$0050,$8000
-	dc.w	$D650,$0443,$3FFF,$D669,$0024,$0443,$3FFF,$D669,$0030,$0443,$3FFF
-	dc.w	$6B00,$0048,$0257,$8000,$8757,$0250,$7FFF,$2F28,8,$2F28,4,$2F3C,$3FFF
-	dc.w	0,$F21F,$D080,$F21F,$4823,$2F29,$002C,$2F29,$0028,$2F3C,$3FFF,0,$2F29
-	dc.w	$0038,$2F29,$0034,$2F3C,$3FFF,0,$F21F,$4823,$F21F,$4823,$6016,$60FE
-	dc.w	$4A42,$670C,$F229,$4823,$0024,$F229,$4823,$0030,$F200,$0423,$F200
-	dc.w	$A800,$F22E,$6800,$FF90,$45EE,$FF90,$0800,9,$670E,$00AA,0,1,8,$F22E
-	dc.w	$4800,$FF90,$2D6E,$FF60,$FF54,$02AE,0,$0030,$FF60,$48E7,$C0C0,$2F2E
-	dc.w	$FF54,$2F2E,$FF58,$41EE,$FF90,$F210,$6800,$4AAE,$FF58,$6C06,$0090
-	dc.w	$8000,0,$2F2E,$FF64,$F22E,$9000,$FF60,$F23C,$8800,0,0,$F22E,$4801
-	dc.w	$FF90,$F200,$A800,$816E,$FF66,$1D57,$FF64,$588F,$2D5F,$FF58,$2D5F
-	dc.w	$FF54,$4CDF,$0303,$2D6E,$FF58,$FF90,$2D6E,$FF54,$FF60,$4845,$4A45
-	dc.w	$66FF,0,$0086,$F23A,$4500,$FCEC,$2004,$5380,$4283,$E288,$6406,$F231
-	dc.w	$4923,$3800,$0683,0,12,$4A80,$66EC,$4A2E,$FF50,$670A,$F200,$0018
-	dc.w	$60FF,0,$0028,$F200,$0018,$F200,$0838,$F293,$001A,$5386,$3A3C,1,$F23C
-	dc.w	$9000,0,$0020,$F23A,$4523,$FCC2,$6000,$FDA8,$F23A,$4523,$FCB8,$F200
-	dc.w	$0838,$F294,$005C,$F292,12,$F23A,$4420,$FCA6,$5286,$604C,$5286,$3A3C
-	dc.w	1,$F23C,$9000,0,$0020,$6000,$FD7A,$F23A,$4500,$FC6A,$2004,$4283,$E288
-	dc.w	$6406,$F231,$4923,$3800,$0683,0,12,$4A80,$66EC,$F200,$0018,$F200
-	dc.w	$0838,$F28E,$0012,$F23A,$4420,$FC60,$5286,$5284,$F23A,$4523,$FC56
-	dc.w	$F23C,$9000,0,$0010,$F200,$0820,$41EE,$FF84,$F210,$6800,$2428,4,$2628
-	dc.w	8,$42A8,4,$42A8,8,$2010,$4840,$6714,$0480,0,$3FFD,$4A80,$6E0A,$4480
-	dc.w	$E28A,$E293,$51C8,$FFFA,$4A82,$6604,$4A83,$6710,$4281,$0683,0,$0080
-	dc.w	$D581,$0283,$FFFF,$FF80,$2004,$5688,$61FF,0,$02B0,$4A2E,$FF50,$6728
-	dc.w	$F200,$003A,$F281,12,$F206,$4000,$F200,$0018,$602E,$4A87,$6D08,$F23A
-	dc.w	$4400,$FBE4,$6022,$F206,$4000,$F200,$0018,$6018,$F200,$003A,$F28E,10
-	dc.w	$F23A,$4400,$FB9A,$6008,$F206,$4000,$F200,$0018,$F229,$4820,$0018
-	dc.w	$F22E,$6800,$FF90,$242A,4,$262A,8,$3012,$670E,$0440,$3FFD,$4440,$E28A
-	dc.w	$E293,$51C8,$FFFA,$4281,$0683,0,$0080,$D581,$0283,$FFFF,$FF80,$7004
-	dc.w	$41EE,$FF54,$61FF,0,$0228,$202E,$FF54,$720C,$E2A8,$EFEE,$010C,$FF84
-	dc.w	$E2A8,$EFEE,$0404,$FF84,$4A00,$6708,$00AE,0,$2080,$FF64,$4280,$022E
-	dc.w	15,$FF84,$4AAE,$FF58,$6C02,$7002,$4A86,$6C02,$5280,$EFEE,2,$FF84
-	dc.w	$F23C,$8800,0,0,$F21F,$D0E0,$4CDF,$04FC,$4E75,$4002,0,$A000,0,0,0
-	dc.w	$4005,0,$C800,0,0,0,$400C,0,$9C40,0,0,0,$4019,0,$BEBC,$2000,0,0,$4034
-	dc.w	0,$8E1B,$C9BF,$0400,0,$4069,0,$9DC5,$ADA8,$2B70,$B59E,$40D3,0,$C278
-	dc.w	$1F49,$FFCF,$A6D5,$41A8,0,$93BA,$47C9,$80E9,$8CE0,$4351,0,$AA7E,$EBFB
-	dc.w	$9DF9,$DE8E,$46A3,0,$E319,$A0AE,$A60E,$91C7,$4D48,0,$C976,$7586,$8175
-	dc.w	$0C17,$5A92,0,$9E8B,$3B5D,$C53D,$5DE5,$7525,0,$C460,$5202,$8A20,$979B
-	dc.w	$4002,0,$A000,0,0,0,$4005,0,$C800,0,0,0,$400C,0,$9C40,0,0,0,$4019,0
-	dc.w	$BEBC,$2000,0,0,$4034,0,$8E1B,$C9BF,$0400,0,$4069,0,$9DC5,$ADA8,$2B70
-	dc.w	$B59E,$40D3,0,$C278,$1F49,$FFCF,$A6D6,$41A8,0,$93BA,$47C9,$80E9,$8CE0
-	dc.w	$4351,0,$AA7E,$EBFB,$9DF9,$DE8E,$46A3,0,$E319,$A0AE,$A60E,$91C7,$4D48
-	dc.w	0,$C976,$7586,$8175,$0C18,$5A92,0,$9E8B,$3B5D,$C53D,$5DE5,$7525,0
-	dc.w	$C460,$5202,$8A20,$979B,$4002,0,$A000,0,0,0,$4005,0,$C800,0,0,0,$400C
-	dc.w	0,$9C40,0,0,0,$4019,0,$BEBC,$2000,0,0,$4034,0,$8E1B,$C9BF,$0400,0
-	dc.w	$4069,0,$9DC5,$ADA8,$2B70,$B59D,$40D3,0,$C278,$1F49,$FFCF,$A6D5,$41A8
-	dc.w	0,$93BA,$47C9,$80E9,$8CDF,$4351,0,$AA7E,$EBFB,$9DF9,$DE8D,$46A3,0
-	dc.w	$E319,$A0AE,$A60E,$91C6,$4D48,0,$C976,$7586,$8175,$0C17,$5A92,0,$9E8B
-	dc.w	$3B5D,$C53D,$5DE4,$7525,0,$C460,$5202,$8A20,$979A,$48E7,$FF00,$7E01
-	dc.w	$5380,$2802,$2A03,$E9C2,$1003,$E782,$E9C3,$6003,$E783,$8486,$E385
-	dc.w	$E394,$4846,$D346,$D685,$4E71,$D584,$4E71,$D346,$4846,$4A47,$6712
-	dc.w	$4847,$E947,$DE41,$10C7,$4847,$4247,$51C8,$FFC8,$6012,$4847,$3E01
-	dc.w	$4847,$5247,$51C8,$FFBA,$4847,$E94F,$10C7,$4CDF,$00FF,$4E75,$7001
-	dc.w	$6100,$00D6,$3D7C,$0121,10,$6000,$007E,$7002,$6100,$00C6,$3D7C,$0141
-	dc.w	10,$606E,$7004,$6100,$00B8,$3D7C,$0101,10,$6060,$7008,$6100,$00AA
-	dc.w	$3D7C,$0161,10,$6052,$700C,$6100,$009C,$3D7C,$0161,10,$6044,$7001
-	dc.w	$6100,$008E,$3D7C,$00A1,10,$6036,$7002,$6100,$0080,$3D7C,$00C1,10
-	dc.w	$6028,$7004,$6100,$0072,$3D7C,$0081,10,$601A,$7008,$6100,$0064,$3D7C
-	dc.w	$00E1,10,$600C,$700C,$6100,$0056,$3D7C,$00E1,10,$2D6E,$FF68,6,$F22E
-	dc.w	$D0C0,$FFDC,$F22E,$9C00,$FF60,$4CEE,$0303,$FF9C,$4E5E,$2F17,$2F6F,8,4
-	dc.w	$2F6F,12,8,$2F7C,0,1,12,$3F6F,6,12,$3F7C,$4008,6,$0817,5,$6706,$08EF
-	dc.w	2,13,$60FF,$FFFF,$2D82,$122E,$FF41,$0201,$0038,$0C01,$0018,$6700,12
-	dc.w	$0C01,$0020,$6700,$0060,$4E75,$122E,$FF41,$0241,7,$323B,$1206,$4EFB
-	dc.w	$1002,$0010,$0016,$001C,$0020,$0024,$0028,$002C,$0030,$91AE,$FFA4
-	dc.w	$4E75,$91AE,$FFA8,$4E75,$95C0,$4E75,$97C0,$4E75,$99C0,$4E75,$9BC0
-	dc.w	$4E75,$9196,$4E75,$0C2E,$0030,10,$6612,$082E,5,4,$660A,$4E7A,$8800
-	dc.w	$91C0,$4E7B,$8800,$4E75,$4480,$60A0,0,0,0,0,0,0,$4E71,$4E71,$4E71
-Install_FPU_Emulation_End:
-	dc.w	$E6B5,$B6C2,$94F8,$46FB
 
 Install_FPU_Libraries:
 	LEA	(_060FPLSP_TOP,PC),A0
@@ -4360,7 +2204,7 @@ Install_Int_Emulation_End:
 Install_Mem_Library:
 	LEA	(_060_imem_read,PC),A0
 	MOVE.L	A0,($007A,A6)
-	LEA	(_060_imem_read,PC),A0
+	LEA	(_060_dmem_read,PC),A0
 	MOVE.L	A0,($007E,A6)
 	LEA	(_060_dmem_write,PC),A0
 	MOVE.L	A0,($0082,A6)
@@ -4380,6 +2224,7 @@ Install_Mem_Library:
 	MOVE.L	A0,($009E,A6)
 	LEA	(_060_dmem_write_long,PC),A0
 	MOVE.L	A0,($00A2,A6)
+
 	LEA	(_060_real_access,PC),A0
 	MOVE.L	A0,($00A6,A6)
 	RTS
@@ -4391,7 +2236,9 @@ _060_dmem_write:	MOVE.L	A6,-(SP)
 	MOVEQ	#0,D1
 	RTS
 
-_060_imem_read:	MOVE.L	A6,-(SP)
+_060_imem_read:
+_060_dmem_read:
+	MOVE.L	A6,-(SP)
 	MOVEA.L	(4).W,A6
 	JSR	(_LVOCopyMem,A6)
 	MOVEA.L	(SP)+,A6
