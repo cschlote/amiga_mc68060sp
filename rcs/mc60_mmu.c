@@ -7,7 +7,7 @@
 **--------------------------------------------------------------------------------
 ** ALL RIGHTS ON THIS SOURCES RESERVED TO SILICON DEPARTMENT SOFTWARE
 **
-** $Id: mc60_build.c 1.2 1997/04/14 22:47:28 schlote Exp schlote $
+** $Id: mc60_build.c 1.3 1997/04/14 23:00:04 schlote Exp schlote $
 **
 **--------------------------------------------------------------------------------
 */
