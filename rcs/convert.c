@@ -7,7 +7,7 @@
 **-------------------------------------------------------------------------------
 ** ALL RIGHTS ON THIS SOURCES RESERVED TO SILICON DEPARTMENT SOFTWARE
 **
-** $Id: convert.c 1.0 1996/02/24 11:19:50 schlote Exp schlote $
+** $Id: convert.c 1.1 1996/02/24 11:41:56 schlote Exp schlote $
 **
 */
 
@@ -15,25 +15,40 @@
 #include <stdlib.h>
 #define  USE_BUILTIN_MATH
 #include <string.h>
+#include <ctype.h>
 
 #include <exec/types.h>
 
 void TranslateBuffer(TEXT *buffer)
 {
 int i,x;
-TEXT *p,work[256];
+TEXT *p,c, work[256],work1[256];
 
-	for ( p=buffer; *p!=0; p++ )
+	for ( p=buffer,i=0; *p!=0; p++,i++ )
 	{
-      switch( *p )
+      c = buffer[i];
+
+		if ( c == '\n' ) { *(p++) = '\n'; break ; }
+
+		if ( isspace(c) )
+		{
+			if      ( i==0 ) *(p++) = '\t';
+         else if ( !isspace(*(p-1)) ) *(p++) = c;
+			continue;
+     	}
+      switch( c )
       {
       case '#'	:	*p='*'; break;
       }
-	}
 
-	if ( sscanf(buffer," short 0x%x %s\n",&x, work) == 2 )
-		sprintf(buffer,"  	dc.w	$%x		%s\n",x,work);
+	}
+   *p = 0;
+
+	if ( sscanf(buffer,"set %s, 0x%x\n",work, &x) == 2 )
+		sprintf(buffer,"%s	equ	$%x\n",work,x);
+
 }
+
 
 
 
@@ -47,13 +62,13 @@ TEXT buffer[256];
 	printf("Open file '%s'\n",argv[1]);
 	if ( in = fopen( argv[1],"r") )
 	{
-		printf("Open file '%s'\n",argv[1]);
+		printf("Open file '%s'\n",argv[2]);
 		if ( out = fopen( argv[2],"w") )
 		{
       	while ( fgets(buffer,256,in) )
       	{
             TranslateBuffer(buffer);
-            if ( !fputs( buffer, out) )
+            if ( fputs( buffer, out) )
             {
             	printf("*** error on file write\n");
             	break;
