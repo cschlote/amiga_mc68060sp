@@ -7,7 +7,7 @@
 **-------------------------------------------------------------------------------
 ** ALL RIGHTS ON THIS SOURCES RESERVED TO SILICON DEPARTMENT SOFTWARE
 **
-** $Id: 68060.library.asm,v 1.5 1996/06/09 21:16:18 schlote Exp schlote $
+** $Id: 68060.library.asm,v 1.8 1996/06/09 22:21:37 schlote Exp schlote $
 **
 **
 	include	68060.library.i
@@ -33,7 +33,7 @@ RomTag:	ILLEGAL
 
 LibName:	dc.b	'68060.library',0
 IDString:	dc.b	'68060.library 40.2 (09.06.96) (c) by Silicon Department Software Solutions, C. Schlote',0,0
-	dc.b	0
+                        even
 
 InitTable:	dc.l	170
 	dc.l	funcTable
@@ -1424,7 +1424,7 @@ Install_Caches:	MOVEM.L	D0-D7/A0-A6,-(SP)
 	MOVEA.L	A6,A2
 	MOVEA.L	(4).W,A6
 	LEA	(Install_Caches_Doit,PC),A5
-	JSR	(LVOSupervisor,A6)
+	JSR	(_LVOSupervisor,A6)
 	MOVEM.L	(SP)+,D0-D7/A0-A6
 	RTS
 
