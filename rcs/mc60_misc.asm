@@ -8,7 +8,7 @@
 **-------------------------------------------------------------------------------
 ** ALL RIGHTS ON THIS SOURCES RESERVED TO SILICON DEPARTMENT SOFTWARE
 **
-** $Id: mc60_mmu.asm 1.2 1997/04/12 13:39:03 schlote Exp schlote $
+** $Id: mc60_mmu.asm 1.3 1997/04/14 22:47:28 schlote Exp schlote $
 **
 
 	machine	68060
