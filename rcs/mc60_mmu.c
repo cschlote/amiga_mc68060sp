@@ -7,7 +7,7 @@
 **-------------------------------------------------------------------------------
 ** ALL RIGHTS ON THIS SOURCES RESERVED TO SILICON DEPARTMENT SOFTWARE
 **
-** $Id:$
+** $Id: mc60_build.c 1.1 1997/04/12 13:39:03 schlote Exp schlote $
 **
 */
 
@@ -140,7 +140,7 @@ ULONG *mptr;
 BOOL rc = FALSE;
 int i;
 
-	D(bug("\tMap Memory: %08lx, %08lx, %04lx\n",addr,size,mode));
+	D2(bug("\tMap Memory: %08lx, %08lx, %04lx\n",addr,size,mode));
 
 	mode |= 1;					// Or PageResident to Mode
 
@@ -199,17 +199,23 @@ int i;
       	   if ( tptr[tindx] != fptr->mmu_PointerTableDesc )	// Is PageTable inst.
       	   {
       	      pptr = (ULONG*)(tptr[tindx] & ~3);
-      	      pindx = spage & 0x3F;						// Lower 6 Bit of page number
+      	      pindx = spage & 0x3F;							// Lower 6 Bit of page number
 
 					if ( pptr[pindx] ==  fptr->mmu_IndIllPageDesc )
-      	      	pptr[pindx] = spage << 12;				// Map Logical -> Physikal Addr :-=)
+      	      	pptr[pindx] = spage << 12;					// Map Logical -> Physikal Addr :-=)
 
-      	      pptr[pindx] = pptr[pindx] | mode;				// Patch Mode Bits
+	 	     		 pptr[pindx] = pptr[pindx] | mode;			// Patch Mode Bits
 
 					if ( (pptr[pindx] & 0x60) == 0x60 )
-						pptr[pindx] &= ~0x20;					// Force Model to precise
+						pptr[pindx] &= ~0x20;
 
-						rc = TRUE;									// So long it's ok.
+/*
+					if ( ( 0x60 & pptr[pindx] ) > 0x20 )
+					{
+      	     		 pptr[pindx] = pptr[pindx] | mode;			// Patch Mode Bits
+					}
+*/
+					rc = TRUE;											// So long it's ok.
       	   }
       	   else break;	// No custom page table
   			}
@@ -235,6 +241,7 @@ ULONG i, *x;
 		if ( addr != 0xf80000 )
 		{
         	for( i=0xf80; i<=0xfff; i++ )
+        	{
         		x = (ULONG*)fptr->mmu_RootTable;
          	x = (ULONG*)( x[ i >> 13          ] & ~0x1ff );	// Get PointerDesc, Strip Flags
          	x = (ULONG*)( x[( i >> 6 ) & 0x7f ] & ~0x1ff );	// Get PageDesc, Strip Flags
@@ -242,6 +249,7 @@ ULONG i, *x;
          	x[ i & 0x3f ] = addr | 1;				// Map to New Address, cache/wthrg
 
             addr += 0x1000;							// Next 4k Page  :-)
+         }
 		}
 	}
 	return fptr;
@@ -371,7 +379,7 @@ struct mc60_mmu *fptr;       	// Ptr to MMUFrame, it's our tag ptr
 
    fptr  = Map_Memory( fptr, 0xBC0000,  0x40000, 0x40 );
    fptr  = Map_Memory( fptr, 0xD80000,  0x80000, 0x40 );
-   fptr  = Map_Memory( fptr, 0xF00000,  0x80000, 0x40 );
+   fptr  = Map_Memory( fptr, 0xF00000,  0x80000, 0x00 );
 
 	//***************************************************************
 	// Map Kickstart or shadow as cacheable
@@ -382,17 +390,17 @@ struct mc60_mmu *fptr;       	// Ptr to MMUFrame, it's our tag ptr
 	// Hmm now care abot 'special' Amiga, CD32, A1200 PCMCIA ....
 
 	if ( OpenResource("card.resource") )
-	   fptr  = Map_Memory( fptr, 0x60000, 0x440002, 0x40 );
+	   fptr  = Map_Memory( fptr, 0x600000, 0x440002, 0x40 );
 
 	if ( FindResident("cdstrap") )
-	   fptr  = Map_Memory( fptr, 0xE00000, 0x80000, 0x40 );
+	   fptr  = Map_Memory( fptr, 0xE00000, 0x080000, 0x40 );
 
 	//***************************************************************
 	// Is ExecBase located in $200000 Ram. Yep ? It is a developer
 	// kick ..... make it cacheable
 
 	if ( (UBYTE)((ULONG)(SysBase->LibNode.lib_Node.ln_Name)>>16) == 0x20 )
-	   fptr  = Map_Memory( fptr, 0x200000, 0x80000, 0x40 );
+	   fptr  = Map_Memory( fptr, 0x200000, 0x80000, 0x00 );
 
 	//***************************************************************
 	// Make low memory page non cache cachable
@@ -413,8 +421,7 @@ struct mc60_mmu *fptr;       	// Ptr to MMUFrame, it's our tag ptr
 	   {
 	   ULONG pagemode;
 
-   		pagemode =
-				( TypeOfMem( memhdr->mh_Lower ) & MEMF_PUBLIC )? 0x20:0x40;
+   		pagemode =(TypeOfMem( memhdr->mh_Lower ) & MEMF_CHIP )? 0x40:0x20;
 
 	   	fptr  = Map_Memory( fptr, (ULONG)memhdr->mh_Lower,
 															 (ULONG)memhdr->mh_Upper -

@@ -8,9 +8,8 @@
 **-------------------------------------------------------------------------------
 ** ALL RIGHTS ON THIS SOURCES RESERVED TO SILICON DEPARTMENT SOFTWARE
 **
-** $Id: mc60_mmu.asm 1.1 1996/11/26 21:15:01 schlote Exp schlote $
+** $Id: mc60_mmu.asm 1.2 1997/04/12 13:39:03 schlote Exp schlote $
 **
-** $Log$
 
 	machine	68060
 	near
@@ -19,7 +18,7 @@
 	include	"mc60_libbase.i"
 
 	section          mmu_code,code
-MYDEBUG	SET              1
+MYDEBUG	SET              0
 DEBUG_DETAIL 	set 	10
 
 
@@ -47,8 +46,7 @@ _SetMMUTables:
 
 	ORI.W	#$0700,SR	; Stop IRqs
 	PFLUSHA                                 ;
-	CPUSHA           DC
-	CINVA	DC
+	CPUSHA           BC
 	MOVE.L	(A0)+,D0
 	MOVEC	D0,URP	;SetUserRootPtr
 	NOP
@@ -60,10 +58,10 @@ _SetMMUTables:
                         NOP
  	PFLUSHA		;MC68040
 
-*	TTDISABLE	ITT0,d0                ;Disable all transparent translation
-*	TTDISABLE	ITT1,d1
-*	TTDISABLE	DTT0,d2
-*	TTDISABLE	DTT1,d3
+	TTDISABLE	ITT0,d0                ;Disable all transparent translation
+	TTDISABLE	ITT1,d1
+	TTDISABLE	DTT0,d2
+	TTDISABLE	DTT1,d3
 	DBUG	10,'\t\tITT0: %08lx,ITT1: %08lx,DTT0: %08lx, DTT0: %08lx\n',d0,d1,d2,d3
 
 	MOVEM.L          (sp)+,d0-d7/a0-a6
