@@ -8,7 +8,7 @@
 **-------------------------------------------------------------------------------
 ** ALL RIGHTS ON THIS SOURCES RESERVED TO SILICON DEPARTMENT SOFTWARE
 **
-** $Id: mc60_mmu.asm 1.4 1997/04/14 23:00:04 schlote Exp schlote $
+** $Id: mc60_mmu.asm 1.5 1997/04/14 23:06:35 schlote Exp schlote $
 **
 
 	machine	68060
@@ -30,7 +30,7 @@ DEBUG_DETAIL 	set 	10
 **
 ** Load CPU Ctrl Regs with MMU Parameters.
 
-TTDISABLE	MACRO	
+TTDISABLE	MACRO
 	movec.l          \1,\2
 	bclr.l	#15,\2
 	movec.l	\2,\1
@@ -75,10 +75,7 @@ _SetMMUTables:
 ** following code ripped from 68040.library
 
 	XDEF	_CheckMMU
-_CheckMMU:
-	MOVEM.L          d0-d7/a0-a6,-(sp)
-
-	DBUG	10,'\t\tInstall Data Translation : '
+_CheckMMU:	DBUG	10,'\t\tInstall Data Translation : '
 
 	MOVEC	DTT1,D1	;transparent data set to nocache, precise
 	AND.B	#$9F,D1
@@ -104,9 +101,7 @@ _CheckMMU:
 .is_set:	AND.W	#$F000,D1
 	MOVE.L	D1,D0
 
-.no_MMU:
-	MOVEM.L          (sp)+,d0-d7/a0-a6
-	RTE
+.no_MMU:	RTE
 
 	end
 
