@@ -7,7 +7,7 @@
 **-------------------------------------------------------------------------------
 ** ALL RIGHTS ON THIS SOURCES RESERVED TO SILICON DEPARTMENT SOFTWARE
 **
-** $Id: 68060.library.asm,v 1.4 1996/06/09 20:29:50 schlote Exp schlote $
+** $Id: 68060.library.asm,v 1.5 1996/06/09 21:16:18 schlote Exp schlote $
 **
 **
 	include	68060.library.i
@@ -416,8 +416,7 @@ _060_real_fpu_disabled:
 ; The sample code below simply executes an "rte".
 ;
 _060_real_trap:	RTE
-_060_real_trace:	RTE
-_060_real_access:	RTE
+
 
 ; --------------------------------------------------------------
 
@@ -656,10 +655,6 @@ _060_real_unlock_page:
 	RTS
 
 
-_060_real_trace2:	RTE
-
-_060_real_access2:	RTE
-
 
 * ----------------------------------------------------------
 
@@ -676,8 +671,8 @@ _060_isp_cas_restart:	BRA.L	_isp+(7*8)
 
 _I_CALL_TOP:	dc.l	_060_real_chk		- _I_CALL_TOP
 	dc.l	_060_real_divbyzero	- _I_CALL_TOP
-	dc.l	_060_real_trace2	- _I_CALL_TOP
-	dc.l	_060_real_access2	- _I_CALL_TOP
+	dc.l	_060_real_trace	- _I_CALL_TOP
+	dc.l	_060_real_access	- _I_CALL_TOP
 	dc.l	_060_isp_done		- _I_CALL_TOP
 	dc.l	_060_real_cas		- _I_CALL_TOP
 	dc.l	_060_real_cas2		- _I_CALL_TOP
@@ -710,6 +705,21 @@ _isp:	include 	"isp.sa"
 *-------------------------------------------------------------------------------------------------------------
 *-------------------------------------------------------------------------------------------------------------
 
+*	section	memlib,data
+*--------------------------------------------------------
+*
+* Each IO routine checks to see if the memory write/read is to/from user
+* or supervisor application space. The examples below use simple "move"
+* instructions for supervisor mode applications and call _copyin()/_copyout()
+* for user mode applications.
+* When installing the 060SP, the _copyin()/_copyout() equivalents for a
+* given operating system should be substituted.
+*
+* The addresses within the 060SP are guaranteed to be on the stack.
+* The result is that Unix processes are allowed to sleep as a consequence
+* of a page fault during a _copyout.
+*
+
 Install_Mem_Library:
 	LEA	(_060_imem_read,PC),A0
 	MOVE.L	A0,($007A,A6)
@@ -738,13 +748,40 @@ Install_Mem_Library:
 	MOVE.L	A0,($00A6,A6)
 	RTS
 
+*----------------------------------------------------------------------
+*
+* _060_dmem_write():
+*
+* Writes to data memory while in supervisor mode.
+*
+* INPUTS:
+*	a0 - supervisor source address
+*	a1 - user destination address
+*	d0 - number of bytes to write
+* 	0x4(%a6),bit5 - 1 = supervisor mode, 0 = user mode
+* OUTPUTS:
+*	d1 - 0 = success, !0 = failure
+*
 _060_dmem_write:	MOVE.L	A6,-(SP)
 	MOVEA.L	(4).W,A6
 	JSR	(_LVOCopyMem,A6)
 	MOVEA.L	(SP)+,A6
 	MOVEQ	#0,D1
 	RTS
-
+*----------------------------------------------------------------------
+*
+* _060_imem_read(), _060_dmem_read():
+*
+* Reads from data/instruction memory while in supervisor mode.
+*
+* INPUTS:
+*	a0 - user source address
+*	a1 - supervisor destination address
+*	d0 - number of bytes to read
+* 	0x4(%a6),bit5 - 1 = supervisor mode, 0 = user mode
+* OUTPUTS:
+*	d1 - 0 = success, !0 = failure
+*
 _060_imem_read:
 _060_dmem_read:
 	MOVE.L	A6,-(SP)
@@ -753,52 +790,177 @@ _060_dmem_read:
 	MOVEA.L	(SP)+,A6
 	MOVEQ	#0,D1
 	RTS
-
+*----------------------------------------------------------------------
+*
+* _060_dmem_read_byte():
+*
+* Read a data byte from user memory.
+*
+* INPUTS:
+*	a0 - user source address
+* 	0x4(%a6),bit5 - 1 = supervisor mode, 0 = user mode
+* OUTPUTS:
+*	d0 - data byte in d0
+*	d1 - 0 = success, !0 = failure
+*
 _060_dmem_read_byte:
 	MOVEQ	#0,D0
 	MOVE.B	(A0),D0
 	MOVEQ	#0,D1
 	RTS
-
+*----------------------------------------------------------------------
+*
+* _060_dmem_read_word():
+*
+* Read a data word from user memory.
+*
+* INPUTS:
+*	a0 - user source address
+* 	0x4(%a6),bit5 - 1 = supervisor mode, 0 = user mode
+* OUTPUTS:
+*	d0 - data word in d0
+*	d1 - 0 = success, !0 = failure
+*
 _060_dmem_read_word:
 	MOVEQ	#0,D0
 	MOVE.W	(A0),D0
 	MOVEQ	#0,D1
 	RTS
+*----------------------------------------------------------------------
+*
+* _060_dmem_read_long():
+*
 
+*
+* INPUTS:
+*	a0 - user source address
+* 	0x4(%a6),bit5 - 1 = supervisor mode, 0 = user mode
+* OUTPUTS:
+*	d0 - data longword in d0
+*	d1 - 0 = success, !0 = failure
+*
 _060_dmem_read_long:
 	MOVE.L	(A0),D0
 	MOVEQ	#0,D1
 	RTS
-
+*----------------------------------------------------------------------
+*
+* _060_dmem_write_byte():
+*
+* Write a data byte to user memory.
+*
+* INPUTS:
+*	a0 - user destination address
+* 	d0 - data byte in d0
+* 	0x4(%a6),bit5 - 1 = supervisor mode, 0 = user mode
+* OUTPUTS:
+*	d1 - 0 = success, !0 = failure
+*
 _060_dmem_write_byte:
 	MOVE.B	D0,(A0)
 	MOVEQ	#0,D1
 	RTS
-
+*----------------------------------------------------------------------
+*
+* _060_dmem_write_word():
+*
+* Write a data word to user memory.
+*
+* INPUTS:
+*	a0 - user destination address
+* 	d0 - data word in d0
+* 	0x4(%a6),bit5 - 1 = supervisor mode, 0 = user mode
+* OUTPUTS:
+*	d1 - 0 = success, !0 = failure
+*
 _060_dmem_write_word:
 	MOVE.W	D0,(A0)
 	MOVEQ	#0,D1
 	RTS
-
+*----------------------------------------------------------------------
+*
+* _060_dmem_write_long():
+*
+* Write a data longword to user memory.
+*
+* INPUTS:
+*	a0 - user destination address
+* 	d0 - data longword in d0
+* 	0x4(%a6),bit5 - 1 = supervisor mode, 0 = user mode
+* OUTPUTS:
+*	d1 - 0 = success, !0 = failure
+*
 _060_dmem_write_long:
 	MOVE.L	D0,(A0)
 	MOVEQ	#0,D1
 	RTS
-
+*----------------------------------------------------------------------
+*
+* _060_imem_read_word():
+*
+* Read an instruction word from user memory.
+*
+* INPUTS:
+*	a0 - user source address
+* 	0x4(%a6),bit5 - 1 = supervisor mode, 0 = user mode
+* OUTPUTS:
+*	d0 - instruction word in d0
+*	d1 - 0 = success, !0 = failure
+*
 _060_imem_read_word:
 	MOVE.W	(A0),D0
 	MOVEQ	#0,D1
 	RTS
-
+*----------------------------------------------------------------------
+*
+* _060_imem_read_long():
+*
+* Read an instruction longword from user memory.
+*
+* INPUTS:
+*	a0 - user source address
+* 	0x4(%a6),bit5 - 1 = supervisor mode, 0 = user mode
+* OUTPUTS:
+*	d0 - instruction longword in d0
+*	d1 - 0 = success, !0 = failure
+*
 _060_imem_read_long:
 	MOVE.L	(A0),D0
 	MOVEQ	#0,D1
 	RTS
+*----------------------------------------------------------------------
+*
+* _060_real_trace():
+*
+* This is the exit point for the 060FPSP when an instruction is being traced
+* and there are no other higher priority exceptions pending for this instruction
+* or they have already been processed.
+*
+* The sample code below simply executes an "rte".
+*
+_060_real_trace:	RTE
+*----------------------------------------------------------------------
+*
+* _060_real_access():
+*
+* This is the exit point for the 060FPSP when an access error exception
+* is encountered. The routine below should point to the operating system
+* handler for access error exceptions. The exception stack frame is an
+* 8-word access error frame.
+*
+* The sample routine below simply executes an "rte" instruction which
+* is most likely the incorrect thing to do and could put the system
+* into an infinite loop.
+*
+_060_real_access:	RTE
 
-_060_real_trace3:	RTE
 
-_060_real_access3:	RTE
+*-------------------------------------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------------------------------------
 
 
 ; --------------------------------------------------------------------------
