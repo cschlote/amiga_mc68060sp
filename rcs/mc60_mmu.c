@@ -7,7 +7,7 @@
 **--------------------------------------------------------------------------------
 ** ALL RIGHTS ON THIS SOURCES RESERVED TO SILICON DEPARTMENT SOFTWARE
 **
-** $Id: mc60_build.c 1.3 1997/04/14 23:00:04 schlote Exp schlote $
+** $Id: mc60_build.c 1.4 1997/04/14 23:06:35 schlote Exp schlote $
 **
 **--------------------------------------------------------------------------------
 */
@@ -268,7 +268,7 @@ ULONG spage, epage;				// Start 1k Memory Page
 ULONG size;							// Entries needed
 struct mc60_nc *nc;				// Ptr to Segment
 
-	D2(bug("\tAllocate Nestcount\n"));
+	D(bug("\tAllocate Nestcount:"));
 	if (fptr)
 	{
 		spage = (lower & ~0xfff) >> 12;			// Get start und end page number
@@ -282,6 +282,8 @@ struct mc60_nc *nc;				// Ptr to Segment
       	nc->nc_Low = spage;						// Add Segment to List
       	nc->nc_High = epage;
          AddTail( (struct List*)&fptr->mmu_NestCounts, (struct Node*)nc );
+
+			D(bug(" (%08lx):%08lx, %08lx\n",nc, nc->nc_Low, nc->nc_High));
       }
 	}
    return fptr;
@@ -339,7 +341,7 @@ ULONG i,ready=FALSE;
 			//** Now create default registers for URP,SRP, TCR
 
          fptr->mmu_TCR = 0x8008;
-         fptr->mmu_URP = fptr->mmu_SRP = fptr->mmu_RootTable;
+         fptr->mmu_URP = fptr->mmu_SRP = (ULONG)fptr->mmu_RootTable;
 
          //** Special Setup for 060er
 
@@ -428,7 +430,7 @@ struct mc60_mmu *fptr;       	// Ptr to MMUFrame, it's our tag ptr
 															 (ULONG)memhdr->mh_Upper -
             	                               (ULONG)memhdr->mh_Lower,
 															pagemode );
-			if ( pagemode == 0x40 )
+			if ( pagemode == 0x20 )
    	      fptr = CreateNestCount(fptr,(ULONG)memhdr->mh_Lower,(ULONG)memhdr->mh_Upper);
    	}
    	Permit();

@@ -8,7 +8,7 @@
 **-------------------------------------------------------------------------------
 ** ALL RIGHTS ON THIS SOURCES RESERVED TO SILICON DEPARTMENT SOFTWARE
 **
-** $Id: mc60_mmu.asm 1.5 1997/04/14 23:06:35 schlote Exp schlote $
+** $Id: mc60_mmu.asm 1.6 1997/04/15 02:33:50 schlote Exp schlote $
 **
 
 	machine	68060
@@ -19,7 +19,109 @@
 
 	section          mmu_code,code
 MYDEBUG	SET              0
-DEBUG_DETAIL 	set 	10
+DEBUG_DETAIL 	set              10
+
+**-------------------------------------------------------------------------------
+
+	XDEF	_GetVBR
+_GetVBR:	MOVEC	VBR,D0
+	DBUG	10,"VBR is set to %08lx\n",d0
+	RTE
+
+
+	XDEF	_SetVBR
+_SetVBR:	DBUG	10,"VBR is set to %08lx\n",d0
+	MOVEC	D0,VBR
+	RTE
+
+*-----------------------------------------------------------------------------
+
+CACRB_ESB	= 29	;@@@@@@@@@@ Make a header
+CACRB_CABC	= 22
+CACRB_EBC	= 23
+PCRB_ESS	= 0
+
+	XDEF	_EnableCaches
+_EnableCaches:
+	ORI.W	#700,SR	; Stop all
+	CPUSHA	BC	; Invalidate all Caches
+
+	movec.l	VBR,a1                	; patch bpe grap
+	move.l	2*4(a1),Old_AccessFault
+	Lea	(New_AccessFault,pc),a0
+ 	move.l  	a0,2*4(a1)
+ 	move.l	a0,(2*4).w
+
+	MOVEC	CACR,D0	; Get CACR from CPU
+	BSET	#CACRB_CABC,D0	; Flush Branch Cache on set PCR !
+	MOVEC	D0,CACR	; Now store it back to CACR
+	BSET	#CACRB_ESB,D0	; Enable store buffer to optimize
+	BSET	#CACRB_EBC,D0	; Enable Branch Pred. Cache
+	MOVEC	D0,CACR	; Now store it back to CACR
+	NOP		; Stall pipe
+
+	MOVEC	PCR,D1	; Enable Superscalar Mode
+	BSET	#PCRB_ESS,D1
+	MOVEC	d1,PCR
+	NOP		; Stall pipe - now things are
+                                                                ; really set. go on and have fun...
+
+	DBUG	10,"\t\tCache Regs set to: CACR=$%08lx, PCR=$%08lx\n",d0,d1
+	RTE
+
+; --------------------------------------------------------------------------
+
+Old_AccessFault:	dc.l	0
+New_AccessFault:	DBUG	5,"Exception AccessFault!!!\n"
+	BTST	#2,(12+3,SP)		; BPE ?
+	BNE.B	New_AccessFault_BranchPredictionError
+	MOVE.L	(Old_AccessFault,PC),-(sp)
+	RTS
+
+
+New_AccessFault_BranchPredictionError:
+	DBUG	5,"Flush Branch Cache\n"
+
+	MOVE.L	D0,-(SP)
+	CPUSHA	BC
+	NOP
+	MOVEC	CACR,D0
+	bset	#CACRB_CABC,D0	; CABC
+	MOVEC	D0,CACR
+	NOP
+	CPUSHA	BC
+	NOP
+	MOVE.L	(SP)+,D0
+	RTE
+
+
+
+*----------------------------------------------------------------------------------------------------
+*----------------------------------------------------------------------------------------------------
+*
+* Flush Data Lines at (a0)-(16,a0)
+*
+
+**
+**	XDEF	_FlushLines
+**_FlushLines:
+**	MOVEM.L	A5/A6,-(SP)
+**	LEA	(FlushMMU_Trap,PC),A5
+**	MOVEA.L	(mc60_SysBase,A6),A6
+**	JSR	(_LVOSupervisor,A6)
+**	MOVEM.L	(SP)+,A5/A6
+**	RTS
+**
+**FlushMMU_Trap:	CPUSHL	DC,(A0)
+**	LEA	($0010,A0),A0
+**	CPUSHL	DC,(A0)
+**	PFLUSHA		;Invalidate ATCs
+**	RTE
+**
+**
+
+
+
 
 
 **-------------------------------------------------------------------------------
