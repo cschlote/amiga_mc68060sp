@@ -5,7 +5,7 @@
 #    \|| |_)|)   Carsten Schlote         Egelseeweg 52     35423 Lich
 # \__/||_/\_|     Branko Mikiç            Limmerstrasse 10   30451 Hannover
 #-----------------------------------------------------------------------------
-# $Id: Makefile,v 1.20 1996/02/16 13:06:18 schlote Exp $
+# $Id: Makefile 1.1 1996/02/19 23:20:34 schlote Exp schlote $
 #-----------------------------------------------------------------------------
 #---- Default Regeln
 #-----------------------------------------------------------------------------
@@ -28,7 +28,7 @@ all : doku isp
 
 #-----------------------------------------------------------------------------
 
-DOKU_FILES = Makefile ReadMe changes errata misc
+DOKU_FILES = Makefile ReadMe changes errata misc test.doc
 
 doku:
 	ci -q -l -m"Changes" $(DOKU_FILES)
