@@ -7,7 +7,7 @@
 **-------------------------------------------------------------------------------
 ** ALL RIGHTS ON THIS SOURCES RESERVED TO SILICON DEPARTMENT SOFTWARE
 **
-** $Id: 68060.library.asm,v 1.8 1996/06/09 22:21:37 schlote Exp schlote $
+** $Id: 68060.library.asm,v 1.9 1996/06/09 22:23:48 schlote Exp schlote $
 **
 **
 	include	68060.library.i
@@ -1061,6 +1061,7 @@ Install_Exec_Patches:
 	LEA	(OldBeginIO,PC),A0
 	MOVE.L	D0,(A0)
 
+
 NoINDPatch:	MOVEA.L	A2,A6
 	MOVEA.L	($0044,A6),A0	;_buildMMU
 	JSR	(A0)
@@ -1142,16 +1143,19 @@ NewSupervisor_Start:
 	RTS
 
 ; --------------------------------------------------------------------------
-NewBusError:	BTST	#2,(15,SP)
-	BNE.B	NewBusError_BranchPredictionError
-	RTE
 
-;fiX Label expected
-	NOP
+
+
+NewBusError:	BTST	#2,(12+3,SP)		; BPE ?
+	BNE.B	NewBusError_BranchPredictionError
+*	RTE
+OldBusError:            *+2		; BAD CODE :-( But quick
+	jmp              0
+
 NewBusError_BranchPredictionError:
 	MOVE.L	D0,-(SP)
 	MOVEC	CACR,D0
-	ORI.L	#$00400000,D0
+	bset	#22,D0	; CABC
 	MOVEC	D0,CACR
 	MOVE.L	(SP)+,D0
 	RTE
@@ -1497,13 +1501,19 @@ Install_Dispatcher:	MOVEM.L	D0-D7/A0-A6,-(SP)
 	TST.L	D0
 	BEQ.B	.vbrmoved
 
+
 	SUBA.L	A0,A0
 	MOVEA.L	D0,A1
-	MOVE.W	#$00FF,D0
+	MOVE.W	#$00FF,D1
 .copyvbr:	MOVE.L	(A0)+,(A1)+
-	DBRA	D0,.copyvbr
+	DBRA	D1,.copyvbr
 
-.vbrmoved:	LEA	(Install_Tasks,PC),A5
+.vbrmoved:
+                        move.l	d0,a1                      ; patch bpe grap
+                        move.l	2*4(a1),OldBusError
+                        move.l           #NewBusError,2*4(a1)
+
+	LEA	(Install_Tasks,PC),A5
 	JSR	(_LVOSupervisor,A6)
 Install_Dispatcher_Quit:
 	JSR	(_LVOEnable,A6)
