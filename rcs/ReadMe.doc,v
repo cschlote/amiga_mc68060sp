@@ -1,0 +1,151 @@
+head	1.0;
+branch	1.0.1;
+access;
+symbols;
+locks
+	schlote:1.0.1.2; strict;
+comment	@# @;
+
+
+1.0
+date	96.02.19.21.52.03;	author schlote;	state Exp;
+branches
+	1.0.1.1;
+next	;
+
+1.0.1.1
+date	96.02.19.21.57.23;	author schlote;	state Exp;
+branches;
+next	1.0.1.2;
+
+1.0.1.2
+date	96.02.19.22.02.21;	author schlote;	state Exp;
+branches;
+next	;
+
+
+desc
+@Integer Exeception Software Package
+Motorola Release 1.01 vom 7-Okt-1994
+Release Dokumentation
+@
+
+
+1.0
+log
+@Initial revision
+@
+text
+@Files in this directory:
+-------------------------
+
+fpsp.sa		Full FP Kernel Module - hex image
+fpsp.s		Full FP Kernel Module - source code
+fpsp.doc	Full FP Kernel Module - on-line documentation
+
+pfpsp.sa	Partial FP Kernel Module - hex image
+pfpsp.s		Partial FP Kernel Module - source code
+
+fplsp.sa	FP Library Module - hex image
+fplsp.s		FP Library Module - source code
+fplsp.doc	FP Library Module - on-line documentation
+
+isp.sa		Integer Unimplemented Kernel Module - hex image
+isp.s		Integer Unimplemented Kernel Module - source code
+isp.doc		Integer Unimplemented Kernel Module - on-line doc
+
+ilsp.sa		Integer Unimplemented Library Module - hex image
+ilsp.s		Integer Unimplemented Library Module - source code
+ilsp.doc	Integer Unimplemented Library Module - on-line doc
+
+fskeleton.s	Sample Call-outs needed by fpsp.sa and pfpsp.sa
+
+iskeleton.s	Sample Call-outs needed by isp.sa
+
+os.s		Sample Call-outs needed by fpsp.sa, pfpsp.sa, and isp.sa
+
+ftest.sa	Simple test program to test that {p}fpsp.sa
+		was connected properly; hex image
+ftest.s		above test; source code
+
+itest.sa	Simple test program to test that isp.sa was
+		connected properly; hex image
+itest.s		above test; source code
+
+test.doc	on-line documentation for {i,f}test.sa
+
+README		This file
+
+ERRATA		Known errata for this release
+
+MISC		Release file version numbers
+@
+
+
+1.0.1.1
+log
+@Removed PC Crap -> using ISO latin-1
+@
+text
+@d1 43
+a43 44
+Files in this directory:
+-------------------------
+
+fpsp.sa		Full FP Kernel Module - hex image
+fpsp.s		Full FP Kernel Module - source code
+fpsp.doc	Full FP Kernel Module - on-line documentation
+
+pfpsp.sa	Partial FP Kernel Module - hex image
+pfpsp.s		Partial FP Kernel Module - source code
+
+fplsp.sa	FP Library Module - hex image
+fplsp.s		FP Library Module - source code
+fplsp.doc	FP Library Module - on-line documentation
+
+isp.sa		Integer Unimplemented Kernel Module - hex image
+isp.s		Integer Unimplemented Kernel Module - source code
+isp.doc		Integer Unimplemented Kernel Module - on-line doc
+
+ilsp.sa		Integer Unimplemented Library Module - hex image
+ilsp.s		Integer Unimplemented Library Module - source code
+ilsp.doc	Integer Unimplemented Library Module - on-line doc
+
+fskeleton.s	Sample Call-outs needed by fpsp.sa and pfpsp.sa
+
+iskeleton.s	Sample Call-outs needed by isp.sa
+
+os.s		Sample Call-outs needed by fpsp.sa, pfpsp.sa, and isp.sa
+
+ftest.sa	Simple test program to test that {p}fpsp.sa
+		was connected properly; hex image
+ftest.s		above test; source code
+
+itest.sa	Simple test program to test that isp.sa was
+		connected properly; hex image
+itest.s		above test; source code
+
+test.doc	on-line documentation for {i,f}test.sa
+
+README		This file
+
+ERRATA		Known errata for this release
+
+MISC		Release file version numbers
+
+@
+
+
+1.0.1.2
+log
+@Additions for Amiga RCS branch
+@
+text
+@d1 2
+a2 5
+
+$Id: readme,v 1.2 1996/02/15 15:19:26 schlote Exp $
+
+Files in this directory for original release 1.01:
+---------------------------------------------------
+@
