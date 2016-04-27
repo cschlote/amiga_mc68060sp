@@ -6,7 +6,6 @@
 ** See      http://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
 **-----------------------------------------------------------------------------
 
-
 	machine	68060
 	near
 

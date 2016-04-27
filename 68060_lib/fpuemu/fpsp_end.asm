@@ -10,7 +10,6 @@
 *
 * Use PhxAss (AmiNet) to compile.
 *
-* ALL RIGHTS RESERVED BY CARSTEN SCHLOTE, COENOBIUM DEVELOPMENTS
 *
 **------------------------------------------------------------------------------------------------------
 	NOLIST
