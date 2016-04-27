@@ -1,0 +1,18 @@
+
+/*-------------------------------------------------------------------------------
+**  /\  |\     Silicon Department      Telefax     06404-64760
+**  \_ o| \_ _  Software Entwicklung    Telefon        06404-7996
+**    \|| |_)|)   Carsten Schlote         Egelseeweg 52     35423 Lich
+** \__/||_/\_|     Branko Mikiç            Limmerstrasse 10   30451 Hannover
+**------------------------------------------------------------------------------*/
+
+$Id: errata 1.0.1.2 1996/02/19 22:02:21 schlote Exp schlote $
+
+
+-	Fix address decoding for ISP - untested
+
+
+68060 Software Package Errata	As of 7 October 1994
+------------------------------
+
+No known errata for this release.
