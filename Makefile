@@ -1,11 +1,13 @@
 
 #-----------------------------------------------------------------------------
-#  /\  |\     Silicon Department      Telefax     06404-64760
-#  \_ o| \_ _  Software Entwicklung    Telefon        06404-7996
-#    \|| |_)|)   Carsten Schlote         Egelseeweg 52     35423 Lich
-# \__/||_/\_|     Branko Mikiç            Limmerstrasse 10   30451 Hannover
+#  /\    |\     Silicon Department     
+#  \_  o| \_ _  Software Entwicklung
+#     \||  |_)|)   Copyright by Carsten Schlote, 1990-2016
+# \__/||_/\_|     Released under CC-BY-NC-SA 4.0 license in 2016
+# See      http://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
 #-----------------------------------------------------------------------------
-# $Id: Makefile 1.2 1996/02/19 23:22:11 schlote Exp schlote $
+
+
 #-----------------------------------------------------------------------------
 #---- Default Regeln
 #-----------------------------------------------------------------------------

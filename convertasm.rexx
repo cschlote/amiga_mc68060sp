@@ -1,15 +1,12 @@
 /*
+**-----------------------------------------------------------------------------
+**  /\    |\     Silicon Department     
+**  \_  o| \_ _  Software Entwicklung
+**     \||  |_)|)   Copyright by Branko Mikic, 1996
+** \__/||_/\_|     Released under CC-BY-NC-SA 4.0 license in 2016
+** See      http://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+**-----------------------------------------------------------------------------
 
-***************************************************************************
-*      _                                                                  *
-*     (_ ·|· _ _             Carsten Schlote         Branko Mikic         *
-*     __)lll(_(_)|\|         Egelseeweg 52           Limmerstr.10         *
-* ----------------------     35423 Lich              30451 Hannover       *
-* S  o  l  u  t  i  o  n                                                  *
-* Software   Development     Telefax 06404-64760     Telefon 0511-440662  *
-*                            Telefon 06404-7996      Telefon 0511-9245416 *
-*                                                                         *
-***************************************************************************
 
 	$VER: convertasm.rexx V1.0 (17.4.96)
 
@@ -37,7 +34,6 @@
 
 	Written in ARexx by Branko Mikiç
 	for Silicon Solution (C) 1996
-
 */
 
 TRACE off

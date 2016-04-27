@@ -1,16 +1,11 @@
+**-----------------------------------------------------------------------------
+**  /\    |\     Silicon Department     
+**  \_  o| \_ _  Software Entwicklung
+**     \||  |_)|)   Copyright by Carsten Schlote, 1990-2016
+** \__/||_/\_|     Released under CC-BY-NC-SA 4.0 license in 2016
+** See      http://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+**-----------------------------------------------------------------------------
 
-
-**-------------------------------------------------------------------------------
-**  /\  |\     Silicon Department         Telefax             06404-64760
-**  \_ o| \_ _  Software Entwicklung      Telefon             06404-7996
-**    \|| |_)|)   Carsten Schlote         Oberstedter Str 1   35423 Lich
-** \__/||_/\_|     Branko Mikiç           Elisenstr 10        30451 Hannover
-**-------------------------------------------------------------------------------
-** ALL RIGHTS ON THIS SOURCES RESERVED TO SILICON DEPARTMENT SOFTWARE
-**
-** $Id: mc60_patches.asm 1.7 1997/04/15 02:58:40 schlote Release schlote $
-**
-**
 	machine	68060
 	near
 

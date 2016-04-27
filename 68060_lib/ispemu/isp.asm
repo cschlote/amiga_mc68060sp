@@ -1,13 +1,11 @@
+**-----------------------------------------------------------------------------
+**  /\    |\     Silicon Department     
+**  \_  o| \_ _  Software Entwicklung
+**     \||  |_)|)   Copyright by Carsten Schlote, 1990-2016
+** \__/||_/\_|     Released under CC-BY-NC-SA 4.0 license in 2016
+** See      http://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+**-----------------------------------------------------------------------------
 
-**------------------------------------------------------------------------------------------------------
-**  /\  |\     Silicon Department      Telefax     06404-64760
-**  \_ o| \_ _  Software Entwicklung    Telefon        06404-7996
-**    \|| |_)|)   Carsten Schlote         Egelseeweg 52     35423 Lich
-** \__/||_/\_|     Branko Mikiç            Limmerstrasse 10   30451 Hannover
-**------------------------------------------------------------------------------------------------------
-*
-* $Id: isp.asm,v 1.0.1.23 1997/04/21 19:27:14 schlote Exp schlote $
-*
 * This file is derived from the isp.asm,v 1.0.1.4 1996/02/19 23:02:26
 *
 * Use PhxAss (AmiNet) to compile.
